@@ -13,6 +13,17 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    int ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int tmp;
+        cin >> tmp;
+        if (tmp == 1 || tmp == 3)
+            ans++;
+    }
+    cout << ans << "\n";
 }
 
 int main()

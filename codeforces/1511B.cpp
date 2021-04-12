@@ -13,6 +13,20 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int a, b, c;
+    cin >> a >> b >> c;
+    int z = pow(10, c - 1);
+    int x = z;
+    int y = z;
+    while (to_string(x).length() < a)
+    {
+        x *= 2;
+    }
+    while (to_string(y).length() < b)
+    {
+        y *= 3;
+    }
+    cout << x << " " << y << "\n";
 }
 
 int main()
