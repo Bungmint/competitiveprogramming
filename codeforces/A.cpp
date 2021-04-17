@@ -18,6 +18,23 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> odd, even;
+    for (int i = 0; i < n; i++)
+    {
+        int tmp;
+        cin >> tmp;
+        if (tmp % 2 == 0)
+            even.PB(tmp);
+        else
+            odd.PB(tmp);
+    }
+    for (auto x : even)
+        cout << x << " ";
+    for (auto x : odd)
+        cout << x << " ";
+    cout << "\n";
 }
 
 int main()

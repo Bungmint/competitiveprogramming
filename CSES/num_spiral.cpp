@@ -1,12 +1,8 @@
 //#pragma GCC optimize("O3")
 //#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
+
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -18,6 +14,30 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    ll y, x;
+    cin >> y >> x;
+    if (y >= x)
+    {
+        if ((y - 1) % 2 == 0)
+        {
+            cout << (y - 1) * (y - 1) + x << "\n";
+        }
+        else
+        {
+            cout << y * y - x + 1 << "\n";
+        }
+    }
+    else
+    {
+        if ((x - 1) % 2 == 0)
+        {
+            cout << x * x - y + 1 << "\n";
+        }
+        else
+        {
+            cout << (x - 1) * (x - 1) + y << "\n";
+        }
+    }
 }
 
 int main()
@@ -30,7 +50,4 @@ int main()
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

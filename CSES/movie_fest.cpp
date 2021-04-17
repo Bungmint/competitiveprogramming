@@ -18,18 +18,34 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<pair<int, int>> vec(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vec[i].first >> vec[i].second;
+    }
+    sort(all(vec), [](pair<int, int> x, pair<int, int> y) {
+        return x.second < y.second;
+    });
+    int ans = 0;
+    int prev_end = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (prev_end <= vec[i].first)
+        {
+            ans++;
+            prev_end = vec[i].second;
+        }
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

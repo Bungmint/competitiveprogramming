@@ -18,6 +18,43 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n, ts = 0, ms = 0;
+    vector<int> t_idx, m_idx;
+    cin >> n;
+    string s;
+    cin >> s;
+    bool is_pos = true;
+    for (int i = 0; i < n; i++)
+    {
+        if (s[i] == 'T')
+        {
+            t_idx.PB(i);
+            ts++;
+        }
+        else
+        {
+            ms++;
+            m_idx.PB(i);
+        }
+    }
+    if (ts != ms * 2)
+        is_pos = false;
+    else
+    {
+        for (int i = 0; i < n / 3; i++)
+        {
+            if (t_idx[i] > m_idx[i])
+                is_pos = false;
+            if (t_idx[n / 3 + i] < m_idx[i])
+                is_pos = false;
+        }
+    }
+    if (is_pos)
+        cout << "YES"
+             << "\n";
+    else
+        cout << "NO"
+             << "\n";
 }
 
 int main()

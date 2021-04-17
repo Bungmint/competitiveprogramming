@@ -18,18 +18,24 @@ const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    ll sum = 0, ans = -LINF;
+    for (int i = 0; i < n; i++)
+    {
+        ll tmp;
+        cin >> tmp;
+        sum = max(tmp, sum + tmp);
+        ans = max(ans, sum);
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif
