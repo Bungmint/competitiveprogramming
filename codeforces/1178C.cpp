@@ -31,22 +31,34 @@ struct custom_hash
 using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
+const int MOD = 998244353;
+
+ll mod_pow(ll base, ll exp)
+{
+    if (exp == 0)
+        return 1;
+    if (exp == 1)
+        return base;
+    ll m = mod_pow(base, exp / 2);
+    if (exp % 2 == 0)
+        return ((m * m) % MOD);
+    else
+        return (((m * m) % MOD) * base) % MOD;
+}
 
 void solve()
 {
+    ll h, w;
+    cin >> h >> w;
+    ll ans = (mod_pow(2, h + 1) * mod_pow(2, w - 1)) % MOD;
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

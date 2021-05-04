@@ -32,21 +32,65 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+char mat[50][50];
+bool vis[50][50], cycle = false;
+int offx[4] = {0, 0, -1, 1}, offy[4] = {-1, 1, 0, 0};
+int n, m;
+
+void dfs(int x, int y, int px, int py)
+{
+    if (vis[x][y])
+    {
+        cycle = true;
+        return;
+    }
+    vis[x][y] = true;
+    for (int i = 0; i < 4; i++)
+    {
+        int nxtx = x + offx[i], nxty = y + offy[i];
+        if (nxtx >= n || nxtx < 0 || nxty >= m || nxty < 0)
+            continue;
+        if (nxtx == px && nxty == py)
+            continue;
+        if (mat[nxtx][nxty] != mat[x][y])
+            continue;
+        dfs(nxtx, nxty, x, y);
+    }
+}
 
 void solve()
 {
+    cin >> n >> m;
+    for (int i = 0; i < n; i++)
+    {
+        string s;
+        cin >> s;
+        for (int j = 0; j < m; j++)
+        {
+            mat[i][j] = s[j];
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            if (vis[i][j])
+                continue;
+            dfs(i, j, -1, -1);
+        }
+    }
+    if (cycle)
+        cout << "Yes"
+             << "\n";
+    else
+        cout << "No\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

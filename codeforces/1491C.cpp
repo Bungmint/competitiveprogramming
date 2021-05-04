@@ -8,33 +8,38 @@ using namespace std;
 template <typename T>
 using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
+const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> tramp(n);
+    vector<int> pekora(n);
+    ll ans = 0;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> tramp[i];
+    }
+    for (int i = 0; i < n; i++)
+    {
+        ans += max(tramp[i] - 1 - pekora[i], 0);
+        for (int j = 2; j <= tramp[i]; j++)
+        {
+            if (j + i > n - 1)
+                break;
+            pekora[i + j]++;
+        }
+        if (i < n - 1)
+            pekora[i + 1] += max(0, pekora[i] - tramp[i] + 1);
+    }
+    cout << ans << "\n";
 }
 
 int main()

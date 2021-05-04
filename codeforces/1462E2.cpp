@@ -32,15 +32,70 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int N = 2e5 + 15;
+ll fact[N];
+
+void precalc()
+{
+    for (ll i = 0; i < N; i++)
+    {
+        if (i == 0)
+            fact[i] = 1LL;
+        else
+            fact[i] = (i * fact[i - 1]) % MOD;
+    }
+}
+
+ll mod_pow(ll base, ll exp)
+{
+    if (exp == 0)
+        return 1LL;
+    if (exp == 1)
+        return base;
+    ll m = mod_pow(base, exp / 2);
+    if (exp % 2 == 0)
+        return (m * m) % MOD;
+    return (((m * m) % MOD) * base) % MOD;
+}
+
+ll inv_mod(ll a)
+{
+    return mod_pow(a, MOD - 2);
+}
+
+ll nCk(ll n, ll k)
+{
+    if (n < k)
+        return 0LL;
+    return (((fact[n] * inv_mod(fact[k])) % MOD) * inv_mod(fact[n - k])) % MOD;
+}
 
 void solve()
 {
+    ll n, m, k;
+    cin >> n >> m >> k;
+    vector<int> vec(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vec[i];
+    }
+    sort(all(vec));
+    ll ans = 0LL;
+    for (ll i = 0; i < n; i++)
+    {
+        int targ = vec[i] + k;
+        ll idx = upper_bound(all(vec), targ) - vec.begin();
+        ans += nCk(idx - i - 1LL, m - 1LL);
+        ans %= MOD;
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
+    precalc();
     int t;
     cin >> t;
     while (t--)

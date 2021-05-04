@@ -33,8 +33,33 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
+ll comb(ll a)
+{
+    if (a <= 1)
+        return 0;
+    return a * (a - 1) / 2;
+}
+
 void solve()
 {
+    int n;
+    cin >> n;
+    unordered_map<int, int, custom_hash> map1;
+    for (int i = 0; i < n; i++)
+    {
+        int c;
+        cin >> c;
+        map1[c]++;
+    }
+    ll ans = 0LL;
+    for (int i = 1; i <= n; i++)
+    {
+        if (map1.count(i) == 0)
+            continue;
+        ll cu = map1[i], plus1 = map1[i + 1], plus2 = map1[i + 2];
+        ans += comb(cu) * (plus1 + plus2) + cu * (cu - 1) * (cu - 2) / 6 + comb(plus1) * cu + comb(plus2) * cu + plus1 * plus2 * cu;
+    }
+    cout << ans << "\n";
 }
 
 int main()

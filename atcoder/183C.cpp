@@ -32,21 +32,57 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
-
+int N = 0, n, k;
+vector<int> perm;
+vector<vector<int>> vec;
+bool chosen[10];
+void search()
+{
+    if ((int)perm.size() == n - 1)
+    {
+        int ans = 0;
+        ans += vec[0][perm[0] - 1];
+        ans += vec[perm[n - 2] - 1][0];
+        for (int i = 0; i < n - 2; i++)
+            ans += vec[perm[i] - 1][perm[i + 1] - 1];
+        if (ans == k)
+            N++;
+    }
+    else
+    {
+        for (int i = 2; i <= n; i++)
+        {
+            if (chosen[i])
+                continue;
+            chosen[i] = true;
+            perm.PB(i);
+            search();
+            chosen[i] = false;
+            perm.pop_back();
+        }
+    }
+}
 void solve()
 {
+    cin >> n >> k;
+    memset(chosen, false, sizeof(chosen));
+    vec = vector<vector<int>>(n, vector<int>(n));
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            cin >> vec[i][j];
+        }
+    }
+    search();
+    cout << N << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

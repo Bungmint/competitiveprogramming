@@ -8,6 +8,14 @@ using namespace std;
 template <typename T>
 using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
+#define all(v) (v).begin(), (v).end()
+#define ar array
+#define PB push_back
+using ll = long long;
+const int INF = 1e9;
+const ll LINF = 1e15;
+const int MOD = 1e9 + 7;
+
 struct custom_hash
 {
     static uint64_t splitmix64(uint64_t x)
@@ -25,16 +33,32 @@ struct custom_hash
     }
 };
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
-
 void solve()
 {
+    int n, k;
+    cin >> n >> k;
+    vector<int> p(n), vals(n + 1);
+    for (int i = 0; i < n; i++)
+        cin >> p[i];
+    sort(all(p));
+    int d, maximal = 0LL;
+    for (int i = 0; i <= n; i++)
+    {
+        if (i == 0)
+            d = p[0] - 1;
+        else if (i == n)
+            d = k - p[n - 1];
+        else
+            d = p[i] - p[i - 1];
+        maximal = max(maximal, d - 1);
+        if (i != 0 && i != n)
+            vals[i] = d / 2;
+        else
+            vals[i] = d;
+    }
+    sort(all(vals));
+    maximal = max(maximal, vals[n] + vals[n - 1]);
+    cout << setprecision(10) << (long double)maximal / (long double)k << "\n";
 }
 
 int main()
@@ -43,8 +67,9 @@ int main()
     cin.tie(0), cout.tie(0);
     int t;
     cin >> t;
-    while (t--)
+    for (int i = 1; i <= t; i++)
     {
+        cout << "CASE #" << i << ": ";
         solve();
     }
 #ifdef LOCAL

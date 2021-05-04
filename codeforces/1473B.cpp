@@ -16,19 +16,29 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7;
 
-void solve(int t)
+void solve()
 {
-    ll ans = 0;
-    map<int, ll> pr;
-    int m;
-    for (int i = 0; i < m; i++)
+    string s, t;
+    cin >> s >> t;
+    if (s.length() > t.length())
+        swap(s, t);
+    int slen = s.length(), tlen = t.length();
+    int g = gcd(slen, tlen);
+    int total_len = slen * tlen / g;
+    string ans = "";
+    for (int i = 0; i < total_len; i++)
     {
-        ll p, n;
-        cin >> p >> n;
-        pr[p] = n;
+        ans += s[i % (int)s.length()];
     }
-
-    cout << "Case #" << t << ": " << ans;
+    for (int i = 0; i < total_len; i++)
+    {
+        if (ans[i] != s[i % (int)s.length()] || ans[i] != t[i % (int)t.length()])
+        {
+            cout << -1 << "\n";
+            return;
+        }
+    }
+    cout << ans << "\n";
 }
 
 int main()
@@ -37,9 +47,9 @@ int main()
     cin.tie(0), cout.tie(0);
     int t;
     cin >> t;
-    for (int i = 1; i <= t; i++)
+    while (t--)
     {
-        solve(i);
+        solve();
     }
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";

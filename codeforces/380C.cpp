@@ -16,31 +16,15 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
 struct item
 {
+    int brac, open, close;
 };
 
 struct segtree
 {
     int size;
-    item NEUTRAL = {};
+    item NEUTRAL = {0, 0, 0};
     vector<item> vals;
     void init(int n)
     {
@@ -49,47 +33,39 @@ struct segtree
             size *= 2;
         vals.resize(2 * size);
     }
-    item single(int v)
+    item single(char v)
     {
+        if (v == '(')
+        {
+            return {0, 1, 0};
+        }
+        return {0, 0, 1};
     }
     item merge(item a, item b)
     {
+        item res;
+        res.brac = a.brac + b.brac + 2 * min(a.open, b.close);
+        res.open = a.open + b.open - min(a.open, b.close);
+        res.close = a.close + b.close - min(a.open, b.close);
+        return res;
     }
 
-    void build(vector<int> &vec, int x, int l, int r)
+    void build(string &s, int x, int l, int r)
     {
         if (r - l == 1)
         {
-            if (l < (int)vec.size())
-                vals[x] = single(vec[l]);
+            if (l < (int)s.length())
+                vals[x] = single(s[l]);
             return;
         }
         int mid = (l + r) / 2;
-        build(vec, 2 * x + 1, l, mid);
-        build(vec, 2 * x + 2, mid, r);
+        build(s, 2 * x + 1, l, mid);
+        build(s, 2 * x + 2, mid, r);
         vals[x] = merge(vals[2 * x + 1], vals[2 * x + 2]);
     }
-    void build(vector<int> &vec)
+    void build(string &s)
     {
-        build(vec, 0, 0, size);
-    }
-    void set(int i, int v, int x, int l, int r)
-    {
-        if (r - l == 1)
-        {
-            vals[x] = single(v);
-            return;
-        }
-        int mid = (l + r) / 2;
-        if (i < mid)
-            set(i, v, 2 * x + 1, l, mid);
-        else
-            set(i, v, 2 * x + 2, mid, r);
-        vals[x] = merge(vals[2 * x + 1], vals[2 * x + 2]);
-    }
-    void set(int i, int v)
-    {
-        set(i, v, 0, 0, size);
+        build(s, 0, 0, size);
     }
     item query(int l, int r, int x, int lx, int rx)
     {
@@ -110,18 +86,26 @@ struct segtree
 
 void solve()
 {
+    string s;
+    cin >> s;
+    int m;
+    cin >> m;
+    segtree st;
+    st.init((int)s.length());
+    st.build(s);
+    while (m--)
+    {
+        int l, r;
+        cin >> l >> r;
+        cout << st.query(l - 1, r).brac << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

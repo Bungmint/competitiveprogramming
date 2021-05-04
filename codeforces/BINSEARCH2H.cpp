@@ -35,18 +35,38 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    string s;
+    cin >> s;
+    unordered_map<char, ll, custom_hash> b;
+    for (int i = 0; i < (int)s.length(); i++)
+        b[s[i]]++;
+    ll B = b['B'], S = b['S'], C = b['C'];
+    ll acB, acS, acC, priB, priS, priC;
+    cin >> acB >> acS >> acC >> priB >> priS >> priC;
+    ll money;
+    cin >> money;
+    ll l = 0, r = 1e13, ans = 0;
+    while (l <= r)
+    {
+        ll m = l + (r - l) / 2;
+        if (max(0LL, (m * B - acB)) * priB + max(0LL, (m * S - acS)) * priS + max(0LL, (m * C - acC)) * priC <= money)
+        {
+            ans = m;
+            l = m + 1;
+        }
+        else
+        {
+            r = m - 1;
+        }
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

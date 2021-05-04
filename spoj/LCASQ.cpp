@@ -32,21 +32,80 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int N = 10005;
+const int LOG = 20;
+int up[N][LOG];
+int depth[N];
+vector<int> children[N];
+
+void dfs(int V)
+{
+    for (auto c : children[V])
+    {
+        depth[c] = depth[V] + 1;
+        up[c][0] = V;
+        for (int i = 1; i < LOG; i++)
+        {
+            up[c][i] = up[up[c][i - 1]][i - 1];
+        }
+        dfs(c);
+    }
+}
+
+int lca(int a, int b)
+{
+    if (depth[a] < depth[b])
+        swap(a, b);
+    int k = depth[a] - depth[b];
+    for (int j = LOG - 1; j >= 0; j--)
+    {
+        if (k & (1 << j))
+            a = up[a][j];
+    }
+    if (a == b)
+        return a;
+    for (int j = LOG - 1; j >= 0; j--)
+    {
+        if (up[a][j] != up[b][j])
+        {
+            a = up[a][j];
+            b = up[b][j];
+        }
+    }
+    return up[a][0];
+}
 
 void solve()
 {
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++)
+    {
+        int m;
+        cin >> m;
+        while (m--)
+        {
+            int c;
+            cin >> c;
+            children[i].PB(c);
+        }
+    }
+    int q;
+    cin >> q;
+    dfs(0);
+    while (q-- > 0)
+    {
+        int u, v;
+        cin >> u >> v;
+        cout << lca(u, v) << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

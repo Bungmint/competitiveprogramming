@@ -31,22 +31,46 @@ struct custom_hash
 using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
+const int MOD = 1e9 + 7;
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> a(n), res;
+    ll sum = 0LL;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> a[i];
+        sum += a[i];
+    }
+    int alice = a[0];
+    res.PB(1);
+    int total = a[0];
+    for (int i = 1; i < n; i++)
+    {
+        if (alice >= 2 * a[i])
+        {
+            res.PB(i + 1);
+            total += a[i];
+        }
+    }
+    if (total * 2 <= sum)
+        cout << 0 << "\n";
+    else
+    {
+        cout << res.size() << "\n";
+        for (auto x : res)
+            cout << x << " ";
+        cout << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

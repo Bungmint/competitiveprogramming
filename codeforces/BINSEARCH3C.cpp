@@ -32,21 +32,50 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+int n, k;
+vector<int> stalls;
+
+bool good(int x)
+{
+    int c = stalls[0];
+    int cnt = 1;
+    while (cnt < k)
+    {
+        auto it = lower_bound(all(stalls), c + x);
+        if (it == stalls.end())
+            break;
+        c = *it;
+        cnt++;
+    }
+    return cnt == k;
+}
 
 void solve()
 {
+    cin >> n >> k;
+    stalls.resize(n);
+    for (int i = 0; i < n; i++)
+        cin >> stalls[i];
+    int l = 1, r = 1e9, ans = 1;
+    while (l <= r)
+    {
+        int m = l + (r - l) / 2;
+        if (good(m))
+        {
+            ans = m;
+            l = m + 1;
+        }
+        else
+            r = m - 1;
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

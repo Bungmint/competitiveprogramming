@@ -35,18 +35,25 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> vec(n + 1);
+    for (int i = 1; i <= n; i++)
+    {
+        int t;
+        cin >> t;
+        vec[t] = i;
+    }
+    for (int i = 1; i <= n; i++)
+        cout << vec[i] << " ";
+    cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

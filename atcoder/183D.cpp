@@ -35,18 +35,41 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    ll w;
+    cin >> n >> w;
+    vector<pair<pair<int, int>, int>> v(n);
+    for (int i = 0; i < n; i++)
+        cin >> v[i].first.first >> v[i].first.second >> v[i].second;
+    sort(all(v));
+    priority_queue<pair<pair<int, int>, int>, vector<pair<pair<int, int>, int>>, greater<pair<pair<int, int>, int>>> pq;
+    ll cur = 0LL;
+    ll maximum = 0LL;
+    for (int i = 0; i < n; i++)
+    {
+        int st = v[i].first.first, en = v[i].first.second;
+        while (!pq.empty() && pq.top().first.first <= st)
+        {
+            cur -= v[pq.top().second].second;
+            pq.pop();
+        }
+        pq.push({{en, st}, i});
+        cur += v[i].second;
+        maximum = max(cur, maximum);
+    }
+    if (maximum > w)
+        cout << "No"
+             << "\n";
+    else
+        cout << "Yes"
+             << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

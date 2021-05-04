@@ -35,6 +35,38 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    if (n % 2)
+    {
+        cout << "NO"
+             << "\n";
+        return;
+    }
+    n /= 2;
+    int sqr = sqrt(n);
+    if (sqr * sqr == n)
+    {
+        cout << "YES"
+             << "\n";
+        return;
+    }
+    if (n % 2)
+    {
+        cout << "NO"
+             << "\n";
+        return;
+    }
+    n /= 2;
+    sqr = sqrt(n);
+    if (sqr * sqr == n)
+    {
+        cout << "YES"
+             << "\n";
+        return;
+    }
+    cout << "NO"
+         << "\n";
 }
 
 int main()

@@ -35,6 +35,20 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    string s, ans = "2020";
+    cin >> s;
+    string front = s.substr(0, 4), back = s.substr(n - 4, 4), fr = s.substr(0, 2), ba = s.substr(n - 2, 2);
+    string fro3 = s.substr(0, 3), ba1 = s.substr(n - 1, 1), fro1 = s.substr(0, 1), ba3 = s.substr(n - 3, 3);
+    if (front == ans || back == ans || (fr == "20" && ba == "20") || (fro3 + ba1 == ans) || (fro1 + ba3 == ans))
+    {
+        cout << "YES"
+             << "\n";
+        return;
+    }
+    cout << "NO"
+         << "\n";
 }
 
 int main()

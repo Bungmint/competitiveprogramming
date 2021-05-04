@@ -31,22 +31,57 @@ struct custom_hash
 using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
+const int MOD = 1e9 + 7;
+const int N = 1e7; // Only advised to use it under 1e7 (More Memory)
+int lp[N + 1];
+vector<int> pr;
+void linsieve()
+{
+    for (int i = 2; i <= N; i++)
+    {
+        if (lp[i] == 0)
+        {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() && pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+        {
+            lp[i * pr[j]] = pr[j];
+        }
+    }
+}
 
 void solve()
 {
+    int n;
+    cin >> n;
+    auto it = lower_bound(all(pr), n);
+    if (*it > n * (n - 1) / 2)
+    {
+        cout << -1 << "\n";
+        return;
+    }
+    int extra = *it - n;
+    cout << *it << "\n";
+    for (int i = 1; i <= n; i++)
+    {
+        if (i == n)
+            cout << n << " " << 1 << "\n";
+        else
+            cout << i << " " << i + 1 << "\n";
+    }
+    for (int i = 1; i <= extra; i++)
+    {
+        cout << i << " " << extra + i + 1 << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    linsieve();
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

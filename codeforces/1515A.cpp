@@ -35,6 +35,56 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n, x;
+    cin >> n >> x;
+    vector<int> g(n);
+    int sum = 0;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> g[i];
+        sum += g[i];
+    }
+    sort(all(g));
+    if (x > sum)
+    {
+        cout << "YES"
+             << "\n";
+        for (auto y : g)
+            cout << y << " ";
+        cout << "\n";
+        return;
+    }
+    if (x == sum)
+    {
+        cout << "NO"
+             << "\n";
+        return;
+    }
+    int cur = 0, idx = -1;
+    for (int i = 0; i < n; i++)
+    {
+        if (cur == x)
+        {
+            idx = i;
+        }
+        cur += g[i];
+    }
+    cout << "YES"
+         << "\n";
+    if (n == 1)
+    {
+        cout << g[0] << "\n";
+        return;
+    }
+    for (int i = 0; i < idx - 1; i++)
+    {
+        cout << g[i] << " ";
+    }
+    if (idx != -1)
+        cout << g[idx] << " " << g[idx - 1] << " ";
+    for (int i = idx + 1; i < n; i++)
+        cout << g[i] << " ";
+    cout << "\n";
 }
 
 int main()

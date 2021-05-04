@@ -35,6 +35,36 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n, sum = 0;
+    cin >> n;
+    vector<int> vec(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vec[i];
+        sum += vec[i];
+    }
+    for (int i = 0; i <= n - 1; i++)
+    {
+        bool pos = true;
+        if (sum % (n - i) != 0)
+            continue;
+        for (int j = 0; j < n; j++)
+        {
+            int cur = vec[j];
+            while (j < n - 1 && cur < sum / (n - i))
+            {
+                cur += vec[j + 1];
+                j++;
+            }
+            if (cur != sum / (n - i))
+                pos = false;
+        }
+        if (pos)
+        {
+            cout << i << "\n";
+            break;
+        }
+    }
 }
 
 int main()

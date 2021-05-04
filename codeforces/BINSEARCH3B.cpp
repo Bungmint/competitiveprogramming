@@ -32,21 +32,52 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+int n, k;
+bool good(vector<ll> &vec, ll targ)
+{
+    int i = 0, cnt = 0;
+    while (i < n)
+    {
+        cnt++;
+        ll cur = vec[i];
+        if (cur > targ)
+            return false;
+        while (i <= n - 2 && cur + vec[i + 1] <= targ)
+        {
+            cur += vec[i + 1];
+            i++;
+        }
+        i++;
+    }
+    return cnt <= k;
+}
 
 void solve()
 {
+    cin >> n >> k;
+    vector<ll> vec(n);
+    for (int i = 0; i < n; i++)
+        cin >> vec[i];
+    ll l = 1, r = 1e15, ans;
+    while (l <= r)
+    {
+        ll m = l + (r - l) / 2;
+        if (good(vec, m))
+        {
+            ans = m;
+            r = m - 1;
+        }
+        else
+            l = m + 1;
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

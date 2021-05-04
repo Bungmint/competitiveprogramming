@@ -35,6 +35,26 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<pair<int, int>> p1(n);
+    vector<int> left(n), right(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> left[i] >> right[i];
+        p1[i].first = left[i];
+        p1[i].second = right[i];
+    }
+    sort(all(left));
+    sort(all(right));
+    int ans = 0LL;
+    for (int i = 0; i < n; i++)
+    {
+        int exr = lower_bound(all(right), p1[i].first) - right.begin();
+        int exl = upper_bound(all(left), p1[i].second) - left.begin();
+        ans = max(exl - exr, ans);
+    }
+    cout << n - ans << "\n";
 }
 
 int main()

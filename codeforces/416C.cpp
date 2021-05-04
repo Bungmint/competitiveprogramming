@@ -35,18 +35,55 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<pair<int, int>> visit(n);
+    vector<bool> used(n);
+    for (int i = 0; i < n; i++)
+    {
+        int c, p;
+        cin >> c >> p;
+        visit[i] = {c, p};
+    }
+    int k;
+    cin >> k;
+    vector<pair<int, int>> tables(k), ans;
+    int cnt = 0;
+    for (int i = 0; i < k; i++)
+    {
+        cin >> tables[i].first;
+        tables[i].second = i + 1;
+    }
+    sort(all(tables));
+    for (int i = 0; i < k; i++)
+    {
+        int targ = tables[i].first, max_val = 0, idx = -1;
+        for (int j = 0; j < n; j++)
+        {
+            if (used[j])
+                continue;
+            if (max_val < visit[j].second && visit[j].first <= targ)
+            {
+                max_val = visit[j].second;
+                idx = j;
+            }
+        }
+        if (idx == -1)
+            continue;
+        cnt += max_val;
+        ans.PB({idx + 1, tables[i].second});
+        used[idx] = true;
+    }
+    cout << ans.size() << " " << cnt << "\n";
+    for (auto x : ans)
+        cout << x.first << " " << x.second << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

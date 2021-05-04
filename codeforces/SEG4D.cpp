@@ -16,31 +16,20 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
 struct item
 {
+    int set[40], diff;
+    item()
+    {
+        memset(set, 0, sizeof(set));
+        diff = 0;
+    }
 };
 
 struct segtree
 {
     int size;
-    item NEUTRAL = {};
+    item NEUTRAL;
     vector<item> vals;
     void init(int n)
     {
@@ -51,9 +40,23 @@ struct segtree
     }
     item single(int v)
     {
+        item res;
+        res.set[v - 1] = 1;
+        res.diff = 1;
+        return res;
     }
     item merge(item a, item b)
     {
+        item ans;
+        for (int i = 0; i < 40; i++)
+        {
+            if (a.set[i] || b.set[i])
+            {
+                ans.set[i] = 1;
+                ans.diff++;
+            }
+        }
+        return ans;
     }
 
     void build(vector<int> &vec, int x, int l, int r)
@@ -110,18 +113,38 @@ struct segtree
 
 void solve()
 {
+    int n, q;
+    cin >> n >> q;
+    segtree st;
+    st.init(n);
+    vector<int> initial(n);
+    for (int i = 0; i < n; i++)
+        cin >> initial[i];
+    st.build(initial);
+    while (q--)
+    {
+        int op;
+        cin >> op;
+        if (op == 1)
+        {
+            int l, r;
+            cin >> l >> r;
+            cout << st.query(l - 1, r).diff << "\n";
+        }
+        else
+        {
+            int i, v;
+            cin >> i >> v;
+            st.set(i - 1, v);
+        }
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

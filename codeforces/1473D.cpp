@@ -16,31 +16,15 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
 struct item
 {
+    int start, increase, decrease;
 };
 
 struct segtree
 {
     int size;
-    item NEUTRAL = {};
+    item NEUTRAL = {-INF, 0, 0};
     vector<item> vals;
     void init(int n)
     {
@@ -51,9 +35,15 @@ struct segtree
     }
     item single(int v)
     {
+        return {v, 0, 0};
     }
     item merge(item a, item b)
     {
+        if (a.start == -INF)
+            return b;
+        if (b.start == -INF)
+            return a;
+        return {a.start, max(a.start + a.increase, b.start + b.increase) - a.start, a.start - min(a.start - a.decrease, b.start - b.decrease)};
     }
 
     void build(vector<int> &vec, int x, int l, int r)
@@ -110,6 +100,30 @@ struct segtree
 
 void solve()
 {
+    int n, m;
+    string s;
+    cin >> n >> m >> s;
+    vector<int> arr(n + 1, 0);
+    for (int i = 1; i <= n; i++)
+    {
+        if (s[i - 1] == '+')
+            arr[i]++;
+        else
+            arr[i]--;
+        arr[i] += arr[i - 1];
+    }
+    segtree st;
+    st.init(n + 1);
+    st.build(arr);
+    while (m--)
+    {
+        int l, r;
+        cin >> l >> r;
+        item last = st.query(r, n + 1), first = st.query(0, l);
+        last.start = arr[l - 1];
+        item res = st.merge(first, last);
+        cout << res.increase + res.decrease + 1 << "\n";
+    }
 }
 
 int main()

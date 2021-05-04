@@ -33,8 +33,63 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
+void recur(ll sz, ll start, ll K)
+{
+    if (sz <= 0)
+        return;
+    if (sz == 1)
+    {
+        cout << start << " ";
+        return;
+    }
+    ll pos = 1LL, cnt = 0;
+    while (pos < K && cnt < sz - 1)
+    {
+        pos *= 2LL;
+        cnt++;
+    }
+    assert(pos >= K);
+    if (cnt == sz - 1)
+    {
+        pos /= 2;
+        K -= pos;
+        ll st = -1;
+        for (int i = start + 1; i < start + sz; i++)
+        {
+            st = i;
+            pos /= 2;
+            if (K <= pos)
+                break;
+            K -= pos;
+        }
+        for (int i = st; i >= start; i--)
+            cout << i << " ";
+        recur(sz - (st - start + 1), st + 1, K);
+    }
+    else
+    {
+        cout << start << " ";
+        recur(sz - 1, start + 1, K);
+    }
+}
+
 void solve()
 {
+    ll n, k;
+    cin >> n >> k;
+    ll pos = 1LL, cnt = 0;
+    while (pos < k && cnt < n - 1)
+    {
+        pos *= 2;
+        cnt++;
+    }
+    if (pos < k)
+    {
+        cout << -1 << "\n";
+        return;
+    }
+    recur(n, 1LL, k);
+    cout << "\n";
 }
 
 int main()

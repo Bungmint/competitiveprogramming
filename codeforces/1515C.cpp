@@ -35,6 +35,30 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n, m, x;
+    cin >> n >> m >> x;
+    set<pair<int, int>> s;
+    vector<int> ans(n);
+    for (int i = 1; i <= m; i++)
+    {
+        s.insert({0, i});
+    }
+    for (int i = 0; i < n; i++)
+    {
+        int tmp;
+        cin >> tmp;
+        auto it = s.begin();
+        pair<int, int> p = *it;
+        s.erase(it);
+        p.first += tmp;
+        ans[i] = p.second;
+        s.insert(p);
+    }
+    cout << "YES"
+         << "\n";
+    for (auto y : ans)
+        cout << y << " ";
+    cout << "\n";
 }
 
 int main()

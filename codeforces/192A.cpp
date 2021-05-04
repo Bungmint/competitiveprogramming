@@ -32,21 +32,43 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int MAX = 1e5 + 10;
+vector<ll> tri;
+
+void precalc()
+{
+    tri.resize(MAX);
+    for (ll i = 1; i < MAX; i++)
+    {
+        tri[i] = (i + 1) * i / 2;
+    }
+}
 
 void solve()
 {
+    int n;
+    cin >> n;
+    for (int i = 1; i <= MAX; i++)
+    {
+        if (tri[i] >= n)
+            break;
+        ll targ = n - tri[i];
+        if (binary_search(all(tri), targ))
+        {
+            cout << "YES"
+                 << "\n";
+            return;
+        }
+    }
+    cout << "NO\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    precalc();
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

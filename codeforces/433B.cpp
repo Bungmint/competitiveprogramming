@@ -35,18 +35,55 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<ll> pref(n), pref_cheap(n), vec(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vec[i];
+        if (i == 0)
+            pref[i] = vec[i];
+        else
+            pref[i] = pref[i - 1] + vec[i];
+    }
+    sort(all(vec));
+    for (int i = 0; i < n; i++)
+    {
+        if (i == 0)
+            pref_cheap[i] = vec[i];
+        else
+            pref_cheap[i] = pref_cheap[i - 1] + vec[i];
+    }
+    int m;
+    cin >> m;
+    while (m-- > 0)
+    {
+        int op, l, r;
+        cin >> op >> l >> r;
+        l--;
+        r--;
+        if (op == 1)
+        {
+            if (l == 0)
+                cout << pref[r] << "\n";
+            else
+                cout << pref[r] - pref[l - 1] << "\n";
+        }
+        else
+        {
+            if (l == 0)
+                cout << pref_cheap[r] << "\n";
+            else
+                cout << pref_cheap[r] - pref_cheap[l - 1] << "\n";
+        }
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

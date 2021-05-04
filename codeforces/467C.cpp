@@ -32,21 +32,53 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+ll dp[5001][5001];
 
 void solve()
 {
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<ll> v(n), pref(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> v[i];
+        if (i == 0)
+            pref[i] = v[i];
+        else
+            pref[i] = pref[i - 1] + v[i];
+    }
+    for (int j = 1; j <= k; j++)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (i == 0)
+            {
+                if (m == 1)
+                    dp[i][j] = pref[i];
+                continue;
+            }
+            if (i >= m)
+            {
+                dp[i][j] = max(dp[i - 1][j], dp[i - m][j - 1] + pref[i] - pref[i - m]);
+            }
+            else if (i == m - 1)
+            {
+                dp[i][j] = max(dp[i - 1][j], pref[i]);
+            }
+            else
+            {
+                dp[i][j] = dp[i - 1][j];
+            }
+        }
+    }
+    cout << dp[n - 1][k] << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

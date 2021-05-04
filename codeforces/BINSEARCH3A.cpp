@@ -32,21 +32,45 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+vector<pair<double, double>> peeps;
+int n;
+bool good(double t)
+{
+    double left = -LINF, right = LINF;
+    for (int i = 0; i < n; i++)
+    {
+        left = max(left, peeps[i].first - t * peeps[i].second);
+        right = min(right, peeps[i].first + peeps[i].second * t);
+    }
+    return left < right || ((right - left) < 1e-9 && (right - left) > 0) || ((left - right) < 1e-9 && (left - right) > 0);
+}
 
 void solve()
 {
+    cin >> n;
+    peeps.resize(n);
+    for (int i = 0; i < n; i++)
+        cin >> peeps[i].first >> peeps[i].second;
+    double l = 0, r = 1e10, ans;
+    while (l + 1e-6 < r)
+    {
+        double m = (r + l) / 2;
+        if (good(m))
+        {
+            ans = m;
+            r = m;
+        }
+        else
+            l = m;
+    }
+    cout << setprecision(20) << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

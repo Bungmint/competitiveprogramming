@@ -35,6 +35,36 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> ans(n);
+    deque<int> deq;
+    for (int i = 0; i < n; i++)
+    {
+        int tmp;
+        cin >> tmp;
+        deq.push_back(tmp);
+    }
+    int tog = 0, cnt = 0;
+    while (cnt < n)
+    {
+        if (tog)
+        {
+            ans[cnt] = deq.back();
+            deq.pop_back();
+        }
+        else
+        {
+            ans[cnt] = deq.front();
+            deq.pop_front();
+        }
+        cnt++;
+        tog += 1;
+        tog %= 2;
+    }
+    for (auto x : ans)
+        cout << x << " ";
+    cout << "\n";
 }
 
 int main()

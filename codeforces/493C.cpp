@@ -35,18 +35,47 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+    int n;
+    cin >> n;
+    vector<int> fi(n);
+    for (int i = 0; i < n; i++)
+        cin >> fi[i];
+    int m;
+    cin >> m;
+    vector<int> se(m);
+    for (int i = 0; i < m; i++)
+        cin >> se[i];
+    sort(all(fi));
+    sort(all(se));
+    int ans = 3 * n - 3 * m;
+    int a = 3 * n, b = 3 * m;
+    int tar, j, sc, idx;
+    for (int i = 0; i < n; i++)
+    {
+        tar = fi[i] - 1;
+        j = lower_bound(all(fi), fi[i]) - fi.begin();
+        sc = 3 * (n - j) + 2 * j;
+        idx = upper_bound(all(se), tar) - se.begin();
+        if (ans < sc - (idx)*2 - (m - idx) * 3)
+        {
+            a = sc;
+            b = (idx)*2 + (m - idx) * 3;
+            ans = sc - (idx)*2 - (m - idx) * 3;
+        }
+    }
+    if (ans < 2 * n - 2 * m)
+    {
+        a = 2 * n;
+        b = 2 * m;
+    }
+    cout << a << ":" << b << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

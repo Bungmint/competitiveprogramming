@@ -16,44 +16,34 @@ const int INF = 1e9;
 const ll LINF = 1e15;
 const int MOD = 1e9 + 7;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
-
 struct item
 {
+    int max, min;
 };
 
 struct segtree
 {
     int size;
-    item NEUTRAL = {};
+    item NEUTRAL = {INT_MAX, INT_MAX};
     vector<item> vals;
     void init(int n)
     {
         size = 1;
         while (size < n)
             size *= 2;
-        vals.resize(2 * size);
+        vals.assign(2 * size, NEUTRAL);
     }
     item single(int v)
     {
+        if (v == 0)
+            return NEUTRAL;
+        return {v, v};
     }
     item merge(item a, item b)
     {
+        return {
+            max(a.max, b.max),
+            min(a.min, b.min)};
     }
 
     void build(vector<int> &vec, int x, int l, int r)
@@ -91,37 +81,66 @@ struct segtree
     {
         set(i, v, 0, 0, size);
     }
-    item query(int l, int r, int x, int lx, int rx)
+    void range_set(int l, int r)
+    {
+        for (int i = l; i < r; i++)
+            set(i, 0, 0, 0, size);
+    }
+    int query(int l, int r, int x, int lx, int rx, int p)
     {
         if (lx >= r || rx <= l)
-            return NEUTRAL;
+            return 0;
         if (lx >= l && rx <= r)
-            return vals[x];
+        {
+            if (vals[x].min > p)
+                return 0;
+            if (vals[x].max <= p)
+            {
+                range_set(lx, rx);
+                return rx - lx;
+            }
+        }
         int mid = (lx + rx) / 2;
-        item a = query(l, r, 2 * x + 1, lx, mid);
-        item b = query(l, r, 2 * x + 2, mid, rx);
-        return merge(a, b);
+        int a = query(l, r, 2 * x + 1, lx, mid, p);
+        int b = query(l, r, 2 * x + 2, mid, rx, p);
+        return a + b;
     }
-    item query(int l, int r)
+    int query(int l, int r, int p)
     {
-        return query(l, r, 0, 0, size);
+        return query(l, r, 0, 0, size, p);
     }
 };
 
 void solve()
 {
+    int n, m;
+    cin >> n >> m;
+    segtree st;
+    st.init(n);
+    while (m--)
+    {
+        int op;
+        cin >> op;
+        if (op == 1)
+        {
+            int i, h;
+            cin >> i >> h;
+            st.set(i, h);
+        }
+        else
+        {
+            int l, r, p;
+            cin >> l >> r >> p;
+            cout << st.query(l, r, p) << "\n";
+        }
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif
