@@ -1,6 +1,3 @@
-#include <bits/stdc++.h>
-
-using namespace std;
 const int N = 1e7; // Only advised to use it under 1e7 (More Memory)
 int lp[N + 1];
 vector<int> pr;

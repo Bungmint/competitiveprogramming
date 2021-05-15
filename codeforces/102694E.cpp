@@ -8,14 +8,6 @@ using namespace std;
 template <typename T>
 using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7;
-
 struct custom_hash
 {
     static uint64_t splitmix64(uint64_t x)
@@ -33,14 +25,40 @@ struct custom_hash
     }
 };
 
+#define all(v) (v).begin(), (v).end()
+#define ar array
+#define PB push_back
+using ll = long long;
+const int INF = 1e9;
+const ll LINF = 1e15;
+const int MOD = 1e9 + 7; //998244353
+const int N = 3e5 + 10;
+vector<int> adj[N];
+int start[N], ending[N], timer = 0;
+
+void dfs(int v, int pv)
+{
+    start[v] = timer;
+    for (auto e : adj[v])
+    {
+        if (e != pv)
+        {
+            timer++;
+            dfs(e, v);
+        }
+    }
+    ending[v] = timer;
+}
+
 struct item
 {
+    long double val = 0LL;
 };
 
 struct segtree
 {
     int size;
-    item NEUTRAL = {};
+    item NEUTRAL = {0};
     vector<item> vals;
     void init(int n)
     {
@@ -51,9 +69,11 @@ struct segtree
     }
     item single(int v)
     {
+        return {log10((long double)v)};
     }
     item merge(item a, item b)
     {
+        return {a.val + b.val};
     }
 
     void build(vector<int> &vec, int x, int l, int r)
@@ -108,20 +128,63 @@ struct segtree
     }
 };
 
+bool close(long double x, long double y)
+{
+    if (x - y > 0 && x - y < 1e-9)
+        return true;
+    if (y - x > 0 && y - x < 1e-9)
+        return true;
+    return false;
+}
+
 void solve()
 {
+    int n, q;
+    cin >> n;
+    for (int i = 0; i < n - 1; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        adj[u].PB(v);
+        adj[v].PB(u);
+    }
+    dfs(1, 0);
+    cin >> q;
+    segtree st;
+    st.init(n);
+    cout << setprecision(20);
+    while (q--)
+    {
+        int op, x, y;
+        cin >> op >> x >> y;
+        if (op == 1)
+        {
+            int node = start[x];
+            st.set(node, y);
+        }
+        else
+        {
+            int sbstart1 = start[x], sbend1 = ending[x];
+            int sbstart2 = start[y], sbend2 = ending[y];
+            long double logx = st.query(sbstart1, sbend1 + 1).val;
+            long double logy = st.query(sbstart2, sbend2 + 1).val;
+            if (close(logx, 9 + logy) || logx > 9 + logy)
+            {
+                cout << 1000000000 << "\n";
+            }
+            else
+            {
+                cout << pow(10, logx - logy) << "\n";
+            }
+        }
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif
