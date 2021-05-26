@@ -30,50 +30,78 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int LOG = 20;
+int n, q;
 
 void solve()
 {
-    int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
+    vector<int> a(n), p(n + 1);
+    vector<vector<int>> down(n + 1, vector<int>(LOG));
+    for (int i = 0; i < n; i++)
+        cin >> a[i];
     for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> p[i];
+        down[p[i]][0] = i;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    for (int i = 1; i < LOG; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        for (int j = 1; j <= n; j++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            down[p[j]][i] = down[down[p[j]][i - 1]][i - 1];
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cin >> q;
+    vector<int> pos(n + 1);
+    iota(all(pos), 0);
+    int cnt = 0;
+    while (q--)
+    {
+        int op;
+        cin >> op;
+        if (op == 1)
+        {
+            cnt++;
+        }
+        else if (op == 2)
+        {
+            int x, y;
+            cin >> x >> y;
+            for (int i = LOG - 1; i >= 0; i--)
+            {
+                if (cnt & (1 << i))
+                {
+                    x = down[x][i];
+                    y = down[y][i];
+                }
+            }
+            swap(pos[x], pos[y]);
+        }
+        else
+        {
+            int x;
+            cin >> x;
+            for (int i = LOG - 1; i >= 0; i--)
+            {
+                if (cnt & (1 << i))
+                {
+                    x = down[x][i];
+                }
+            }
+            cout << a[pos[x] - 1] << "\n";
+        }
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

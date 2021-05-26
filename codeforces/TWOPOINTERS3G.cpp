@@ -32,52 +32,58 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+ll a = 0, b = 0, rude = 0;
+
+inline void add(char c)
+{
+    if (c > 'b')
+        return;
+    if (c == 'a')
+        a++;
+    if (c == 'b')
+        rude += a, b++;
+}
+inline void remove(char c)
+{
+    if (c > 'b')
+        return;
+    if (c == 'a')
+        rude -= b, a--;
+    if (c == 'b')
+        b--;
+}
+inline bool good(ll c)
+{
+    return (rude <= c);
+}
 
 void solve()
 {
     int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    ll c;
+    cin >> n >> c;
+    string s;
+    cin >> s;
+    int l = 0;
+    int res = 0;
+    for (int r = 0; r < n; r++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        add(s[r]);
+        while (l < n && !good(c))
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            remove(s[l]);
+            l++;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        res = max(res, r - l + 1);
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << res << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

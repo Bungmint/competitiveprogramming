@@ -37,43 +37,46 @@ void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> inc, v(n);
+    int cnt = 1;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> v[i];
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    for (int i = 1; i < n; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (i == n - 1)
+            inc.PB(cnt);
+        else if (v[i] > v[i + 1])
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            inc.PB(cnt);
+            cnt = 1;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        else
+            cnt++;
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    int ans = 0LL, cap = 1, tmp = 0;
+    int i = 0;
+    while (i < (int)inc.size())
+    {
+        ans++;
+        tmp = 0LL;
+        for (int j = i; j < min(i + cap, (int)inc.size()); j++)
+        {
+            tmp += inc[j];
+        }
+        i += cap;
+        cap = tmp;
+    }
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

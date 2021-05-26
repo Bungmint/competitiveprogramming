@@ -30,50 +30,70 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int N = 2e5 + 1;
+int n;
 
 void solve()
 {
-    int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> b(n);
+    vector<bool> used(2 * n, false);
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> b[i];
+        used[b[i] - 1] = true;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    set<int> s;
+    set<int, greater<int>> s1;
+    for (int i = 1; i <= 2 * n; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (!used[i - 1])
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            s.insert(i);
+            s1.insert(i);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    int mini = 0, maxi = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (*s.begin() > b[i])
+        {
+            auto it = s.end();
+            it--;
+            s.erase(it);
+        }
+        else
+        {
+            mini++;
+            s.erase(s.begin());
+        }
+    }
+    for (int i = 0; i < n; i++)
+    {
+        if (*s1.begin() < b[n - i - 1])
+        {
+            auto it = s1.end();
+            it--;
+            s1.erase(it);
+        }
+        else
+        {
+            maxi++;
+            s1.erase(s1.begin());
+        }
+    }
+    maxi = n - maxi;
+    cout << (abs(mini - maxi) + 1) << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

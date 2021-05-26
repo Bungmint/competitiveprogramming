@@ -1,6 +1,6 @@
-__int128 read()
+__int128_t read()
 {
-    __int128 x = 0, f = 1;
+    __int128_t x = 0, f = 1;
     char ch = getchar();
     while (ch < '0' || ch > '9')
     {
@@ -15,7 +15,7 @@ __int128 read()
     }
     return x * f;
 }
-void print(__int128 x)
+void print(__int128_t x)
 {
     if (x < 0)
     {
@@ -26,4 +26,4 @@ void print(__int128 x)
         print(x / 10);
     putchar(x % 10 + '0');
 }
-bool cmp(__int128 x, __int128 y) { return x > y; }
+bool cmp(__int128_t x, __int128_t y) { return x > y; }

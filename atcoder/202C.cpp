@@ -30,54 +30,51 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> a(n), b(n), c(n);
+    unordered_map<int, vector<int>, custom_hash> m1;
+    unordered_map<int, int, custom_hash> m2, m3;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> a[i];
+        m2[a[i]]++;
     }
-    sort(all(cust));
-    int cnt = 0;
     for (int i = 0; i < n; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> b[i];
+        if (m2.count(b[i]))
+            m1[b[i]].PB(i + 1);
+    }
+    for (int i = 0; i < n; i++)
+    {
+        cin >> c[i];
+        m3[c[i]]++;
+    }
+    ll ans = 0LL;
+    for (auto x : m1)
+    {
+        ll occ = m2[x.first];
+        ll pos = 0LL;
+        for (auto y : x.second)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            pos += m3[y];
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        ans += occ * pos;
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

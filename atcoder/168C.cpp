@@ -35,37 +35,13 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
-        {
-            avail.push(pq.top().second);
-            pq.pop();
-        }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
-    }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    long double a, b, h, m;
+    cin >> a >> b >> h >> m;
+    long double ang1 = (h + m / 60) * 2 * M_PI, ang2 = (h / 12 + m / 720) * 2 * M_PI;
+    long double diff = fabs(ang1 - ang2);
+    cout << setprecision(20);
+    long double c = sqrt(a * a + b * b - 2 * a * b * cos(diff));
+    cout << c << "\n";
 }
 
 int main()

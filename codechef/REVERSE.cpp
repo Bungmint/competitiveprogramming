@@ -30,37 +30,61 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e15;
+const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 1e5 + 1;
+vector<pair<int, bool>> adj[N];
+int dist[N], n, m;
 
-void dfs(int V, int pV)
+void pogbfs()
 {
+    for (int i = 1; i <= n; i++)
+        dist[i] = INF;
+    deque<int> deq;
+    dist[1] = 0;
+    deq.push_front(1);
+    while (!deq.empty())
+    {
+        int v = deq.front();
+        deq.pop_front();
+        for (auto x : adj[v])
+        {
+            if (x.second && dist[x.first] > dist[v])
+            {
+                dist[x.first] = dist[v];
+                deq.push_back(x.first);
+            }
+            if (!x.second && dist[x.first] > dist[v] + 1)
+            {
+                dist[x.first] = dist[v] + 1;
+                deq.push_back(x.first);
+            }
+        }
+    }
 }
 
 void solve()
 {
-    int n, k;
-    cin >> n >> k;
-    vector<vector<int>> adj(n);
-    for (int i = 0; i < n - 1; i++)
+    cin >> n >> m;
+    for (int i = 0; i < m; i++)
     {
         int u, v;
         cin >> u >> v;
-        adj[u].PB(v);
-        adj[v].PB(u);
+        adj[u].PB({v, true});
+        adj[v].PB({u, false});
     }
+    pogbfs();
+    if (dist[n] == INF)
+        cout << -1 << "\n";
+    else
+        cout << dist[n] << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

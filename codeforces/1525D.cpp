@@ -30,54 +30,59 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int N = 5001;
+int seats[N];
+int dp[N][N];
 
 void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> taken, empty;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> seats[i];
+        if (seats[i])
+            taken.PB(i);
+        else
+            empty.PB(i);
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    int leng = empty.size();
+    int k = taken.size();
+    for (int i = 0; i < leng; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        for (int j = 0; j < k; j++)
+            dp[i][j] = INF;
+    }
+    for (int i = 0; i < leng; i++)
+    {
+        for (int j = 0; j < k; j++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            if (j > i)
+                break;
+            if (i > 0 && j > 0)
+                dp[i][j] = min(dp[i - 1][j], dp[i - 1][j - 1] + abs(empty[i] - taken[j]));
+            else if (i > 0)
+                dp[i][j] = min(dp[i - 1][j], abs(empty[i] - taken[j]));
+            else
+                dp[i][j] = abs(empty[i] - taken[j]);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    if (leng == 0 || k == 0)
+    {
+        cout << 0 << "\n";
+        return;
+    }
+    cout << dp[leng - 1][k - 1] << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

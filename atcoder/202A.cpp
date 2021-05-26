@@ -30,54 +30,21 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
-        {
-            avail.push(pq.top().second);
-            pq.pop();
-        }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
-    }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    int a, b, c;
+    cin >> a >> b >> c;
+    cout << 21 - a - b - c << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

@@ -30,50 +30,64 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+
+ll big(ll x, ll y)
+{
+    ll sz = x, cnt = 1LL;
+    ;
+    while (sz < y)
+    {
+        sz += x;
+        sz *= 2;
+        sz -= x;
+        cnt++;
+    }
+    if (sz > y)
+    {
+        sz /= 2;
+        cnt--;
+    }
+    return cnt;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    ll x, y;
+    cin >> x >> y;
+    if (x > y)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cout << -1 << "\n";
+        return;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    ll ans = 0;
+    unordered_set<ll, custom_hash> s1;
+    while (y > 0)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        ll val = big(x, y);
+        ans += val;
+        if (s1.count(val))
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            cout << -1 << "\n";
+            return;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        s1.insert(val);
+        y -= ((1LL << val) - 1) * x;
+        if (y > 0)
+        {
+            ans++;
+        }
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

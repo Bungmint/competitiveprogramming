@@ -30,50 +30,63 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int LOG = 32;
+int arr[LOG], n, q, val;
+
+ll calc()
+{
+    ll ans = 0LL;
+    for (ll i = 0; i < LOG; i++)
+    {
+        if (arr[i] != 0)
+            ans += (1LL << i);
+    }
+    return ans;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    memset(arr, 0, sizeof(arr));
+    cin >> n >> q;
+    vector<int> v(n);
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> v[i];
+        for (int j = 0; j < LOG; j++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            if ((1 << j) & v[i])
+                arr[j]++;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << calc() << "\n";
+    while (q--)
+    {
+        int x;
+        cin >> x >> val;
+        x--;
+        for (int i = 0; i < LOG; i++)
+        {
+            if ((1 << i) & v[x])
+                arr[i]--;
+        }
+        for (int i = 0; i < LOG; i++)
+        {
+            if ((1 << i) & val)
+                arr[i]++;
+        }
+        v[x] = val;
+        cout << calc() << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

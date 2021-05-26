@@ -1,5 +1,5 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
@@ -32,52 +32,68 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 2e5 + 1;
+ll EXP[N], p[N], sz[N], n, m, x, y, val, extra[N];
+string s;
+
+int get(int v)
+{
+    return (v == p[v] ? v : get(p[v]));
+}
+
+void unite(int a, int b)
+{
+    a = get(a);
+    b = get(b);
+    if (a == b)
+        return;
+    if (sz[a] < sz[b])
+        swap(a, b);
+    sz[a] += sz[b];
+    extra[b] = EXP[a];
+    p[b] = a;
+}
+
+ll cal(int a)
+{
+    return ((a == p[a]) ? EXP[a] : (EXP[a] - extra[a] + cal(p[a])));
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
+    cin >> n >> m;
     for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        sz[i] = 1;
+        p[i] = i;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    while (m--)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> s;
+        if (s == "join")
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            cin >> x >> y;
+            unite(x, y);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        else if (s == "add")
+        {
+            cin >> x >> val;
+            x = get(x);
+            EXP[x] += val;
+        }
+        else
+        {
+            cin >> x;
+            cout << cal(x) << "\n";
+        }
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

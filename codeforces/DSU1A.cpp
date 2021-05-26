@@ -32,52 +32,59 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 1e5 + 1;
+int rk[N], p[N];
+
+int root(int v)
+{
+    return p[v] = (p[v] == v ? v : root(p[v]));
+}
+
+void unite(int a, int b)
+{
+    a = root(a);
+    b = root(b);
+    if (a == b)
+        return;
+    if (rk[a] == rk[b])
+        rk[a]++;
+    if (rk[a] > rk[b])
+        p[b] = a;
+    else
+        p[a] = b;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int n, m;
+    cin >> n >> m;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        rk[i] = 1, p[i] = i;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    while (m--)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        string op;
+        int u, v;
+        cin >> op >> u >> v;
+        u--;
+        v--;
+        if (op == "union")
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            unite(u, v);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        else
+        {
+            cout << (root(u) == root(v) ? "YES" : "NO") << "\n";
+        }
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

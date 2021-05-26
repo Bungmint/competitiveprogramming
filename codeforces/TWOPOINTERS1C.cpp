@@ -35,37 +35,32 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int n, m;
+    cin >>
+        n >> m;
+    vector<int> a(n), b(m);
     for (int i = 0; i < n; i++)
+        cin >> a[i];
+    for (int i = 0; i < m; i++)
+        cin >> b[i];
+    int i = 0, cnt = 0;
+    ll ans = 0LL;
+    for (int j = 0; j < m; j++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (j == 0 || b[j] != b[j - 1])
+            cnt = 0;
+        while (i < n && a[i] < b[j])
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            i++;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        while (i < n && a[i] == b[j])
+        {
+            cnt++;
+            i++;
+        }
+        ans += cnt;
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << ans << "\n";
 }
 
 int main()

@@ -30,50 +30,65 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
-    int n;
+    ll n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    vector<ll> d(2 * n);
+    unordered_map<ll, int> m1;
+    m1.reserve(1024);
+    m1.max_load_factor(0.25);
+    unordered_set<ll> s1;
+    for (int i = 0; i < 2 * n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> d[i];
+        m1[d[i]]++;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    for (auto x : m1)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (x.second != 2)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            cout << "NO"
+                 << "\n";
+            return;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    sort(all(d), [](ll x, ll y) {
+        return x > y;
+    });
+    ll cumsum = 0LL, a;
+
+    for (ll i = 0; i < n; i++)
+    {
+        if ((d[2 * i] - cumsum) % (2LL * (n - i)) != 0)
+        {
+            cout << "NO"
+                 << "\n";
+            return;
+        }
+        a = (d[2 * i] - cumsum) / (2LL * (n - i));
+        if (s1.count(a) != 0 || a == 0)
+        {
+            cout << "NO"
+                 << "\n";
+            return;
+        }
+        s1.insert(a);
+        cumsum += 2LL * a;
+    }
+    cout << "YES"
+         << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

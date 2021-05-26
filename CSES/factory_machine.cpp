@@ -35,49 +35,42 @@ const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int n, t;
+    cin >> n >> t;
+    vector<ll> vec(n);
     for (int i = 0; i < n; i++)
+        cin >> vec[i];
+    ll l = 1, r = 1e18, ans = -1;
+    while (l <= r)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        ll m = l + (r - l) / 2;
+        ll pos_pro = 0LL;
+        bool ok = false;
+        for (int i = 0; i < n; i++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            pos_pro += m / vec[i];
+            if (pos_pro >= t)
+            {
+                ok = true;
+                break;
+            }
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        if (ok)
+        {
+            ans = m;
+            r = m - 1;
+        }
+        else
+            l = m + 1;
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << ans << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

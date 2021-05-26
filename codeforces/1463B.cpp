@@ -30,50 +30,70 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    ll s = 0LL;
+    vector<ll> vec(n);
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> vec[i];
+        s += vec[i];
     }
-    sort(all(cust));
-    int cnt = 0;
+    ll targ = s / 2;
+    bool odd = true;
+    ll val = 0LL;
     for (int i = 0; i < n; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (i % 2 == 0)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            val += vec[i];
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    if (val > targ)
+        odd = false;
+    if (odd)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (i % 2 == 0)
+            {
+                cout << 1 << " ";
+            }
+            else
+            {
+                cout << vec[i] << " ";
+            }
+        }
+        cout << "\n";
+    }
+    else
+    {
+        for (int i = 0; i < n; i++)
+        {
+            if (i % 2 == 1)
+            {
+                cout << 1 << " ";
+            }
+            else
+            {
+                cout << vec[i] << " ";
+            }
+        }
+        cout << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

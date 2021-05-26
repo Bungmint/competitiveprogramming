@@ -30,50 +30,55 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+const int N = 1e5 + 1;
+vector<vector<int>> adj;
+pair<ll, ll> p[N];
+ll arr[N];
+ll dp[N][2];
+
+void dfs(int V, int pV)
+{
+    ll p1 = p[V].first, p2 = p[V].second;
+    for (auto e : adj[V])
+    {
+        if (e == pV)
+            continue;
+        dfs(e, V);
+        dp[V][0] += max(dp[e][0] + llabs(p[e].first - p1), dp[e][1] + llabs(p[e].second - p1));
+        dp[V][1] += max(dp[e][0] + llabs(p[e].first - p2), dp[e][1] + llabs(p[e].second - p2));
+    }
+}
 
 void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
+    adj.clear();
+    adj.resize(n + 1);
+    memset(dp, 0, sizeof(dp));
     for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        cin >> p[i].first >> p[i].second;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n - 1; i++)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
-        {
-            avail.push(pq.top().second);
-            pq.pop();
-        }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        int u, v;
+        cin >> u >> v;
+        adj[u].PB(v);
+        adj[v].PB(u);
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    dfs(1, 0);
+    cout << max(dp[1][0], dp[1][1]) << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

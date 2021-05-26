@@ -30,54 +30,66 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+vector<ll> BIT;
+int n;
+
+void upd(int i, ll v)
+{
+    i++;
+    for (int j = i; j <= n; j += j & (-j))
+    {
+        BIT[j] += v;
+    }
+}
+ll query(int i)
+{
+    i++;
+    ll ans = 0LL;
+    while (i > 0)
+    {
+        ans += BIT[i];
+        i -= (i) & (-i);
+    }
+    return ans;
+}
 
 void solve()
 {
-    int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<ll> v(n);
+    vector<ll> maxi(n), pref(n), doublepref(n);
+    ll ma = 0LL;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> v[i];
+        ma = max(ma, v[i]);
+        maxi[i] = ma;
+        if (i == 0)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            pref[i] = v[i];
+            doublepref[i] = pref[i];
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        if (i != 0)
+            pref[i] += pref[i - 1] + v[i];
+        if (i != 0)
+            doublepref[i] += doublepref[i - 1] + pref[i];
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    for (ll i = 0; i < n; i++)
+    {
+        if (i == 0)
+            cout << pref[i] + (i + 1) * maxi[i] << "\n";
+        else
+            cout << pref[i] + doublepref[i - 1] + (i + 1) * maxi[i] << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

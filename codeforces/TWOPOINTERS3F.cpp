@@ -32,52 +32,54 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+int cards[26], instring[26];
+
+void add(char c)
+{
+    instring[c - 'a']++;
+}
+void remove(char c)
+{
+    instring[c - 'a']--;
+}
+bool good()
+{
+    for (int i = 0; i < 26; i++)
+    {
+        if (cards[i] < instring[i])
+            return false;
+    }
+    return true;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    int n, m;
+    cin >> n >> m;
+    string s, card;
+    cin >> s >> card;
+    for (int i = 0; i < m; i++)
+        cards[card[i] - 'a']++;
+    int l = 0;
+    ll res = 0LL;
+    for (int r = 0; r < n; r++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        add(s[r]);
+        while (l < n && !good())
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            remove(s[l]);
+            l++;
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        res += r - l + 1;
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    cout << res << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

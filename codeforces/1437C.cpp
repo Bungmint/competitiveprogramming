@@ -32,48 +32,56 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 210;
+int dp[2 * N][N];
 
 void solve()
 {
+    memset(dp, -1, sizeof(dp));
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> dish(n);
     for (int i = 0; i < n; i++)
+        cin >> dish[i];
+    sort(all(dish));
+    for (int i = 1; i <= 2 * n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        for (int j = 0; j < n; j++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            if (i == 1)
+            {
+                if (j == 0)
+                    dp[i][j] = abs(i - dish[j]);
+                continue;
+            }
+            if (j == 0)
+                dp[i][j] = min(dp[i - 1][j], abs(i - dish[j]));
+            else
+            {
+                if (dp[i - 1][j - 1] != -1 && dp[i - 1][j] != -1)
+                    dp[i][j] = min(dp[i - 1][j], dp[i - 1][j - 1] + abs(i - dish[j]));
+                else if (dp[i - 1][j] != -1)
+                    dp[i][j] = dp[i - 1][j];
+                else if (dp[i - 1][j - 1] != -1)
+                    dp[i][j] = dp[i - 1][j - 1] + abs(i - dish[j]);
+            }
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    int mini = INF;
+    for (int i = 1; i <= 2 * n; i++)
+    {
+        if (dp[i][n - 1] != -1)
+            mini = min(mini, dp[i][n - 1]);
+    }
+    cout << mini << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

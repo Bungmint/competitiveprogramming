@@ -37,43 +37,70 @@ void solve()
 {
     int n;
     cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> v(n);
+    for (int i = 0; i < n; i++)
+        cin >> v[i];
+    sort(all(v));
+    int zr = 0, pos = 0, neg = 0;
+    int neggap = INT32_MAX, small = INT32_MAX;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        if (v[i] > 0)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            pos++;
+            small = min(small, v[i]);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        if (v[i] < 0)
+        {
+            neg++;
+            if (i > 0)
+                neggap = min(neggap, abs(v[i] - v[i - 1]));
+        }
+        if (v[i] == 0)
+        {
+            zr++;
+            if (i > 0 || v[i - 1] < 0)
+                neggap = min(neggap, abs(v[i - 1]));
+        }
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    if (neg == 0)
+    {
+        cout << max(zr, min(zr, 1) + min(pos, 1)) << "\n";
+        return;
+    }
+    if (pos == 0)
+    {
+        cout << neg + zr << "\n";
+        return;
+    }
+    if (zr == 0)
+    {
+        if (small <= neggap)
+            cout << neg + 1 << "\n";
+        else
+            cout << neg << "\n";
+        return;
+    }
+    if (zr >= 2)
+    {
+        cout << zr + neg << "\n";
+        return;
+    }
+    if (zr == 1)
+    {
+        if (neggap >= small)
+            cout << neg + 2 << "\n";
+        else
+            cout << neg + 1 << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();

@@ -32,52 +32,62 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 200001;
+int n, q, sz[N], p[N], op, x, y, de;
+set<int> s1;
+
+int root(int a)
+{
+    return p[a] = ((p[a] == a) ? a : root(p[a]));
+}
+void unite(int a, int b)
+{
+    a = root(a), b = root(b);
+    if (a == b)
+        return;
+    if (sz[a] < sz[b])
+        swap(a, b);
+    sz[a] += sz[b];
+    p[b] = a;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
+    cin >> n >> q;
     for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
+        s1.insert(i);
+        p[i] = i;
+        sz[i] = 1;
     }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
+    while (q--)
     {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> op >> x >> y;
+        if (op == 1)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            unite(x, y);
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        else if (op == 2)
+        {
+            while (*s1.lower_bound(x) < y)
+            {
+                de = *s1.lower_bound(x);
+                unite(de + 1, x);
+                s1.erase(de);
+            }
+        }
+        else
+        {
+            cout << ((root(x) == root(y)) ? "YES" : "NO") << "\n";
+        }
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

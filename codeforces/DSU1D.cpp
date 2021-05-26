@@ -32,52 +32,74 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 50001, K = 150000;
+ar<int, 3> query[K];
+int sz[N], p[N], n, m, k, u, v, ans[K];
+string op;
+
+int root(int a)
+{
+    return (a == p[a] ? a : root(p[a]));
+}
+
+void unite(int a, int b)
+{
+    a = root(a);
+    b = root(b);
+    if (a == b)
+        return;
+    if (sz[a] < sz[b])
+        swap(a, b);
+    sz[a] += sz[b];
+    p[b] = a;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    cin >> n >> m >> k;
+    iota(p + 1, p + n + 1, 1);
+    fill(sz + 1, sz + n + 1, 1);
+    while (m--)
+        cin >> u >> v;
+    for (int i = 0; i < k; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        cin >> op;
+        cin >> u >> v;
+        if (op == "cut")
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            query[i] = {0, u, v};
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
+        else
+            query[i] = {1, u, v};
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    for (int i = k - 1; i >= 0; i--)
+    {
+        u = query[i][1], v = query[i][2];
+        if (query[i][0] == 0)
+        {
+            unite(u, v);
+        }
+        else
+        {
+            ans[i] = ((root(u) == root(v)) ? 1 : 2);
+        }
+    }
+    for (int i = 0; i < k; i++)
+    {
+        if (ans[i] == 1)
+            cout << "YES"
+                 << "\n";
+        else if (ans[i] == 2)
+            cout << "NO"
+                 << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

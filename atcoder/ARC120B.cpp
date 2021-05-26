@@ -30,54 +30,63 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
+const ll LINF = 1e15;
+const int MOD = 998244353;
+
+ll mod_pow(ll base, ll exp)
+{
+    if (exp == 0)
+        return 1LL;
+    if (exp == 1)
+        return base;
+    ll m = mod_pow(base, exp / 2);
+    if (exp % 2 == 0)
+        return (m * m) % MOD;
+    return (((m * m) % MOD) * base) % MOD;
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    for (int i = 0; i < n; i++)
+    int h, w;
+    cin >> h >> w;
+    vector<pair<char, int>> col(h + w - 1, {'A', 0});
+    bool ok = true;
+    for (int i = 0; i < h; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        string s;
+        cin >> s;
+        for (int j = 0; j < w; j++)
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            if (col[i + j].first != 'A' && col[i + j].first != s[j] && s[j] != '.')
+            {
+                ok = false;
+            }
+            if (s[j] == '.')
+                col[i + j].second = 1;
+            else
+                col[i + j].first = s[j];
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
+    if (!ok)
+    {
+        cout << 0 << "\n";
+        return;
+    }
+    ll cnt = 0LL;
+    for (int i = 0; i < h + w - 1; i++)
+    {
+        //cout << col[i].first << " " << col[i].second << "\n";
+        if (col[i].first == 'A' && col[i].second != 0)
+            cnt++;
+    }
+    cout << mod_pow(2, cnt) << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

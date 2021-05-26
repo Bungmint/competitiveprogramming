@@ -30,50 +30,61 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e18;
+const ll LINF = 1e15;
 const int MOD = 1e9 + 7; //998244353
+bool pre[101][10];
+
+void prec()
+{
+    for (int i = 1; i <= 9; i++)
+    {
+        pre[0][i] = true;
+        for (int j = 1; j < 10 * i; j++)
+        {
+            if (j % i == 0)
+                pre[j][i] = true;
+            for (int k = 0; k < 10; k++)
+            {
+                if (j - 10 * k - i >= 0)
+                    pre[j][i] |= pre[j - 10 * k - i][i];
+            }
+        }
+    }
+}
 
 void solve()
 {
-    int n;
-    cin >> n;
-    vector<ar<int, 3>> cust(n);
-    vector<int> ans(n);
-    priority_queue<int, vector<int>, greater<int>> avail;
-    for (int i = 1; i <= n; i++)
-        avail.push(i);
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    int n, d;
+    cin >> n >> d;
     for (int i = 0; i < n; i++)
     {
-        cin >> cust[i][0] >> cust[i][1];
-        cust[i][2] = i;
-    }
-    sort(all(cust));
-    int cnt = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (!pq.empty() && pq.top().first < cust[i][0])
+        int x;
+        cin >> x;
+        if (x % d == 0)
+            cout << "YES"
+                 << "\n";
+        else
         {
-            avail.push(pq.top().second);
-            pq.pop();
+            if (x >= 10 * d)
+                cout << "YES"
+                     << "\n";
+            else if (pre[x][d])
+                cout << "YES"
+                     << "\n";
+            else
+                cout << "NO"
+                     << "\n";
         }
-        ans[cust[i][2]] = avail.top();
-        avail.pop();
-        pq.push({cust[i][1], ans[cust[i][2]]});
-        cnt = max(cnt, (int)pq.size());
     }
-    cout << cnt << "\n";
-    for (auto x : ans)
-        cout << x << " ";
-    cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t = 1;
-    //cin >> t;
+    prec();
+    int t;
+    cin >> t;
     while (t--)
     {
         solve();
