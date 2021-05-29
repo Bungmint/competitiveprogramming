@@ -1,12 +1,7 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 struct custom_hash
 {
@@ -30,11 +25,21 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e15;
+const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+	ll n,x;
+	cin >>  n >>x;
+	ll ans1 = 0, ans2=0;
+	for (int i=0;i<n;i++){
+		int t;
+		cin >> t;
+		ans1+=(t+x-1)/x;
+		ans2+=t;
+	}
+	cout << (ans2+x-1)/x <<" "<<ans1<<"\n";
 }
 
 int main()
@@ -47,7 +52,4 @@ int main()
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

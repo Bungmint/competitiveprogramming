@@ -63,21 +63,68 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 101;
+vector<pi> adj[N];
+bool vis[N][N];
+
+int bfs(int V, int U)
+{
+    memset(vis, 0, sizeof(vis));
+    queue<pi> q;
+    q.push({V, 0});
+    int ans = 0LL;
+    while (!q.empty())
+    {
+        int v = q.front().first, c = q.front().second;
+        q.pop();
+        if (vis[v][c])
+            continue;
+        vis[v][c] = true;
+        if (v == U)
+            ans++;
+        if (c == 0)
+        {
+            for (pi &p : adj[v])
+            {
+                q.push({p.first, p.second});
+            }
+            continue;
+        }
+        for (pi &p : adj[v])
+        {
+            if (p.second != c)
+                continue;
+            q.push({p.first, p.second});
+        }
+    }
+    return ans;
+}
 
 void solve()
 {
+    int n, m, q;
+    cin >> n >> m;
+    for (int i = 0; i < m; i++)
+    {
+        int u, v, c;
+        cin >> u >> v >> c;
+        adj[u].PB({v, c});
+        adj[v].PB({u, c});
+    }
+    cin >> q;
+    while (q--)
+    {
+        int u, v;
+        cin >> u >> v;
+        cout << bfs(u, v) << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

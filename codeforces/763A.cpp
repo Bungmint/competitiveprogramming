@@ -63,21 +63,92 @@ using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 1e5 + 1;
+bool subcol[N];
+int col[N], ans = -1;
+vi adj[N];
+
+void subdfs(int V, int pV)
+{
+    int pre = col[V];
+    subcol[V] = true;
+    for (auto &e : adj[V])
+    {
+        if (e == pV)
+            continue;
+        subdfs(e, V);
+        subcol[V] &= subcol[e];
+        if (pre != col[e])
+            subcol[V] = false;
+    }
+}
+void dfs(int V, int pV)
+{
+    int f = 0, child = -1;
+    if (subcol[V])
+    {
+        ans = V;
+        return;
+    }
+    for (auto &e : adj[V])
+    {
+        if (e == pV)
+            continue;
+        if (!subcol[e])
+        {
+            f++;
+            child = e;
+        }
+    }
+    if (f >= 2)
+        return;
+    if (f == 1)
+    {
+        unordered_set<int, custom_hash> s1;
+        for (int &e : adj[V])
+        {
+            if (e != child && e != pV)
+            {
+                s1.insert(col[e]);
+            }
+        }
+        if ((int)s1.size() >= 2 || (col[V] != col[pV] && pV != 0))
+            return;
+        dfs(child, V);
+    }
+    if (f == 0)
+        ans = V;
+}
 
 void solve()
 {
+    int n;
+    cin >> n;
+    for (int i = 0; i < n - 1; i++)
+    {
+        int u, v;
+        cin >> u >> v;
+        adj[u].PB(v);
+        adj[v].PB(u);
+    }
+    for (int i = 1; i <= n; i++)
+        cin >> col[i];
+    subdfs(1, 0);
+    dfs(1, 0);
+    if (ans == -1)
+        cout << "NO\n";
+    else
+    {
+        cout << "YES\n";
+        cout << ans << "\n";
+    }
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
+    solve();
 #ifdef LOCAL
     cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif

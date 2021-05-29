@@ -1,22 +1,19 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+using ll = long long;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
-using ll = long long;
-typedef vector<int> vi;
-typedef pair<int, int> pi;
 
 template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
 template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v)
 {
@@ -59,26 +56,43 @@ struct custom_hash
     }
 };
 
-using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+ll G[501][501], n, v[501], ans[501];
 
 void solve()
 {
+	cin >> n;
+	for (int i=0;i<n;i++)
+		for (int j=0;j<n;j++)
+			cin >> G[i][j];
+	for (int i=0;i<n;i++) cin >> v[i],v[i]--;
+	unordered_set<int, custom_hash> s1;
+	for (int i=n-1;i>=0;i--){
+		s1.insert(v[i]);
+		for (int j=0;j<n;j++)
+			for (int k=0;k<n;k++)
+				G[j][k] = min(G[j][k], G[j][v[i]]+G[v[i]][k]);
+		for (auto &j:s1){
+			for (auto &k:s1){
+				ans[i]+=G[j][k];
+				dbg(v[i], j, k, G[j][k]);
+			}
+		}
+	}
+	for (int i=0;i<n;i++) cout << ans[i] << " ";
+	cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
+    int t=1;
+    //cin >> t;
     while (t--)
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

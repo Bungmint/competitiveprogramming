@@ -1,16 +1,12 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
+#define REP(i,s,n) for (int i=s;i<n;i++)
 using ll = long long;
 typedef vector<int> vi;
 typedef pair<int, int> pi;
@@ -59,26 +55,46 @@ struct custom_hash
     }
 };
 
-using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N=1e5+1;
+int c[N], vis[N], u, v, col, n,m;
+vi adj[N];
+unordered_set<int,custom_hash> s1[N];
+
+void dfs(int V){
+	if (vis[V]) return;
+	vis[V] = true;
+	for (auto &e:adj[V]){
+		dfs(e);
+		if (c[e]!=c[V]){
+			s1[c[V]].insert(c[e]);
+			s1[c[e]].insert(c[V]);
+		}
+	}
+}
 
 void solve()
 {
+	cin >> n>>m;
+	set<int> colors;
+	REP(i,1,n+1){cin >>c[i];colors.insert(c[i]);}
+	REP(i,0,m)cin >> u >> v, adj[u].PB(v), adj[v].PB(u);
+	int ans=-1, num = -1;
+	REP(i,1,n+1){
+		if (!vis[i]) dfs(i);
+	}
+	for (auto &x:colors){
+		dbg(s1[x]);
+		if (ans<(int)s1[x].size())ans = (int)s1[x].size(), num = x;
+	}
+	cout << num << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    solve();
 }

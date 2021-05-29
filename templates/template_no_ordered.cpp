@@ -1,22 +1,22 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+using ll = long long;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
-using ll = long long;
-typedef vector<int> vi;
-typedef pair<int, int> pi;
+#define sz(x) (int)(x).size()
 
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
 template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
 template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v)
 {
@@ -59,7 +59,8 @@ struct custom_hash
     }
 };
 
-using ll = long long;
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
@@ -78,7 +79,4 @@ int main()
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

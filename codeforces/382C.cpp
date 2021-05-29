@@ -1,16 +1,12 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
+#define sz(x) (int)x.size()
 using ll = long long;
 typedef vector<int> vi;
 typedef pair<int, int> pi;
@@ -59,26 +55,89 @@ struct custom_hash
     }
 };
 
-using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 1e5;
+int v[N];
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=0;i<n;i++) cin >> v[i];
+	sort(v,v+n);
+	if (n==1){
+		cout << -1 << "\n";
+		return;
+	}
+	if (n==2){
+		if (v[0]!=v[1]){
+			int d = v[1]-v[0];
+			if (d%2){
+				cout << 2 << "\n";
+				cout << v[0]-d << " "<< v[1]+d << "\n";
+				
+			}else{
+				cout << 3 << "\n";
+				cout << v[0]-d << " "<< v[0]+d/2 << " "<<v[1]+d << "\n";
+			}
+		}else{
+			cout << 1 << "\n";
+			cout << v[0]<<"\n";
+		}
+		return;
+	}
+	unordered_map<int,int,custom_hash> s1;
+	for (int i=1;i<n;i++){
+		s1[v[i]-v[i-1]]++;
+	}
+	int s = sz(s1);
+	if(s==1){
+		int d = s1.begin()->first;
+		if (d==0){
+			cout << 1 << "\n";
+			cout << v[0]<<"\n";
+			return;
+		}
+		cout << 2 << "\n";
+		cout << v[0]-d<< " "<< v[n-1] + d << "\n";
+	}else if(s==2){
+		auto it = s1.begin();
+		int d1 = it->first, n1 = it->second;
+		it++;
+		int d2 = it->first, n2 = it->second;
+		if ((n1!=1&&n2!=1)||(d1!=2*d2&&d2!=2*d1)||(n1>=2&&d1>d2)||(n2>=2&&d2>d1)){
+			cout << 0 << "\n";
+			return;
+		}
+		cout << 1 << "\n";
+		if (d1>d2){
+			for (int i=1;i<n;i++){
+				if (v[i]-v[i-1]==d1){
+					cout << v[i-1] + d2 << "\n";
+					return;
+				}
+			}
+		}
+		for (int i=1;i<n;i++){
+				if (v[i]-v[i-1]==d2){
+					cout << v[i-1] + d1 << "\n";
+					return;
+				}
+			}
+	}else{
+		cout << 0 << "\n";
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
+    int t=1;
     while (t--)
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

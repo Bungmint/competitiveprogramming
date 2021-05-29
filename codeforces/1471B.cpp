@@ -1,12 +1,7 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 struct custom_hash
 {
@@ -30,11 +25,35 @@ struct custom_hash
 #define PB push_back
 using ll = long long;
 const int INF = 1e9;
-const ll LINF = 1e15;
+const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+	int n,x;
+	cin >>n>>x;
+	vector<ll> v(n), cnt(n);
+	for (int i=0;i<n;i++) cin >> v[i];
+	ll idx=n-1, mi=INF;
+	for (int i=0;i<n;i++){
+		ll cur = v[i];
+		while(cur%x==0){
+			cnt[i]++;
+			cur/=x;
+		}
+		if (mi>cnt[i]){
+			idx = i;
+			mi =cnt[i];
+		}
+	}
+	ll ans = 0LL;
+	for (int i=0;i<=idx;i++){
+		ans+=v[i]*(min(mi+2, cnt[i]+1));
+	}
+	for (int i=idx+1;i<n;i++){
+		ans += v[i]*(min(mi+1, cnt[i]+1));
+	}
+	cout << ans << "\n";
 }
 
 int main()
@@ -47,7 +66,4 @@ int main()
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

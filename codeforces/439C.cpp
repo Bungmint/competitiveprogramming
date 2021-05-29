@@ -1,12 +1,7 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -59,26 +54,67 @@ struct custom_hash
     }
 };
 
-using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
 
 void solve()
 {
+	int n,k,p;
+	cin >> n >>k >>p;
+	vi v(n);
+	int odd =0, even = 0;
+	for (int i=0;i<n;i++){
+		cin >>v[i];
+		if (v[i]%2) odd++;
+		else even++;
+	}	
+	if (odd<k-p){
+		cout << "NO\n";
+		return;
+	}
+	odd-=(k-p);
+	if (odd%2){
+		cout << "NO\n";
+		return;
+	}
+	if (even+odd/2<p){
+		cout << "NO\n";
+		return;
+	}
+	cout << "YES\n";
+	vector<vi> ans(k);
+	vi o, e;
+	for (int i=0;i<n;i++){
+		if (v[i]%2) o.PB(v[i]);
+		else e.PB(v[i]);
+	}
+	for (int i=0;i<k-p;i++){
+		ans[k-1-i].PB(o[i]);
+	}
+	int cnt = p-1;
+	for (int i=k-p;i<(int)o.size();i++){
+		if (cnt<0){ans[0].PB(o[i]);continue;}
+		ans[cnt].PB(o[i]);
+		if ((i-k+p)%2){
+			cnt--;
+		}
+	}
+	for (int i=0;i<(int)e.size();i++){
+		if (i<p) ans[i].PB(e[i]);
+		else ans[0].PB(e[i]);
+	}
+	for (auto x:ans){
+		cout << (int)x.size()<<" ";
+		for (auto y:x) cout << y << " ";
+		cout << "\n";
+	}
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        solve();
-    }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    solve();
 }

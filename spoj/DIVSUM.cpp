@@ -1,22 +1,19 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+using ll = long long;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
 #define PB push_back
-using ll = long long;
-typedef vector<int> vi;
-typedef pair<int, int> pi;
 
 template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
 template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v)
 {
@@ -59,26 +56,34 @@ struct custom_hash
     }
 };
 
-using ll = long long;
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353
+const int N = 5e5+1;
+int di[N];
+
+inline void p(){
+	for (int i=1;i<N;i++)
+		for (int j=2*i;j<N;j+=i)
+			di[j]+=i;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	cout << di[n]<<"\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
+    p();
     int t;
     cin >> t;
     while (t--)
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }
