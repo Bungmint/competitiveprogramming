@@ -4,11 +4,20 @@
 using namespace std;
 
 using ll = long long;
+using vi = vector<int>;
+using pi = pair<int, int>;
+using vpi = vector<pair<int, int>>;
+using pl = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pl>;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
 
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
@@ -63,7 +72,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
+const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
@@ -73,9 +82,9 @@ int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
+    int testcase;
+    cin >> testcase;
+    while (testcase--)
     {
         solve();
     }
