@@ -69,30 +69,63 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+1;
+int a[N], subtree[N];
+vi G[N];
+ll dp[N], mx[N], res = -LINF;
+
+void dfs(int V,int pV){
+	subtree[V] = 1;
+	dp[V] = a[V];
+	vl choice;
+	for (int e:G[V]){
+		if (e==pV) continue;
+		dfs(e,V);
+		subtree[V] += subtree[e];
+		dp[V] += dp[e];
+		mx[V] = max(mx[V], mx[e]);
+		choice.pb(mx[e]);
+	}
+	sort(all(choice), greater<ll>());
+	if (sz(choice)>=2){
+		res = max(res, choice[0]+choice[1]);
+	}
+	mx[V] = max(mx[V], dp[V]);
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> a[i];
+	for (int i=0;i<n-1;++i){
+		int u,v;
+		cin >> u >> v;
+		G[u].pb(v);G[v].pb(u);
+	}
+	if (n==1){
+		cout << "Impossible"<<"\n";
+		return;
+	}
+	for (int i=1;i<=n;++i){
+		dp[i] = mx[i] = -LINF;
+	}
+	dfs(1,0);
+	if (res==-LINF){
+		cout << "Impossible\n";
+		return;
+	}
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

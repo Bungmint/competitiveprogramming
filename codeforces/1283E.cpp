@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,30 +68,65 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+10;
+int cnt[N];
+bool vis[N], meh[N];
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i], cnt[a[i]]++;
+	int mi =0, ma = 0;
+	for (int i=1;i<=n;++i){
+		int k = cnt[i];
+		if (!k) continue;
+		if (!(meh[i])&&!meh[i-1]){
+			meh[i+1] = 1;
+		}
+		
+		
+		if (k>=3){
+			vis[i-1]=1;
+			vis[i]=1;
+			vis[i+1] = 1;
+		}else{
+			if (k==1){
+				if (vis[i-1]&&vis[i]){
+					vis[i+1] = 1;
+				}else if (vis[i-1]){
+					vis[i] = 1;
+				}else{
+					vis[i-1] = 1;
+				}
+			}else{
+				if (vis[i-1]){
+					vis[i] = 1;
+					vis[i+1] = 1;
+				}else{
+					vis[i-1] = 1;
+					vis[i] = 1;
+				}
+			}
+		}
+	}
+	for (int i=0;i<=n+1;++i){
+		if (vis[i]) ma++;
+		if (meh[i]) mi++;
+	}
+	cout << mi <<" " << ma << "\n";
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

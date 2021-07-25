@@ -83,6 +83,20 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	if (n==1){
+		cout << 0 << "\n";
+		return;
+	}
+	if (n==2){
+		cout << 1 << "\n";
+		return;
+	}
+	if (n%2==0){
+		cout << 2 << "\n";
+	}else cout << min(n-1, 3) << "\n";
+	
 }
 
 int main()

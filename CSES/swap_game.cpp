@@ -80,17 +80,71 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int powers[10];
+
+int move(int grid, int i, int j)
+{
+	int a = grid % powers[i + 1] / powers[i];
+	int b = grid % powers[j + 1] / powers[j];
+	return grid - a * powers[i] - b * powers[j] + b * powers[i] + a * powers[j];
+}
 
 void solve()
 {
+	powers[0] = 1;
+	for (int i=1;i<10;++i) powers[i] = powers[i-1]*9;
+	vector<bool> vis(powers[9], false);
+	int target = 0;
+	for (int i=0;i<9;++i){
+		target += (8-i)*powers[i];
+	}
+	int st = 0;
+	for (int i=8;i>=0;--i){
+		int t;
+		cin>> t;
+		st += (t-1)*powers[i];
+	}
+	queue<pi> q;
+	q.push({st,0});
+	while(!q.empty()){
+		auto [g,dist] = q.front();
+		if (g==target){
+			cout <<dist << endl;
+			return;
+		}
+		q.pop();
+		for (int i = 0; i < 8; i++)
+		{
+			if (i % 3 == 2)
+			{
+				continue;
+			}
+			int swapped = move(g, 8 - i, 8 - (i + 1));
+			if (!vis[swapped])
+			{
+				q.push({swapped, dist + 1});
+				vis[swapped] = true;
+			}
+		}
+		// swap two vertically adjacent pieces
+		for (int i = 0; i < 6; i++)
+		{
+			int swapped = move(g, 8 - i, 8 - (i + 3));
+			if (!vis[swapped])
+			{
+				q.push({swapped, dist + 1});
+				vis[swapped] = true;
+			}
+		}
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

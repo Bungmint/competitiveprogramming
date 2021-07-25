@@ -1,3 +1,11 @@
+// Problem: U - Grouping
+// Contest: AtCoder - Educational DP Contest
+// URL: https://atcoder.jp/contests/dp/tasks/dp_u
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,37 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll dp[1<<16], a[16][16], cost[1<<16];
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j) cin >> a[i][j];
+	for (int mask=1;mask<(1<<n);++mask){
+		int last = 31-__builtin_clz(mask);
+		int prevMask = mask-(1<<last);
+		cost[mask] = cost[prevMask];
+		for (int i=0;i<last;++i){
+			if (mask&(1<<i))cost[mask] += a[i][last];
+		}
+	
+	}
+	for (int mask=1;mask<(1<<n);++mask){
+		dp[mask] = -LINF;
+		for (int sub = mask;sub;sub = (sub-1)&mask){
+			dp[mask] = max(dp[mask], cost[sub]+dp[(mask-sub)]);
+		}
+	}
+	cout << dp[(1<<n)-1]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: Problem 2. Telephone
+// Contest: USACO - USACO 2021 January Contest, Gold
+// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=1090
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,54 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int cow[50010];
+int adj[51][51];
+int cost[51][50001];
+int n, k;
 
 void solve()
 {
+	cin >> n >> k;
+	for (int i=1;i<=n;++i) cin >> cow[i];
+	char c;
+	for (int i=1;i<=k;++i){
+		for (int j=1;j<=k;++j){
+			cin >> c;
+			adj[i][j] = (c=='1');
+		}
+		adj[i][0] = adj[i][cow[n]];
+	}
+	cow[n] = 0;
+	memset(cost, -1, sizeof(cost));
+	deque<pi> q;
+	cost[cow[1]][1] = 0;
+	q.pb({cow[1], 1});
+	while(sz(q)){
+		auto [b,loc] = q.front();
+		dbg(b, loc);
+		q.pop_front();
+		if (loc-1>=1&&cost[b][loc-1]==-1){
+			cost[b][loc-1] = cost[b][loc] +1;
+			q.pb({b, loc-1});
+		}
+		if (loc+1<=n&&cost[b][loc+1]==-1){
+			cost[b][loc+1] = cost[b][loc] +1;
+			q.pb({b, loc+1});
+		}
+		if (adj[b][cow[loc]]&&cost[cow[loc]][loc]==-1){
+			cost[cow[loc]][loc] = cost[b][loc];
+			q.push_front({cow[loc], loc});
+		}
+	}
+	cout << cost[0][n]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

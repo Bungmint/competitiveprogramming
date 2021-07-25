@@ -1,3 +1,11 @@
+// Problem: E. Minimax
+// Contest: Codeforces - Codeforces Round #733 (Div. 1 + Div. 2, based on VK Cup 2021 - Elimination (Engine))
+// URL: https://codeforces.com/contest/1530/problem/E
+// Memory Limit: 512 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,93 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	string s;
+	cin >> s;
+	int n = sz(s);
+	vi cnt(26);
+	for (int i=0;i<n;++i) cnt[s[i]-'a']++;
+	dbg(cnt);
+	int mi = INF;
+	int id = -1;
+	for (int i=0;i<26;++i){
+		if (cnt[i]&&mi>cnt[i]) mi = cnt[i], id = i;
+	}
+	if (mi==n){
+		cout << s << "\n";
+		return;
+	}
+	if (mi==1){
+		// Zero
+		for (int i=0;i<cnt[id];++i) cout << (char)('a'+id);
+		for (int i=0;i<26;++i){
+			if (i==id) continue;
+			for (int j=0;j<cnt[i];++j){
+				cout << (char)('a'+i);
+			}
+		}
+		cout << "\n";
+	}else{
+		// Juan
+		int mi = INF;
+		for (int i=0;i<26;++i){
+			if (cnt[i]) mi = min(mi, i);
+		}
+		string tmp = "";
+		for (int i=mi+1;i<26;++i){
+			for (int j=0;j<cnt[i];++j) tmp+=(char)('a'+i);
+		}
+		dbg(mi);
+		if (cnt[mi]*2<=n+2){
+			for (int i=0;i<2;++i) cout << (char)('a'+mi);
+			int ptr = 0;
+			for (int i=2;i<cnt[mi];++i){
+				cout << tmp[ptr++];
+				cout << (char)('a'+mi);
+			}
+			for (int i=ptr;i<sz(tmp);++i) cout << tmp[i];
+			cout << "\n";
+		}else{
+			int avail=0;
+			for (int i=0;i<26;++i){
+				if (i!=mi&&cnt[i]) avail++;
+			}
+			if (avail==1){
+				int j;
+				for (int i=0;i<26;++i){
+					if (i!=mi&&cnt[i]) j = i;
+				}
+		
+				cout << (char)('a'+mi);
+				for (int i=0;i<cnt[j];++i) cout << (char)('a'+j);
+				for (int i=1;i<cnt[mi];++i) cout << (char)('a'+mi);
+				cout << "\n";
+			}else{
+				int j=-1, k=-1;
+				string tmp;
+				for (int i=0;i<26;++i){
+					if (i!=mi&&cnt[i]){
+						if (j==-1){
+							j=i;
+							for (int x=1;x<cnt[i];++x) tmp+=(char)('a'+i);
+						}else if (k==-1){
+							k=i;
+							for (int x=1;x<cnt[i];++x) tmp+=(char)('a'+i);
+						}else{
+							for (int x=0;x<cnt[i];++x) tmp+=(char)('a'+i);
+						}
+					}
+				}
+				cout << (char)('a'+mi);
+				cout << (char)('a'+j);
+				for (int i=1;i<cnt[mi];++i){
+					cout << (char)('a'+mi);
+				}
+				cout << (char)('a'+k);
+				cout << tmp;
+				cout << "\n";
+			}
+		}
+	}
 }
 
 int main()

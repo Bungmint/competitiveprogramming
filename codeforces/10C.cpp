@@ -69,30 +69,55 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e6+1;
+ll d[50], pre[N];
+
+inline int digital_root(int x){
+	int res = 0;
+	while(x){
+		res += (x%10);
+		x/=10;
+	}
+	return res;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	ll res = 0;
+	for (int i=1;i<=n;++i){
+		pre[i] = digital_root(i);
+		if (pre[i]>9) pre[i] = pre[pre[i]];
+		d[pre[i]]++;
+		dbg(pre[i], d[pre[i]]);
+	}
+	for (int i=n+1;i<N;++i){
+		pre[i] = digital_root(i);
+		if (pre[i]>9) pre[i] = pre[pre[i]];
+	}
+	for (int i = 1;i<=45;++i){
+		for (int j=1;j<=45;++j){
+			res += d[i]*d[j] * d[pre[i*j]];
+		}
+	}
+	dbg(res);
+	for (int i=1;i<=n;++i){
+		for (int j=1;i*j<=n;j++){
+			if (pre[i*j]==pre[pre[i]*pre[j]]) res--;
+		}
+	}
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

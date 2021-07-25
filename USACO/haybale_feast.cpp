@@ -1,3 +1,11 @@
+// Problem: Problem 3. Haybale Feast
+// Contest: USACO - USACO 2017 December Contest, Gold
+// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=767
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,45 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+deque<pi> m1, m2;
+ll sum = 0;
+ll n, m;
+int f[100000], s[100000];
 
 void solve()
 {
+	cin >> n>>m;
+	for(int i=0;i<n;++i) cin >> f[i]>>s[i];
+	int l =0, r = 0;
+	int res = INF;
+	multiset<int, greater<int>> st;
+	for (;r<n;++r){
+		st.insert(s[r]);
+		sum += f[r];
+		while(sum>=m&&l<n){
+			sum-=f[l];
+			auto it = st.find(s[l]);
+			st.erase(it);
+			l++;
+			if (sum<m){
+				l--;
+				sum += f[l];
+				st.insert(s[l]);
+				break;
+			}
+		}
+		if (sum>=m) res = min(res, *st.begin());
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    setIO("hayfeast");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -69,28 +69,74 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e5+1;
+const ld eps = 1e-9;
+int a[N];
+pair<ld,int> dp[N][10];
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	for (int i=1;i<=n;++i){
+		cin >> a[i];
+	}
+	for (int i=0;i<=n;++i){
+		for (int j=0;j<10;++j) dp[i][j] = {-1, -1};
+	}
+	dp[0][1] = {0, 0};
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<10;++j){
+			if (dp[i-1][j].fi<-0.5) continue;
+			dp[i][j] = {dp[i-1][j].fi, -1};
+		}
+		ld lg = log10(a[i]);
+		for (int j=0;j<10;++j){
+			if (dp[i-1][j].fi<-0.5) continue;
+			dbg(dp[i-1][j], j);
+			int d = (j*a[i])%10;
+			if (dp[i][d].fi<dp[i-1][j].fi + lg&&dp[i-1][j].fi+lg-dp[i][d].fi>eps){
+				dp[i][d] = {dp[i-1][j].fi+lg, j};
+			}
+			dbg(dp[i][d], d);
+		}
+	}
+	if (dp[n][k].fi<-0.5){
+		cout << -1 << "\n";
+		return;
+	}
+	dbg(dp[n][k].fi);
+	vi ans;
+	int cur = n, d = k;
+	while(cur>0){
+		if (dp[cur][d].se<0){
+			cur--;
+		}else{
+			ans.pb(cur);
+			d = dp[cur][d].se;
+			cur--;
+		}
+	}
+	reverse(all(ans));
+	if (!sz(ans)){
+		cout << -1 << "\n";
+		return;
+	}
+	cout << sz(ans)<<"\n";
+	for (int x:ans) cout << a[x] << " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    int testcase=1;
+    //cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -69,30 +69,76 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 3e5, LOG = 30;
+int a[N];
+int trie[6000000][2];
+vi S[6000000];
+ll dp[2][30];
+const int root = 1;
+int cur = 1;
+
+void insert(int idx){
+	int now = root;
+	int x = a[idx];
+	for (int i=29;i>=0;i--){
+		int c = ((x>>i)&1);
+		if (trie[now][c]==0){
+			trie[now][c] = ++cur;
+		}
+		now = trie[now][c];
+		S[now].pb(idx);
+		dbg(now, S[now]);
+	}
+}
+
+void go(int v, int pos = 29){
+	int l = trie[v][0], r = trie[v][1];
+	if (l) go(l, pos-1);
+	if (r) go(r, pos-1);
+	if (l==0||r==0) return;
+	ll res = 0;
+	int ptr = 0;
+	for (int x:S[l]){
+		while(ptr<sz(S[r])&&S[r][ptr]<x){
+			ptr++;
+		}
+		res+=ptr;
+	}
+	dp[0][pos] += res;
+	dp[1][pos] += sz(S[l])*1LL*sz(S[r]) - res;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		insert(i);
+	}
+	go(root);
+	int ans = 0;
+	ll res = 0;
+	for (int i=29;i>=0;i--){
+		if (!dp[0][i]) continue;
+		if (dp[0][i]>dp[1][i]){
+			ans^=(1<<i);
+			res += dp[1][i];
+		}else{
+			res += dp[0][i];
+		}
+	}
+	cout << res << " "<< ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

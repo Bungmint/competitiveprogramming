@@ -69,12 +69,6 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
@@ -83,12 +77,31 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int xa, ya, xb,yb,xf,yf;
+	cin >> xa >> ya >> xb >> yb >> xf >> yf;
+	if (ya>yb){
+		swap(xa, xb);
+		swap(ya, yb);
+	}
+	if (xa==xb&&xf==xa&&ya<=yf&&yf<=yb){
+		cout << (yb-ya)+2 << "\n";
+		return;
+	}
+	if (xa>xb){
+		swap(xa, xb);
+		swap(ya, yb);
+	}
+	if (ya==yb&&yf==yb&&xa<=xf&&xf<=xb){
+		cout << (xb-xa+2)<<"\n";
+		return;
+	}
+	cout << abs(xa-xb) + abs(ya-yb)<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

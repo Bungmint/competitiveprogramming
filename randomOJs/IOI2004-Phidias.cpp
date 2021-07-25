@@ -81,16 +81,38 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+int n, m, k;
+int dp[602][602], C[602][602];
+
 void solve()
 {
+	cin >> n >> m >> k;
+	for (int i=0;i<k;++i){
+		int x, y;
+		cin >> x >> y;
+		C[x][y] = 1;
+	}
+	for (int x=1;x<=n;++x){
+		for (int y=1;y<=m;++y){
+			if (C[x][y]) continue;
+			dp[x][y] = x*y;
+			for (int i=1;i<=x/2;++i){
+				dp[x][y] = min(dp[x][y], dp[i][y]+dp[x-i][y]);
+			}
+			for (int j=1;j<=y/2;++j){
+				dp[x][y] = min(dp[x][y], dp[x][j]+dp[x][y-j]);
+			}
+		}
+	}
+	cout << dp[n][m]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: A. Fancy Fence
+// Contest: Codeforces - Central-European Olympiad in Informatics, CEOI 2020, Day 1 (IOI, Unofficial Mirror Contest, Unrated)
+// URL: https://codeforces.com/contest/1402/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -69,11 +77,18 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -158,41 +173,67 @@ Mint nCk(ll n, ll k)
     return fact[n] * inv_fact[k] * inv_fact[n - k];
 }
 
+Mint nC2(ll n){
+	return (Mint)n*(Mint)(n-1)/(Mint)2;
+}
+
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n;
+	cin >> n;
+	vector<ll> h(n+1), w(n+1), pref(n+1);
+	vi l(n+1), r(n+1), leftmost(n+1);
+	for (int i=1;i<=n;++i){
+		cin >> h[i];
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	// sort(all(order));
+	// order.resize(unique(all(order))-order.begin());
+	// for (int i=1;i<=n;++i) h[i] = lb(all(order), h[i])-order.begin();
+	for (int j=1;j<=n;++j) cin >> w[j], pref[j] = pref[j-1] + w[j];
+	stack<int>st;
+	for (int i=1;i<=n;++i){
+		while(!st.empty()&&h[st.top()]>=h[i]){
+			if (h[st.top()]==h[i]){
+				leftmost[i] =st.top();
+			}
+			st.pop();
+		}
+		l[i] = (st.empty()? 0:st.top());
+		st.push(i);
+		if (!leftmost[i]) leftmost[i] = i;
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	while(sz(st))st.pop();
+	for (int i=n;i>=1;i--){
+		while(!st.empty()&&h[st.top()]>=h[i])st.pop();
+		r[i] = (st.empty()? n+1:st.top());
+		st.push(i);
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
+	for (int i=1;i<=n;++i){
+		int L = l[i], R = r[i]; //L+1~R-1
+		if (leftmost[i]!=i) L = max(L, leftmost[i]);
+		dbg(L,R);
+		Mint wL = pref[i-1] - pref[L];
+		Mint wR = pref[R-1] - pref[i];
+		dbg(wL,wR);
+		Mint x = nC2(h[i]+1);
+		dbg(x);
+		Mint y = wL*w[i] + (Mint)w[i]*(Mint)(w[i]+1)/(Mint)2 + (wL+(Mint)w[i])*(Mint)wR;
+		ans += x*y;
+		dbg(y);
 	}
-	cout << ans << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    precalc();
-    solve();
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

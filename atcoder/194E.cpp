@@ -69,28 +69,46 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
+
 void solve()
 {
+	int n, m;
+	scanf("%d %d", &n, &m);
+	vi a(n);
+	for (int &e:a) scanf("%d", &e);
+	map<int,int> freq;
+	vi dummy(m+1);
+	iota(all(dummy), 0);
+	set<int> mex(all(dummy));
+	int res = INF;
+	for (int i=0;i<m;++i){
+		freq[a[i]]++;
+		if (freq[a[i]]==1&&mex.count(a[i])) mex.erase(a[i]);
+	}
+	res = min(res, *mex.begin());
+	for (int i=m;i<n;++i){
+		freq[a[i]]++;
+		if (freq[a[i]]==1&&mex.count(a[i])) mex.erase(a[i]);
+		freq[a[i-m]]--;
+		if (!freq[a[i-m]]) mex.insert(a[i-m]);
+		res = min(res, *mex.begin());
+	}
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    // ios_base::sync_with_stdio(false);
+    // cin.tie(NULL);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

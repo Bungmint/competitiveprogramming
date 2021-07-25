@@ -69,26 +69,63 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+1;
+vi G[N];
+ar<int,3> Edge[N];
+vi order;
+bool vis[N];
+
+void dfs(int V){
+	vis[V] = 1;
+	for (int e:G[V]){
+		if (!vis[e]) dfs(e);
+	}
+	order.pb(V);
+}
+
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	dbg(n,m);
+	order.clear();
+	vi v(n+1);
+	for (int i=0;i<=n;++i) G[i].clear(), vis[i] = 0;
+	for (int j=0;j<m;++j){
+		int t, x, y;
+		cin >> t >> x >> y;
+		Edge[j] = {t, x,y};
+		if (t) G[x].pb(y);
+	}
+	for (int i=1;i<=n;++i){
+		if (!vis[i]) dfs(i);
+	}
+	reverse(all(order));
+	for (int i=0;i<n;++i) v[order[i]] = i;
+	for (int i=0;i<m;++i){
+		if (Edge[i][0]){
+			if (v[Edge[i][1]]>v[Edge[i][2]]){
+				cout << "NO\n";
+				return;
+			}
+		}else{
+			if (v[Edge[i][1]]>v[Edge[i][2]]) swap(Edge[i][1], Edge[i][2]);
+		}
+	}
+	cout << "YES\n";
+	for (int i=0;i<m;++i) cout << Edge[i][1]<< " "<< Edge[i][2]<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

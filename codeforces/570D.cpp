@@ -1,3 +1,11 @@
+// Problem: D. Tree Requests
+// Contest: Codeforces - Codeforces Round #316 (Div. 2)
+// URL: https://codeforces.com/contest/570/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,79 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 5e5+1;
+vi g[N];
+char c[N];
+vpi queries[N];
+int depth[N], st[N], ft[N], ver[N], subtree[N], timer = 0, h[N][26];
+bool ans[N];
+
+void dfsSubtree(int v, int pv){
+	st[v] = timer++;
+	ver[st[v]] = v;
+	subtree[v] = 1;
+	for (int e:g[v]){
+		if (e!=pv){depth[e]=depth[v]+1;dfsSubtree(e,v);subtree[v]+=subtree[e];}
+	}
+	ft[v] = timer;
+}
+
+void dfs(int v, int pv, bool keep){
+	int bigChild = -1, mx = 0;
+	for (int e:g[v]){
+		if (e!=pv&&mx<subtree[e]) mx = subtree[e], bigChild = e;
+	}
+	for (int e:g[v]){
+		if (e!=pv&&e!=bigChild) dfs(e,v, 0);
+	}
+	if (bigChild!=-1) dfs(bigChild, v, 1);
+	for (int e:g[v]){
+		if (e!=pv&&e!=bigChild){
+			for (int j=st[e];j<ft[e];++j){
+				h[depth[ver[j]]][c[ver[j]]-'a']++;
+			}
+		}
+	}
+	h[depth[v]][c[v]-'a']++;
+	for (auto [height, id]:queries[v]){
+		int odd = 0;
+		for (int x=0;x<26;++x){
+			if (h[height][x]&1){
+				odd++; 
+			}
+		}
+		ans[id] = (odd<=1);
+	}
+	if (!keep){
+		for (int j=st[v];j<ft[v];++j){
+			h[depth[ver[j]]][c[ver[j]]-'a']--;
+		}
+	}
+}
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	depth[1] = 1;
+	for (int i=2;i<=n;++i){int t;cin >> t;g[t].pb(i), g[i].pb(t);}
+	for (int i=1;i<=n;++i)cin>>c[i];
+	for (int i=0;i<m;++i){
+		int v, h;
+		cin >> v >> h;
+		queries[v].pb({h,i});
+	}
+	dfsSubtree(1,0);
+	dfs(1,0,0);
+	for (int i=0;i<m;++i) cout << (ans[i]? "Yes":"No")<< "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

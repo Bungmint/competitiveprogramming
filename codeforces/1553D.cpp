@@ -1,3 +1,11 @@
+// Problem: D. Backspace
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/contest/1553/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,31 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
 void solve()
 {
+	string s, t;
+	cin >> s >> t;
+	int n = sz(s), m = sz(t);
+	if (n<m){
+		cout << "NO\n";
+		return;
+	}
+	int p = (n-m)&1;
+	int q = 0, k= 0;
+	for (int i=p;i<n;++i){
+		if (k==1){
+			k = 0;
+			continue;
+		}
+		if (q<m&&s[i]==t[q]){
+			q++;
+		}else{
+			k++;
+		}
+	}
+	cout << (q==m? "YES":"NO")<<"\n";
+	
 }
 
 int main()

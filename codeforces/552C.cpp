@@ -1,3 +1,11 @@
+// Problem: C. Vanya and Scales
+// Contest: Codeforces - Codeforces Round #308 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/552/C
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,18 +89,44 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
-void solve()
+
+bool solve()
 {
+	int w, m;
+	cin >> w >> m;
+	vi baseW;
+	for (int x=m;x>0;x/=w){
+		baseW.pb(x%w);
+	}
+	bool res = 1;
+	for (int i=0;i<sz(baseW);++i) if (baseW[i]&&baseW[i]!=1) res = 0; 
+	if (res) return 1;
+	for (int i=0;i<sz(baseW);++i){
+		if (!baseW[i]) continue;
+		if (baseW[i]==w){
+			baseW[i]-=w;
+			if (i+1<sz(baseW)) baseW[i+1]++;
+			continue;
+		}
+		if (baseW[i]<w-1&&baseW[i]!=1) return 0;
+		else if (baseW[i]==w-1){
+			baseW[i]=0;
+			if (i+1<sz(baseW))baseW[i+1]++;
+		}else{
+			baseW[i] = 0;
+		}
+	}
+	return 1;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
-        solve();
+        cout << (solve()? "YES":"NO")<<endl;
     }
 }

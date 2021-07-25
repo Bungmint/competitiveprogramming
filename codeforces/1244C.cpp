@@ -69,30 +69,124 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+using BigInt = __int128_t;
+
+__int128_t read()
+{
+    __int128_t x = 0, f = 1;
+    char ch = getchar();
+    while (ch < '0' || ch > '9')
+    {
+        if (ch == '-')
+            f = -1;
+        ch = getchar();
+    }
+    while (ch >= '0' && ch <= '9')
+    {
+        x = x * 10 + ch - '0';
+        ch = getchar();
+    }
+    return x * f;
+}
+void print(__int128_t x)
+{
+    if (x < 0)
+    {
+        putchar('-');
+        x = -x;
+    }
+    if (x > 9)
+        print(x / 10);
+    putchar(x % 10 + '0');
+}
+bool cmp(__int128_t x, __int128_t y) { return x > y; }
+
+ostream& operator<< (ostream& os, BigInt x){
+	if (x<0){
+		os << "-";
+		x = -x;
+	}
+	if (x==0){
+		os << 0;
+		return os;
+	}
+	string res = "";
+	while(x){
+		res += (x%10) + '0';
+		x/=10;
+	}
+	reverse(all(res));
+	os << res;
+	return os;
+}
+
+BigInt GCD(BigInt a, BigInt b){
+	return (b==0? a:GCD(b, a%b));
+}
+
+BigInt gcd(BigInt a, BigInt b, BigInt& x, BigInt& y) {
+    if (b == 0) {
+        x = 1;
+        y = 0;
+        return a;
+    }
+    BigInt x1, y1;
+    BigInt d = gcd(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * (a / b);
+    return d;
+}
 
 void solve()
 {
+	ll n, p, w,d;
+	cin >> n >> p >> w>>d;
+	if (p%GCD(w,d)!=0){
+		cout << -1 << "\n";
+		return;
+	}
+	BigInt x, y, tmp;
+	BigInt g = gcd(w,d, x, y);
+	x *= p/g;
+	y *= p/g;
+	BigInt lo, hi;
+	w /= g;
+	d /=g;
+	if (y>0){
+		hi = y/w;
+	}else{
+		hi = (y-w+1)/w;
+	}
+	tmp = -x;
+	if (tmp>0){
+		lo = (tmp+d-1)/d;
+	}else{
+		lo = (tmp-d+1)/d;
+	}
+	//cout << lo << " "<< hi << "\n";
+	if (lo>hi){
+		cout << -1 << "\n";
+		return;
+	}
+
+	BigInt a = x + hi*d, b = y-hi*w;
+	BigInt c = n-a-b;
+	if (c<0||a<0||b<0){
+		cout << -1 << "\n";
+		return;
+	}
+	
+	cout << a << " "<< b << " "<<c <<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+	ios_base::sync_with_stdio(0);
+	cin.tie(0), cout.tie(0);
+    solve();
 }

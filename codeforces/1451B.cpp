@@ -83,6 +83,36 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, q;
+	cin >> n >> q;
+	string s;
+	cin >> s;
+	for (int i=0;i<q;++i){
+		int l, r;
+		cin >> l >> r;
+		l--;r--;
+		string t = s.substr(l, r-l+1);
+		bool ok = 0;
+		vi pref(n), suf(n);
+		int len=r-l+1,ptr = 0;
+		for (int j=0;j<=n-1;++j){
+			if (ptr<len&&s[j]==t[ptr]) ptr++;
+			pref[j] = ptr;
+		}
+		ptr = len-1;
+		for (int j=n-1;j>=0;j--){
+			if (ptr>=0&&s[j]==t[ptr])ptr--;
+			suf[j] = ptr;
+		}
+		dbg(pref, suf, t);
+		for (int j=0;j<n;++j){
+			if (j&&j<n-1){
+				dbg(pref[j-1], suf[j+1]);
+				ok |= (pref[j-1]>suf[j+1]&&suf[j+1]!=len-1&&pref[j-1]!=0);
+			}
+		}
+		cout << (ok? "YES":"NO")<<"\n";
+	}
 }
 
 int main()

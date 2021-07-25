@@ -1,3 +1,11 @@
+// Problem: E. Fish
+// Contest: Codeforces - Codeforces Beta Round #16 (Div. 2 Only)
+// URL: https://codeforces.com/problemset/problem/16/E
+// Memory Limit: 128 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,46 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const ld eps = 1e-6;
+ld dp[1<<18];
+ld p[18][18];
+int n;
+
+ld nC2(int x){
+	ld v = (ld)x*(ld)(x-1)/(ld)2;
+	return (ld)1/v;
+}
 
 void solve()
 {
+	cin >> n;
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j) cin >> p[i][j];
+	dp[0] = 1.0;
+	for (int mask=0;mask<(1<<n);++mask){
+		int cnt = n - __builtin_popcount(mask);
+		if (cnt<=1) continue;
+		for (int i=0;i<n;++i){
+			if (((1<<i)&mask)) continue;
+			for (int j=i+1;j<n;++j){
+				if (((1<<j)&mask)) continue;
+				dp[mask|(1<<i)] += dp[mask]*p[j][i]*nC2(cnt);
+				dp[mask|(1<<j)] += dp[mask]*p[i][j]*nC2(cnt);
+				dbg(dp[mask|(1<<i)]);
+			}	
+		}
+	}
+	cout << fixed << setprecision(6);
+	
+	for (int i=0;i<n;++i) cout << dp[((1<<n)-1)^(1<<i)]<<" ";
+	cout << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

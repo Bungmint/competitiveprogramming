@@ -69,26 +69,105 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 4e5+1;
+vi G[N], revG[N];
+int infinite[N], dp[N], loop[N];
+vi order, comp;
+bool vis[N], reach[N];
+
+void simple_dfs(int v){
+	reach[v] = 1;
+	for (int e:G[v]){
+		if (!reach[e]) simple_dfs(e);
+	}
+	order.pb(v);
+}
+
+void dfs2(int v){
+	vis[v] = 1;
+	comp.pb(v);
+	for(int e:revG[v]){
+		if (!vis[e]&&reach[e]) dfs2(e);
+	}
+}
+
+void dfs(int v){
+	if (dp[v]==2) return;
+	dp[v]++;
+	for (int e:G[v]){
+		dfs(e);
+	}
+}
+
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	order.clear();
+	for (int i=1;i<=n;++i){
+		G[i].clear();
+		revG[i].clear();
+		vis[i] = 0;
+		reach[i] = 0;
+		infinite[i] = 0;
+		loop[i] = 0;
+		dp[i] = 0;
+	}
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		if (u==v){
+			loop[u] = 1;
+		}else{
+			G[u].pb(v);
+			revG[v].pb(u);
+		}
+	}
+	simple_dfs(1);
+	reverse(all(order));
+	dbg(order);
+	for (int x:order){
+		if (!vis[x]){
+			comp.clear();
+			dfs2(x);
+			dbg(comp);
+			queue<int>q;
+			if (sz(comp)==1&&loop[x]==0) continue;
+			for (int y:comp){
+				infinite[y] = 1;
+				q.push(y);
+			}
+			while(!q.empty()){
+				int v = q.front();
+				q.pop();
+				for (int e:G[v]){
+					if (!infinite[e]){
+						q.push(e);
+						infinite[e] = 1;
+					}
+				}
+			}
+		}
+	}
+	dfs(1);
+	for (int i=1;i<=n;++i){
+		if (!reach[i]) cout << 0 << " ";
+		else if (infinite[i]) cout << -1 << " ";
+		else  cout << dp[i] << " ";	
+	}
+	cout << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

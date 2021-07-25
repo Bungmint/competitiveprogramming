@@ -79,18 +79,76 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+int n, MOD;
+vi G[100001];
+vl L[100001], R[100001];
+int id[100001];
+int f[100001], g[100001];
+
+void add(int &a, int b){
+	a = ((ll)a+(ll)b)%MOD;
+}
+void mult(int &a,int b){
+	a = ((ll)a*(ll)b)%MOD;
+}
+int mul(int a,int b){
+	return ((ll)a*(ll)b)%MOD;
+}
+
+void dfs1(int v, int pv){
+	f[v] = 1;
+	vi child;
+	for (int e:G[v]){
+		if (e!=pv){
+			dfs1(e,v);
+			child.pb(e);
+			mult(f[v], 1+f[e]);
+		}
+	}
+	L[v].resize(sz(child));
+	R[v].resize(sz(child));
+	for (int i=0;i<sz(child);++i){
+		id[child[i]] = i;
+		L[v][i] = (i? mul(L[v][i-1], 1+f[child[i]]):(1+f[child[i]]));
+	}
+	for (int i=sz(child)-1;i>=0;i--){
+		R[v][i] = (i==sz(child)-1?(1+f[child[i]]): mul(R[v][i+1], 1+f[child[i]]));
+	}
+}
+void dfs2(int v,int pv){
+	if (pv){
+		g[v] = 1+g[pv];
+		int SZ = sz(L[pv]);
+		int j = id[v];
+		int val = 1;
+		if (j>0) mult(val, L[pv][j-1]);
+		if (j<SZ-1) mult(val, R[pv][j+1]);
+		mult(g[v], val);
+	}
+	for (int e:G[v]) if (e!=pv) dfs2(e,v);
+}
 
 void solve()
 {
+	cin >> n >> MOD;
+	for (int i=0;i<n-1;++i){
+		int u,v;
+		cin >> u >> v;
+		G[u].pb(v), G[v].pb(u);
+	}
+	dfs1(1,0);
+	dfs2(1,0);
+	for (int i=1;i<=n;++i){
+		cout << mul(f[i], g[i]+1)<<"\n";
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -69,28 +69,114 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int timer = 0;
+int st[200000], en[200000];
+vi G[200000];
+int a[400010], c[200000], freq[200000], cnt = 0;
+vi order;
+
+void dfs(int V, int pV){
+	st[V] = timer++;
+	a[st[V]] = c[V];
+	for (int e:G[V]){
+		if (e!=pV) dfs(e,V);
+	}
+	en[V] = timer++;
+	a[en[V]] = c[V];
+	dbg(st[V], en[V], V);
+}
+
+void remove(int idx){
+	freq[a[idx]]--;
+	if (!freq[a[idx]])cnt--;
+}
+void add(int idx){
+	freq[a[idx]]++;
+	if (freq[a[idx]]==1) cnt++;
+}     
+int get_answer(){
+	return cnt;
+}
+const int block=450; //Dont forget to set
+
+struct Query {
+    int l, r, idx;
+	inline pair<int, int> toPair() const {
+		return make_pair(l / block, ((l / block) & 1) ? -r : +r);
+	}
+};
+inline bool operator<(const Query &a, const Query &b) {
+	return a.toPair() < b.toPair();
+}
+
+using vq = vector<Query>;
+
+
+vi mo(vq queries) {
+   	vi answers(queries.size());
+    sort(queries.begin(), queries.end());
+
+    int cur_l = 0;
+    int cur_r = -1;
+    for (Query q : queries) {
+        while (cur_l > q.l) {
+            cur_l--;
+            add(cur_l);
+        }
+        while (cur_r < q.r) {
+            cur_r++;
+            add(cur_r);
+        }
+        while (cur_l < q.l) {
+            remove(cur_l);
+            cur_l++;
+        }
+        while (cur_r > q.r) {
+            remove(cur_r);
+            cur_r--;
+        }
+        answers[q.idx] = get_answer();
+    }
+    return answers;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=0;i<n;++i) cin >> c[i], order.pb(c[i]);
+	for (int i=0;i<n-1;++i){
+		int u,v;
+		cin >> u >> v;
+		u--;v--;
+		G[u].pb(v); G[v].pb(u);
+	}
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	for (int i=0;i<n;++i){
+		c[i] = lb(all(order), c[i])-order.begin();
+	}
+	dfs(0,-1);
+	vq Q;
+	for (int i=0;i<n;++i){
+		Q.pb({st[i], en[i], i});
+	}
+	vi ans = mo(Q);
+	for (int x:ans) cout << x << " ";
+	cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

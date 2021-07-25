@@ -69,30 +69,71 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e5+1;
+int p[N], SZ[N], cnt[N];
+vi G[N];
+set<int> zr;
+
+int root(int a){
+	return (a==p[a]? a:p[a]=root(p[a]));
+}
+void merge(int a, int b){
+	a =root(a);
+	b = root(b);
+	if (a==b) return;
+	if (SZ[a]>SZ[b]) swap(a,b);
+	p[a] = b;
+	SZ[b] += SZ[a];
+}
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	vector<vpi> Edge(n+1);
+	for (int i=0;i<m;++i){
+		int u, v;
+		cin>> u >> v;
+		G[u].pb(v);G[v].pb(u);
+	}
+	for (int i=1;i<=n;++i){
+		p[i] = i; SZ[i] = 1;
+		set<int> nxtzr;
+		map<int,int> m1;
+		for (int e:G[i]){
+			if (e>i) continue;
+			int par = root(e);
+			m1[par]++;
+		}
+		int par=-1;
+		for (int x:zr){
+			if (m1[x]<SZ[x]){
+				dbg(zr);
+				merge(x, i);
+				par = root(i);
+				
+			}else{
+				nxtzr.insert(x);
+			}
+		}
+		if (par==-1){
+			zr.insert(i);
+		}else{
+			nxtzr.insert(par);
+			zr = nxtzr;
+		}
+	}
+	cout << sz(zr) -1 <<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

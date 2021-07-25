@@ -1,3 +1,11 @@
+// Problem: E. Cheap Dinner
+// Contest: Codeforces - Educational Codeforces Round 104 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1487/E
+// Memory Limit: 512 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,100 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n1, n2, n3, n4;
+	int m1, m2, m3;
+	cin >> n1 >> n2 >> n3 >> n4;
+	vi a(n1), b(n2), c(n3), d(n4);
+	vi minA(n1, INF), minB(n2,INF), minC(n3, INF);
+	for (int i=0;i<n1;++i){
+		cin >> a[i];
+	}
+	for (int i=0;i<n2;++i){
+		cin >> b[i];
+	}
+	for (int i=0;i<n3;++i){
+		cin >> c[i];
+	}
+	for (int i=0;i<n4;++i){
+		cin >> d[i];
+	}
+	vector<vi> forbAB(n1), forbBC(n2), forbCD(n3);
+	cin >> m1;
+	for (int i=0;i<m1;++i){
+		int x,y;
+		cin >> x >> y;
+		x--,y--;
+		forbAB[x].pb(y);
+	}
+	cin >> m2;
+	for (int i=0;i<m2;++i){
+		int x,y;
+		cin >> x >> y;
+		x--,y--;
+		forbBC[x].pb(y);
+	}
+	cin >> m3;
+	for (int i=0;i<m3;++i){
+		int x,y;
+		cin >> x >> y;
+		x--,y--;
+		forbCD[x].pb(y);
+	}
+	//CD
+	map<int,int> deez;
+	for (int i=0;i<n4;++i){
+		deez[d[i]]++;
+	}
+	for (int i=0;i<n3;++i){
+		for (int x:forbCD[i]){
+			deez[d[x]]--;
+			if (deez[d[x]]==0) deez.erase(d[x]);
+		}
+		minC[i] = (deez.empty()? INF: c[i]+deez.begin()->fi);
+		for (int x:forbCD[i]){
+			deez[d[x]]++;
+		}
+	}
+	deez.clear();
+	for (int i=0;i<n3;++i){
+		deez[minC[i]]++;
+	}
+	for (int i=0;i<n2;++i){
+		for (int x:forbBC[i]){
+			deez[minC[x]]--;
+			if (deez[minC[x]]==0) deez.erase(minC[x]);
+		}
+		minB[i] = (deez.empty()? INF: min(INF,b[i]+deez.begin()->fi));
+		for (int x:forbBC[i]){
+			deez[minC[x]]++;
+		}
+		dbg(minB[i]);
+	}
+	deez.clear();
+	for (int i=0;i<n2;++i){
+		deez[minB[i]]++;
+	}
+	for (int i=0;i<n1;++i){
+		for (int x:forbAB[i]){
+			deez[minB[x]]--;
+			if (deez[minB[x]]==0) deez.erase(minB[x]);
+		}
+		minA[i] = (deez.empty()? INF: min(INF,a[i]+deez.begin()->fi));
+		for (int x:forbAB[i]){
+			deez[minB[x]]++;
+		}
+	}
+	int res = INF;
+	for (int i=0;i<n1;++i) res = min(res, minA[i]);
+	cout << (res==INF? -1:res)<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,30 +68,84 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 201;
+int cycle = INF;
+vi G[N];
+int d[N], p[N];
+bool vis[N];
+
+void bfs(int v){
+	queue<int> q;
+	q.push(v);
+	vis[v] = 1;
+	while(!q.empty()){
+		int u = q.front();
+		dbg(u);
+		q.pop();
+		for (int e:G[u]){
+			if (!vis[e]){
+				p[e] = u;
+				d[e] = d[u]+1;
+				vis[e] = 1;
+				q.push(e);
+			}else if (e!=p[u]){
+				dbg(v,d[e], d[u], e, u);
+				cycle = min(cycle,d[e]+d[u]+1);
+			}
+		}
+	}
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vl a;
+	int zr = 0;
+	for (int i=0;i<n;++i){
+		ll t;
+		cin >> t;
+		if (!t){
+			zr++;
+		}else a.pb(t);
+	}
+	n -=zr;
+	if (n<=200){
+		for (int i=0;i<n;++i){
+			for (int j=i+1;j<n;++j){
+				if (a[i]&a[j]){
+					dbg(i,j);
+					G[i].pb(j);
+					G[j].pb(i);
+				}
+			}
+		}
+		int ans = INF;
+		for (int i=0;i<n;++i){
+			memset(d, 0, sizeof(d));
+			memset(vis, 0, sizeof(vis));
+			cycle = INF;
+			bfs(i);
+			ans = min(ans, cycle);
+		}
+		if (ans==INF){
+			cout << -1 << "\n";
+		}else cout << ans << "\n";
+		return;	
+	}
+	cout << 3 << "\n";
+	return;
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

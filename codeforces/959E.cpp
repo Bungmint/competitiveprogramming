@@ -1,3 +1,11 @@
+// Problem: E. Mahmoud and Ehab and the xor-MST
+// Contest: Codeforces - Codeforces Round #473 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/959/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,21 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	ll n;
+	cin >> n;
+	ll res = 0;
+	for (int i=1;i<=40;++i){
+		res += (1LL<<(i-1))*((n+(1LL<<(i-1))-1)/(1LL<<(i)));
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

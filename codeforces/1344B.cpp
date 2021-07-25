@@ -69,30 +69,114 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dx[4] = {-1, 1, 0,0}, dy[4] = {0,0,-1, 1};
+
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	vector<string> grid(n);
+	vi rowcnt(n), colcnt(m);
+	vector<vector<bool>> vis(n, vector<bool> (m));
+	for (int i=0;i<n;++i){
+		cin >> grid[i];
+	}
+	for (int i=0;i<n;++i){
+		vi ind;
+		for (int j=0;j<m;++j){
+			if (grid[i][j]=='#') ind.pb(j);
+		}
+		int prev = -1;
+		dbg(ind);
+		for (int x:ind){
+			if (prev==-1){
+				prev = x;
+				continue;
+			}
+			if (prev!=x-1){
+				cout << -1 << "\n";
+				return;
+			}
+			prev =x;
+		}
+		rowcnt[i] = sz(ind);
+	}
+	for (int j=0;j<m;++j){
+		vi ind;
+		for (int i=0;i<n;++i){
+			if (grid[i][j]=='#') ind.pb(i);
+		}
+		dbg(ind);
+		int prev = -1;
+		for (int x:ind){
+			if (prev==-1){
+				prev = x;
+				continue;
+			}
+			if (prev!=x-1){
+				cout << -1 << "\n";
+				return;
+			}
+			prev =x;
+		}
+		colcnt[j] = sz(ind);
+	}
+	bool ok = 1;
+	for (int i=0;i<n;++i){
+		bool cur = 0;
+		for (int j=0;j<m;++j){
+			if (grid[i][j]=='#'||!colcnt[j]) cur =1;
+		}
+		ok &= cur;
+	}
+	for (int j=0;j<m;++j){
+		bool cur = 0;
+		for (int i=0;i<n;++i){
+			if (grid[i][j]=='#'||!rowcnt[i]) cur =1;
+		}
+		ok &= cur;
+	}
+	if (!ok){
+		cout <<-1 << "\n";
+		return;
+	}
+	
+	
+	int cnt = 0;
+	for (int i=0;i<n;++i){
+		for (int j=0;j<m;++j){
+			if (grid[i][j]=='#'&&!vis[i][j]){
+				queue<pi>q;
+				q.push({i,j});
+				vis[i][j] = 1;
+				while(!q.empty()){
+					int x = q.front().fi, y = q.front().se;
+					q.pop();
+					for (int k=0;k<4;++k){
+						int nx = x+dx[k], ny = y+ dy[k];
+						if (nx<0||nx>=n||ny<0||ny>=m) continue;
+						if (!vis[nx][ny]&&grid[nx][ny]=='#'){
+							vis[nx][ny] = 1;
+							q.push({nx, ny});
+						}
+					}
+				}
+				cnt++;
+			}
+		}
+	}
+	cout << cnt << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

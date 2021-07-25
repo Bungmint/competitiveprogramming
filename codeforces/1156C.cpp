@@ -1,3 +1,11 @@
+// Problem: C. Match Points
+// Contest: Codeforces - Educational Codeforces Round 64 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1156/C
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,30 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, z;
+	cin >> n >> z;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	sort(all(a));
+	int l = 0, r = n/2, ans = 0;
+	while(l<=r){
+		int m = l + (r-l)/2;
+		bool ok =1;
+		for (int i=0;i<m;++i){
+			ok &= (a[n-m+i]-a[i]>=z);
+		}
+		if (ok) ans = m, l = m+1;
+		else r = m-1;
+	}
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

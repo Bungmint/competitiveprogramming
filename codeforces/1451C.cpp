@@ -83,6 +83,25 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	string a, b;
+	int n,k;
+	cin >>n >> k>> a >> b;
+	vi cntA(27), cntB(27);
+	for (int i=0;i<n;++i){
+		cntA[a[i]-'a']++;
+		cntB[b[i]-'a']++;
+	}
+	for (int i=0;i<26;++i){
+		if (cntA[i]>=cntB[i]&&(cntA[i]-cntB[i])%k==0){
+			int inc = (cntA[i]-cntB[i]);
+			cntA[i] = cntB[i];
+			cntA[i+1] += inc;
+		}
+	}
+	
+	bool ok=1;
+	for (int i=0;i<26;++i) ok&=(cntA[i]==cntB[i]);
+	cout << (ok? "YES":"NO")<<"\n";
 }
 
 int main()

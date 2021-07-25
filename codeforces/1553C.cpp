@@ -1,3 +1,11 @@
+// Problem: C. Penalty
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/contest/1553/problem/C
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,52 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	string s;
+	cin >> s;
+	string t = s;
+	for (int i=0;i<10;++i){
+		if (t[i]=='?'){
+			if (i&1) t[i] = '0';
+			else t[i] = '1';
+		}
+	}
+	int res = 10;
+	int f = 0, st = 0;
+	int fleft = 5, sleft = 5;
+	for (int i=0;i<10;++i){
+		if (i&1) sleft--;
+		else fleft--;
+		if (t[i]=='1'){
+			if (i&1) st++;
+			else f++;
+		}
+		if (f+fleft<st||sleft+st<f) {
+			res = min(res, i+1);
+			break;
+		}
+	}
+	t = s;
+	for (int i=0;i<10;++i){
+		if (t[i]=='?'){
+			if (i&1) t[i] = '1';
+			else t[i] = '0';
+		}
+	}
+	f = st = 0;
+	fleft = 5, sleft = 5;
+	for (int i=0;i<10;++i){
+		if (i&1) sleft--;
+		else fleft--;
+		if (t[i]=='1'){
+			if (i&1) st++;
+			else f++;
+		}
+		if (f+fleft<st||sleft+st<f) {
+			res = min(res, i+1);
+			break;
+		}
+	}
+	cout << res << "\n";
 }
 
 int main()

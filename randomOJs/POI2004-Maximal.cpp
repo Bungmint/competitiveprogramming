@@ -80,15 +80,85 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int MN = 71;
+
+pair<double,pi> dp[MN][10001];
+
+const int N = 1e4; // Only advised to use it under 1e7 (More Memory)
+int lp[N + 1];
+vector<int> pr;
+void linsieve()
+{
+    for (int i = 2; i <= N; i++)
+    {
+        if (lp[i] == 0)
+        {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() && pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+        {
+            lp[i * pr[j]] = pr[j];
+        }
+    }
+}
+
+void precalc(){
+	for (int i=0;i<=10000;++i) dp[0][i] = {0, {0,1}}; //The second part of the pair denotes the last prime used.
+	for (int p = 1;p<=70;++p){
+		for (int i=0;i<=10000;++i){
+			dp[p][i] = dp[p-1][i];
+			ll pp = pr[p-1];
+			while(pp<=i){
+				if (dp[p][i].fi<dp[p-1][i-pp].fi+ log10(pp)){
+					
+					dp[p][i] = {dp[p-1][i-pp].fi+log10(pp), {p,pp}};
+					
+				}
+				pp *= pr[p-1];
+			}
+		}
+	}
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int cur = n;
+	int j = 70;
+	vi a;
+	while(cur&&j){
+		pair<ld,pl> x = dp[j][cur];
+		dbg(x);
+		if (x.se.fi==0) break;
+		a.pb(x.se.se);
+		cur -= x.se.se;
+		j = x.se.fi-1;
+	}
+	while(cur!=0){
+		a.pb(1);
+		cur--;
+	}
+	sort(all(a));
+	dbg(a);
+	int ptr = 1;
+	for (int x:a){
+		for (int i=1;i<x;++i){
+			cout << ptr+i<<" ";
+		}
+		cout << ptr << " ";
+		ptr +=x;
+	}
+	cout << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
+    linsieve();
+    precalc();
     int testcase;
     cin >> testcase;
     while (testcase--)

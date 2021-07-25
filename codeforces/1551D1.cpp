@@ -1,3 +1,11 @@
+// Problem: D1. Domino (easy version)
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/D1
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,16 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, m, k;
+	cin >> n >> m >> k;
+	int c = m/2;
+	bool ok = 0;
+	if (n&1){
+		if (c%2==k%2&&n*c>=k&&k>=c) ok = 1;
+	}else{
+		if (k%2==0&&n*c>=k) ok = 1;
+	}
+	cout << (ok? "YES":"NO")<<"\n";
 }
 
 int main()

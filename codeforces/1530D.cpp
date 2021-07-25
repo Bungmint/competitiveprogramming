@@ -1,3 +1,11 @@
+// Problem: D. Secret Santa
+// Contest: Codeforces - Codeforces Round #733 (Div. 1 + Div. 2, based on VK Cup 2021 - Elimination (Engine))
+// URL: https://codeforces.com/contest/1530/problem/D
+// Memory Limit: 512 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,57 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+bool vis[200010];
+int ind[200010];
+int a[200010];
+int en = -1;
+
+void dfs(int i){
+	vis[i]=1;
+	if (!vis[a[i]]) dfs(a[i]);
+	else{
+		en = i;
+	}
+}
+
+
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=0;i<n;++i) vis[i] = 0, ind[i] = 0;
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		a[i]--;
+		ind[a[i]]++;
+	}
+	int ans = n;
+	vi leaf;
+	for (int i=0;i<n;++i){
+		if (ind[i]==0) leaf.pb(i);
+	}
+	vector<pi> chains;
+	dbg(leaf);
+	for (int i=0;i<sz(leaf);++i){
+		dfs(leaf[i]);
+		ans--;
+		dbg(en,leaf[i], chains);
+		if (en==leaf[i]){
+			a[leaf[i]] = chains[0].fi;
+			chains[0].fi = leaf[i];
+		}else{
+			chains.pb({leaf[i], en});
+		}
+	}
+	for (auto [u,v]:chains){
+		a[v] = u;
+	}
+	
+	cout << ans << "\n";
+	for (int i=0;i<n;++i) cout << a[i]+1 << " ";
+	cout << "\n";
+	
 }
 
 int main()

@@ -74,6 +74,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,7 +130,7 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
+const int N = 1e5+10;
 Mint fact[N], inv_fact[N], inverse[N];
 
 void precalc()
@@ -159,32 +160,62 @@ Mint nCk(ll n, ll k)
 }
 
 
+const int MN = 3011;
+vi G[MN];
+Mint dp[MN][MN];
+int n,deg, D;
+
+void dfs(int V, int pV){
+	for (int i=1;i<=deg+1;++i){
+		dp[V][i] = 1;
+	}
+	for (int e:G[V]){
+		if (e==pV) continue;
+		dfs(e,V);
+		for (int i=1;i<=deg+1;++i){
+			dp[V][i] *= dp[e][i];
+		}
+		
+	}
+	for (int i=1;i<=deg+1;++i){
+		dp[V][i] += dp[V][i-1];
+		dbg(V, dp[V][i]);
+	}
+}
+
+
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
+	cin >> n >> D;
+	deg = n;
+	vector<Mint> v(deg+2);
+	for (int i=2;i<=n;++i){
+		int t;
+		cin >> t;
+		G[t].pb(i);
+		G[i].pb(t);
+	}
+	dfs(1,0);
+	for (int i=1;i<=deg+1;++i){
+		v[i] = dp[1][i];
+	}
+	dbg(v);
+	if (D<=deg+1){
+		cout << v[D]<<"\n";
 		return;
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	vector<Mint> L(deg+2,1), R(deg+2,1);
+	for (int i=1;i<deg+1;++i){
+		L[i+1] = L[i]*(D-i);
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	for (int i=deg+1;i>=2;--i){
+		R[i-1] = R[i]*(D-i);
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
+	for (int i=1;i<=deg+1;++i){
+		Mint product = L[i]*R[i]*v[i]*inv_fact[i-1]*inv_fact[deg+1-i];
+		if ((deg+1-i)&1) ans -=product;
+		else ans += product;
 	}
 	cout << ans << "\n";
 }

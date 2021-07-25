@@ -69,30 +69,49 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+long double f[1001][1001];
+ld g(int w, int b);
+
+ld dp(int w, int b){
+	if (w==0) return 0;
+	if (b==0) return 1;
+	if (f[w][b]>-0.5) return f[w][b];
+	ld val = (ld)w/(ld)(w+b);
+	ld mul = (ld)b/(ld)(w+b);
+	val += mul*(1-g(w, b-1));
+	dbg(w, b, val);
+	return f[w][b] = val;
+}
+
+ld g(int w, int b){
+	if (b==0) return 1;
+	if (w+b<=2) return 1;
+	if (w==0) return 1;
+	ld val =(ld)w/(ld)(w+b);
+	ld mul = (ld)b/(ld)(w+b);
+	if (b==1){
+		return val;
+	}else{
+		return val + mul*((ld)(w)/(ld)(w+b-1) * (1-dp(w-1, b-1))+ (ld)(b-1)/(ld)(w+b-1) * (1-dp(w,b-2)));
+	}
+}
 
 void solve()
 {
+	int w, b;
+	cin >> w >> b;
+	memset(f, -1, sizeof(f));
+	cout <<setprecision(20)<< dp(w, b)<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

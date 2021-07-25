@@ -1,3 +1,11 @@
+// Problem: A. Digits Sum
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/contest/1553/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,10 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	cout << (n+1)/10<<"\n";
+	
 }
 
 int main()

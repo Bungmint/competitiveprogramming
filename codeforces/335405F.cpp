@@ -69,30 +69,61 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int freq[300];
+int total=0;
+int cur =0;
+set<char> req;
+
+void add(char c){
+	freq[c]++;
+	if (freq[c]==1) cur++;
+}
+void remove(char c){
+	freq[c]--;
+	if (freq[c]==0) cur--;
+}
+bool good(){
+	return (cur==total);
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	string s;
+	cin >> s;
+	int ans =INF;
+	int l =0;
+	for (int i=0;i<n;++i){
+		req.insert(s[i]);
+	}
+
+	total = req.size();
+	for (int r=0;r<n;++r){
+		add(s[r]);
+		while(l<n&&good()){
+			remove(s[l]);
+			l++;
+			if (!good()){
+				l--;
+				add(s[l]);
+				break;
+			}
+		}
+		dbg(cur, total);
+		if (good()) ans=min(ans, r-l+1);
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

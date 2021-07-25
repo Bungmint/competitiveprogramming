@@ -69,11 +69,19 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -130,69 +138,63 @@ ostream &operator<<(ostream &os, Mint x){
 }
 
 const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
+const Mint B = 37;
+Mint power[N], inverse[N];
 
 void precalc()
 {
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
+	power[0] = 1;
+    for (int i=1;i<N;++i) power[i] = power[i-1]*B;
+    inverse[0] = 1;
+    inverse[1] = inv(B);
+    for (int i=2;i<N;++i) inverse[i] = inverse[i-1]*inverse[1];
 }
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	string s;
+	cin >> s;
+	int n = sz(s);
+	vector<Mint> hsh(n+1);
+	for (int i=1;i<=n;++i){
+		hsh[i] = hsh[i-1] + power[i-1]*(s[i-1]-'a'+1);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	int l = 1, r = n;
+	int res=0;
+	while(l<=r){
+		dbg(l,r);
+		if (l==r) res++, l++, r--;
+		else{
+			int k = -1;
+			for (int len=1;len<=(r-l+1)/2;len++){
+				if (hsh[len+l-1]-hsh[l-1]==(hsh[r]-hsh[r-len])*inverse[r+1-len-l]){
+					k = len;
+					break;
+				}
+			}
+			if (k==-1){
+				res++;
+				break;
+			} 
+			res+=2;
+			l +=k;
+			r-=k;
+		}
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     precalc();
-    solve();
+    int testcase;
+    cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

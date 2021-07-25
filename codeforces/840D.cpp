@@ -69,30 +69,89 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 3e5+1;
+int a[N], freq[N], answers[N],n,m,k;
+
+void remove(int idx){
+	freq[a[idx]]--;
+}
+void add(int idx){
+	freq[a[idx]]++;
+}     
+const int block=550; //Dont forget to set
+
+struct Query {
+    int l, r,k, idx;
+	inline pair<int, int> toPair() const {
+		return make_pair(l / block, ((l / block) & 1) ? -r : +r);
+	}
+};
+inline bool operator<(const Query &a, const Query &b) {
+	return a.toPair() < b.toPair();
+}
+
+using vq = vector<Query>;
+
+
+void mo(vq queries) {
+   
+    sort(queries.begin(), queries.end());
+
+    int cur_l = 0;
+    int cur_r = -1;
+    for (Query q : queries) {
+        while (cur_l > q.l) {
+            cur_l--;
+            add(cur_l);
+        }
+        while (cur_r < q.r) {
+            cur_r++;
+            add(cur_r);
+        }
+        while (cur_l < q.l) {
+            remove(cur_l);
+            cur_l++;
+        }
+        while (cur_r > q.r) {
+            remove(cur_r);
+            cur_r--;
+        }
+        int res = -1;
+        for (int i=0;i<100;++i){
+        	int id = rng()%(q.r-q.l+1);
+        	dbg(a[id+q.l], freq[a[id+q.k]]);
+        	if (freq[a[id+q.l]]*q.k>(q.r-q.l+1)) res = (res==-1? a[id+q.l]:min(res, a[id+q.l]));
+        }
+        answers[q.idx] =res;
+    }
+    
+}
 
 void solve()
 {
+	cin >> n >> m;
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+	}
+	vq qq(m);
+	for (int i=0;i<m;++i){
+		int l, r, k1;
+		cin >> l >>r>> k1;
+		l--;r--;
+		qq[i] = {l,r,k1, i};
+	}
+	mo(qq);
+	for (int i=0;i<m;++i) cout << answers[i]<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

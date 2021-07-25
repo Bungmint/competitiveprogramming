@@ -1,3 +1,11 @@
+// Problem: D. Beautiful Array
+// Contest: Codeforces - Educational Codeforces Round 63 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1155/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,47 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	ll n, x;
+	cin >> n>>x;
+	vl a(n+1), pref(n+1), sufMax(n+1), prefMax(n+1), val(n+1);
+	for (int i=1;i<=n;++i) cin >> a[i];
+	for (int i=1;i<=n;++i) pref[i] = pref[i-1] + a[i];
+	ll res = 0;
+	ll cur = 0;
+	// No multiplying
+	for (int i=1;i<=n;++i){
+		res = max(res, pref[i]-cur);
+		cur = min(cur, pref[i]);
+	}
+	
+	for (int i=n;i>=1;--i){
+		sufMax[i] = a[i];
+		if (i<n&&sufMax[i+1]>0) sufMax[i]+=sufMax[i+1];
+	}
+	for (int i=1;i<=n;++i){
+		prefMax[i] = a[i];
+		if (prefMax[i-1]>0) prefMax[i] += prefMax[i-1];
+	}
+	dbg(prefMax, sufMax);
+	
+	
+	for (int i=1;i<=n;++i){
+		ll c = a[i]*x;
+		dbg(val[i-1], prefMax[i-1]);
+		c +=max(0LL, max(val[i-1], prefMax[i-1]));
+		val[i] = c;
+		if (i+1<=n&&sufMax[i+1]>0) c+= sufMax[i+1];
+		res = max(res, c);
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

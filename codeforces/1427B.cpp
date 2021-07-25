@@ -1,3 +1,11 @@
+// Problem: B. Chess Cheater
+// Contest: Codeforces - Codeforces Global Round 11
+// URL: https://codeforces.com/contest/1427/problem/B
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,34 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	string s;
+	cin >> s;
+	multiset<int> st;
+	int ans = 0;
+	int last = -1, cnt = 0;
+	for (int i=0;i<n;++i){
+		if (s[i]=='W'){
+			if (last>=0&&i-last-1>0) st.insert({i-last-1});
+			cnt++;
+			last = i;
+		}
+	}
+	while(sz(st)&&k){
+		auto it = st.begin();
+		if (*it>k){
+			cnt +=k;
+			k=0;
+			break;
+		}else{
+			cnt += *it;
+			k-=*it;
+			st.erase(it);
+		}
+	}
+	cnt = min(cnt+k, n);
+	cout << max(2*cnt - (sz(st)+1),0)<<endl;
 }
 
 int main()

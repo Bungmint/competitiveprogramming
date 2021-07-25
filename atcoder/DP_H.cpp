@@ -80,17 +80,41 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dp[1000][1000];
+
+void add(int&a,int b){
+	a = ((ll)a+(ll)b)%MOD;
+}
+void mul(int&a,int b){
+	a = ((ll)a*(ll)b)%MOD;
+}
 
 void solve()
 {
+	dp[0][0] = 1;
+	int h, w;
+	cin >> h >> w;
+	vector<string>grid(h);
+	for (int i=0;i<h;++i) cin >> grid[i];
+	for (int i=0;i<h;++i){
+		for (int j=0;j<w;++j){
+			dbg(i,j);
+			if (i==j&&i==0) continue;
+			if (grid[i][j]=='#') continue;
+			if (i) add(dp[i][j], dp[i-1][j]);
+			if (j) add(dp[i][j], dp[i][j-1]);
+			dbg(dp[i][j]);
+		}
+	}
+	cout << dp[h-1][w-1]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

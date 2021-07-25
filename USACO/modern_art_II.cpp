@@ -1,3 +1,11 @@
+// Problem: Problem 3. Modern Art 2
+// Contest: USACO - USACO 2017 US Open Contest, Gold
+// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=743
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,43 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n+2,0);
+	for (int i=1;i<=n;++i) cin >> a[i];
+	vpi v(n+1, make_pair(INF, -INF));
+	for (int i=0;i<=n+1;++i){
+		if (!a[i]) dbg(i);
+		v[a[i]] = {min(i, v[a[i]].fi), max(i, v[a[i]].se)};
+	}
+	dbg(v[0]);
+	stack<int> st;
+	int res = 0;
+	for (int i=0;i<=n+1;++i){
+		if (v[a[i]].fi==i) {
+			st.push(a[i]);
+			res = max(res, sz(st));
+		}
+		if (st.top()!=a[i]){
+			cout << -1;
+			return;
+		}
+		if (v[a[i]].se == i){
+			st.pop();
+		}
+	}
+	cout << res-1;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("art2");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

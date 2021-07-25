@@ -1,3 +1,11 @@
+// Problem: E. String Multiplication
+// Contest: Codeforces - Codeforces Round #541 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/1131/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,67 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin>>n;
+	vl dp(26);
+	string s;
+	cin >> s;
+	k = sz(s);
+	for (int i=0;i<k;++i){
+		ll cnt =1;
+		while(i+1<k&&s[i+1]==s[i]){
+			i++;
+			cnt++;
+		}
+		dp[s[i]-'a'] = max(dp[s[i]-'a'], cnt);
+	}
+	
+	for (int i=1;i<n;++i){
+		vl nxt(26);
+		cin >> s;
+		k = sz(s);
+		vector<pl> v;
+		for (int j=0;j<26;++j) nxt[j] = max((ll)(dp[j]>0), nxt[j]);
+		for (int j=0;j<k;++j){
+			ll cnt =1;
+			while(j+1<k&&s[j+1]==s[j]){
+				j++;
+				cnt++;
+			}
+			nxt[s[j]-'a'] = max(nxt[s[j]-'a'], cnt);
+			v.pb({s[j]-'a', cnt});
+		}
+		if (sz(v)==1){
+			pl p = v.front();
+			dbg(p);
+			dbg(dp[p.fi], nxt[p.fi], p.se*dp[p.fi]+p.se+dp[p.fi]);
+			nxt[p.fi] = max(nxt[p.fi], p.se*dp[p.fi]+p.se+dp[p.fi]);
+		}else{
+			pl p = v.front(), q = v.back();
+			if (p.fi!=q.fi){
+				nxt[p.fi] = max(p.se+ (!!dp[p.fi]) , nxt[p.fi]);
+				nxt[q.fi] = max(q.se + (!!dp[q.fi]), nxt[q.fi]);
+ 			}else if (dp[p.fi]){
+ 				nxt[p.fi] = max(p.se+q.se+1, nxt[p.fi]);
+ 			}
+		}	
+		for (int j=0;j<26;++j) dp[j] = nxt[j];
+		dbg(dp);
+	}
+	dbg(dp);
+	ll res = 0;
+	for (int i=0;i<26;++i){
+		res = max(res, dp[i]);
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

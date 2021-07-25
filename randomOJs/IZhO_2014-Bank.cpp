@@ -80,17 +80,45 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int leftover[1<<20], covered[1<<20], a[20], b[20], n, m;
 
 void solve()
 {
+	cin >> n >> m;
+	for (int i=0;i<n;++i) cin >> a[i];
+	for (int i=0;i<m;++i) cin >> b[i];
+	memset(leftover, -1, sizeof(leftover)); memset(covered, -1, sizeof(covered));
+	leftover[0] = covered[0] = 0;
+	for (int mask = 0;mask<(1<<m);++mask){
+		for (int last=0;last<m;++last){
+			if (((1<<last)&mask)==0) continue;
+			int prev = mask&~(1<<last);
+			if (covered[prev]==-1) continue;
+			int amt = leftover[prev] + b[last];
+			int cur = a[covered[prev]];
+			if (amt<cur){
+				covered[mask] = covered[prev];
+				leftover[mask] = amt;
+			}else if (amt==cur){
+				covered[mask] = covered[prev]+1;
+				leftover[mask] = 0;
+			}
+		}
+		if (covered[mask]==n){
+			cout << "YES"<<endl;
+			return;
+		}
+	}
+	cout << "NO"<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    // setIO("bank");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

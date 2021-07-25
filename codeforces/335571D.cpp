@@ -69,30 +69,102 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e6+100;
+int n, a[N];
+int grid[501][501], row[501], col[501];
 
 void solve()
 {
+	int h, w;
+	cin >> h >> w;
+	for (int i=0;i<h;++i){
+		string s;
+		cin >> s;
+		for (int j=0;j<w;++j){
+			if (s[j]=='*')grid[i][j]=1, row[i]++, col[j]++;
+			
+		}
+	}
+	int crow = -1;
+	for (int i=0;i<h;++i){
+		if (row[i]>1){
+			if (crow!=-1){
+				cout <<"NO\n";
+				return;
+			}
+			crow = i;
+		}
+	}
+	int ccol = -1;
+	for (int j=0;j<w;++j){
+		if (col[j]>1){
+			if (ccol!=-1){
+				cout << "NO\n";
+				return;
+			}
+			ccol =  j;
+		}
+	}
+	if (crow==-1||ccol==-1){
+		cout << "NO\n";
+		return;
+	}
+	if (grid[crow][ccol]==0){
+		cout << "NO\n";
+		return;
+	}
+	if (crow==h-1||crow==0||ccol==0||ccol==w-1){
+		cout << "NO\n";
+		return;
+	}
+	if (!row[crow-1]||!row[crow+1]||!col[ccol-1]||!col[ccol+1]){
+		cout << "NO\n";
+		return;
+	}
+	
+	bool stop = 0;
+	for (int i=crow+1;i<h;++i){
+		if (row[i]&&stop){
+			cout << "NO\n";
+			return;
+		}
+		if (row[i]==0) stop = 1;
+	}
+	stop = 0;
+	for (int i=crow-1;i>=0;i--){
+		if (row[i]&&stop){
+			cout << "NO\n";
+			return;
+		}
+		if (row[i]==0) stop = 1;
+	}
+	stop = 0;
+	for (int i=ccol+1;i<w;++i){
+		if (col[i]&&stop){
+			cout << "NO\n";
+			return;
+		}
+		if (col[i]==0) stop = 1;
+	}
+	stop = 0;
+	for (int i=ccol-1;i>=0;i--){
+		if (col[i]&&stop){
+			cout << "NO\n";
+			return;
+		}
+		if (col[i]==0) stop = 1;
+	}
+	cout << "YES\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

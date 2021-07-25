@@ -69,28 +69,50 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+void setIO(string s) { // the argument is the filename without the extension
+	freopen((s+".in").c_str(),"r",stdin);
+	freopen((s+".out").c_str(),"w",stdout);
+}
+
+int dp[249][249],n, a[249],  ans = 0;
+
+int dping(int l, int r){
+	int &res = dp[l][r];
+	if (res!=-1) return res;
+	if (l>r) return res = 0;
+	if (l==r) return res = a[l];
+	res = 0;
+	for (int i=l;i<r;++i){
+		int v1 = dping(l,i), v2 = dping(i+1,r);
+		if (v1==v2&&v1) res =max(v1+1,res);
+	}
+	ans = max(ans, res);
+	return res;
+}
+
 void solve()
 {
+	cin >> n;
+	for (int i=0;i<249;++i) cin >> a[i];
+	memset(dp, -1, sizeof(dp));
+	dbg(n-1);
+	dping(0,n-1);
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    setIO("248");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

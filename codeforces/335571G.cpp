@@ -69,30 +69,55 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
 void solve()
 {
+	int n, m;
+	cin >> n;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	cin >> m;
+	vi b(m);
+	for (int i=0;i<m;++i) cin >> b[i];
+	sort(all(a));
+	sort(all(b));
+	int ans = 0;
+	int score1 = 0, score2 = 0;
+	if (2*n-2*m>3*n-3*m){
+		ans = 2*n-2*m;
+		score1 = 2*n, score2 = 2*m;
+	}else{
+		score1 = 3*n, score2 = 3*m;
+		ans = 3*n-3*m;
+	}
+	for (int i=0;i<n;++i){
+		int cur = a[i]-1;
+		int p1 = 2*i + 3*(n-i);
+		int idx = upper_bound(all(b), cur)-b.begin();
+		int p2 = 2*idx + 3*(m-idx);
+		if (p1-p2>ans){
+			score1 = p1;
+			score2 = p2;
+			ans = p1-p2;
+		}else if (p1-p2==ans){
+			if (p1>score1){
+				 score1 = p1;
+				score2 = p2;
+			}
+		}
+	}
+	cout << score1 << ":"<< score2 << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

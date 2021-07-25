@@ -69,12 +69,6 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
@@ -83,16 +77,36 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	ll n, x;
+	cin >> n >> x;
+	vl d(2*n+1), pref(2*n+1), day(2*n+1);
+	for (int i=1;i<=n;++i){
+		cin >> d[i];
+		pref[i] = d[i]*(d[i]+1)/2;
+	}
+	for (int i=n+1;i<=2*n;++i){
+		d[i] = d[i-n];
+		pref[i] = d[i]*(d[i]+1)/2;
+	}
+	day = d;
+	for (int i=1;i<=2*n;++i) d[i] += d[i-1], pref[i] += pref[i-1];
+	ll ans = 0;
+	for (int r=1;r<=2*n;++r){
+		int l = upper_bound(all(d), d[r]-x)-d.begin();
+		dbg(l,r);
+		ll cur =pref[r]-pref[l];
+		dbg(cur);
+		ll lef = min(day[l], max(x-d[r]+d[l], 0LL));
+		dbg(lef);
+		cur += (ll)(day[l]*2-lef+1)*(ll)lef/2LL;
+		ans = max(cur, ans);
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

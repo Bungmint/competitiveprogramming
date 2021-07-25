@@ -1,3 +1,11 @@
+// Problem: R - Walk
+// Contest: AtCoder - Educational DP Contest
+// URL: https://atcoder.jp/contests/dp/tasks/dp_r
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,70 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int n;
+void add(ll &a, ll b){a+=b;a%=MOD;}
+
+ll mul(ll a, ll b){
+	return (a*b)%MOD;
+}
+
+struct Matrix{
+	ll x[50][50];
+	Matrix(){
+		memset(x, 0, sizeof(x));
+	}
+	Matrix operator*(const Matrix& other){
+		Matrix res = Matrix();
+		for (int i=0;i<50;++i){
+			for (int j=0;j<50;++j){
+				for (int k=0;k<50;++k){
+					
+					add(res.x[i][j], mul(x[i][k], other.x[k][j]));
+
+				}
+			}
+		}
+		return res;
+	}
+};
+
+ostream& operator<<(ostream& os, Matrix& mat){
+	os << "\n";
+	for (int i=0;i<n;++i){
+		for (int j=0;j<n;++j) os << mat.x[i][j];
+		os<<"\n";
+	}
+	return os;
+}
+
+Matrix bin_pow(Matrix a, ll k){
+	if (k==1) return a;
+	Matrix m = bin_pow(a, k/2);
+
+	return ((k&1)? m*m*a:m*m);
+}
+
+
+
 
 void solve()
 {
+	ll k;
+	cin >> n>>k;
+	Matrix adj = Matrix();
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j)cin >> adj.x[i][j];
+	adj = bin_pow(adj, k);
+	ll ans = 0;
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j) add(ans, adj.x[i][j]);
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

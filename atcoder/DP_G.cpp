@@ -80,17 +80,44 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+vi order;
+int n, m, dp[100001];
+vi G[100001];
+bool vis[100001];
+
+void dfs(int v){
+	vis[v] = 1;
+	for (int e:G[v]) if (!vis[e]) dfs(e);
+	order.pb(v);
+}
 
 void solve()
 {
+	cin >> n >> m;
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		G[u].pb(v);
+	}
+	for (int i=1;i<=n;++i) if (!vis[i]) dfs(i);
+	int res = 0;
+	reverse(all(order));
+	for (int x:order){
+		for (int e:G[x]){
+			dp[e] = (dp[e]<dp[x]+1? dp[x]+1:dp[e]);
+			res = (res<dp[e]? dp[e]:res);
+		}
+		dbg(x,dp[x]);
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

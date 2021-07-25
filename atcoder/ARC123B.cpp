@@ -1,3 +1,11 @@
+// Problem: B - Increasing Triples
+// Contest: AtCoder - AtCoder Regular Contest 123
+// URL: https://atcoder.jp/contests/arc123/tasks/arc123_b
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,42 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	multiset<int> b, c;
+	vi a(n);
+	for (int &e:a) cin >> e;
+	for (int i=0;i<n;++i){
+		int t;
+		cin >> t;
+		b.insert(t);
+	}
+	for (int i=0;i<n;++i){
+		int t;
+		cin >> t;
+		c.insert(t);
+	}
+	int ans = 0;
+	sort(all(a));
+	dbg(b, c);
+	for (int x:a){
+		auto it = b.upper_bound(x);
+		dbg(*it);
+		if (it==b.end()) break;
+		auto it1 = c.upper_bound(*it);
+		if (it1==c.end()) break;
+		c.erase(it1), b.erase(it);
+		ans++;
+	}
+	cout << ans ;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: F. Pairwise Modulo
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/problemset/problem/1553/F
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,52 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+template<typename T, int N>
+struct BIT{
+	T bit[N+1];
+	BIT(){memset(bit, 0, sizeof(bit));}
+	void upd(int i, T v){
+		for (;i<=N;i+=i&-i) bit[i]+=v;	
+	}
+	T query(int i){
+		T res = 0;
+		for (;i>0;i-=i&-i) res+=bit[i];
+		return res;
+	}
+};
+
+const int MX = 3e5;
+
 void solve()
 {
+	int N;
+	cin >> N;
+	BIT<ll,MX> a, b;
+	ll ans = 0, pref = 0;
+	for (int i=1;i<=N;++i){
+		int x;
+		cin >> x;
+		ans += pref;
+		pref += x;
+		ans += (ll)(i-1LL)*(ll)x;
+		ans += a.query(x);
+		for (int j=x;j<=MX;j+=x){
+			int L = j, R = min(MX, j+x-1);
+			a.upd(L, -x);
+			ans -= j*(b.query(R)-b.query(L-1));
+		}
+		b.upd(x, 1);
+		cout << ans << " ";
+	}
+	cout << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

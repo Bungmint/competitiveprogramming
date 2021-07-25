@@ -69,26 +69,60 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	vector<vi> spar(2*n, vi(20));
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		spar[i][0] = a[i];
+	}
+	for (int i=n;i<2*n;++i){
+		spar[i][0] = a[i-n];
+	}
+	for (int i=1;i<20;++i){
+		for (int j=0;j+(1<<i)<2*n;++j){
+			spar[j][i] = gcd(spar[j][i-1], spar[j+(1<<(i-1))][i-1]);
+		}
+	}
+	int l = 1, r = n, ans = -1;
+	while(l<=r){
+		int m = l + (r-l)/2;
+		int lg = log2(m);
+		bool ok = 1;
+		int g=-1;
+		for (int i=0;i<n;++i){
+			int c = gcd(spar[i][lg],spar[i+m-1-(1<<lg)+1][lg]);
+			if (g==-1){
+				g=c;
+			}else if (g!=c){
+				ok = 0;
+				break;
+			}
+		}
+		if (ok){
+			ans = m;
+			r = m-1;
+		}else{
+			l = m+1;
+		}
+	}
+	cout << ans-1 << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

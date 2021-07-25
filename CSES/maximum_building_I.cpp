@@ -1,3 +1,11 @@
+// Problem: Maximum Building I
+// Contest: CSES - CSES Problem Set
+// URL: https://cses.fi/problemset/task/1147
+// Memory Limit: 512 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,45 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	vector<string> grid(n);
+	for (string &s:grid) cin >> s;
+	vector<vi> sum(n, vi(m));
+	for (int i=0;i<n;++i){
+		for (int j=0;j<m;++j){
+			if (grid[i][j]=='*') sum[i][j] = 0;
+			else sum[i][j] = (i? sum[i-1][j] +1:1); 
+		}
+	}
+	int ans = 0;
+	for (int last=n-1;last>=0;last--){
+		stack<int> st;
+		vi l(m), r(m);
+		for (int i=0;i<m;++i){
+			while(!st.empty()&&sum[last][st.top()]>=sum[last][i]) st.pop();
+			l[i] = (st.empty()? -1:st.top());
+			st.push(i);
+		}
+		while(sz(st)) st.pop();
+		for (int i=m-1;i>=0;--i){
+			while(!st.empty()&&sum[last][st.top()]>=sum[last][i]) st.pop();
+			r[i] = (st.empty()? m:st.top());
+			st.push(i);
+		}
+		for (int i=0;i<m;++i){
+			ans = max(ans, sum[last][i] * (r[i]-l[i]-1));
+		}
+	}
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

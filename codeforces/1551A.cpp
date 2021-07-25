@@ -1,3 +1,11 @@
+// Problem: A. Polycarp and Coins
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,22 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int c = n/3;
+	int res = INF;
+	int c1 = -1, c2;
+	for (int i=c-10;i<=c+10;++i){
+		if (i<0) continue;
+		if (i%2!=n%2) continue;
+		int k = abs(3*i-n)/2;
+		if (res>k){
+			res = k;
+			c1 = i;
+			c2 = (n-c1)/2;
+		}
+	}
+	cout << c1 << " "<< c2<< "\n";
 }
 
 int main()

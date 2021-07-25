@@ -73,7 +73,10 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 998244353;
+map<ll, int> m1;
+vl proc;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -159,40 +162,104 @@ Mint nCk(ll n, ll k)
 }
 
 
+
+
+ll bin_pow(ll a, ll b){
+	ll r = 1;
+	while(b){
+		if (b&1){
+			r *= a;
+		}
+		b/=2;
+		if (!b) break;
+		a*=a;
+	}
+	return r;
+}
+
+inline ll GCD(ll a, ll b){
+	return (b==0? a:GCD(b, a%b));
+}
+
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n ;
+	cin >> n;
+	for (int i=0;i<n;++i){
+		dbg(m1);
+		ll t;
+		cin >> t;
+		bool ok = 0;
+		ll four = pow(t, 0.25);
+		dbg(four);
+		for (ll j=four-2;j<=four+2;++j){
+			if (j<0) continue;
+			dbg(bin_pow(j,4), j);
+			if (bin_pow(j,4)==t){
+				m1[j]+=4;
+				ok =1;
+				break;
+			}
+		}
+		if (ok) continue;
+		ll third =cbrt(t);
+		dbg(third);
+		for (ll j=third-2;j<=third+5;++j){
+			if (j<0) continue;
+			if (bin_pow(j, 3)==t){
+				m1[j]+=3;
+				ok = 1;
+				break;
+			}
+		}
+		if (ok) continue;
+		ll sq = sqrtl(t);
+		if (sq*sq == t){
+			m1[sq]+=2;
+			continue;
+		}
+		proc.pb(t);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	dbg(m1);
+	n = sz(proc);
+	map<ll,int> coprime;
+	for (int i=0;i<n;++i){
+		bool ok = 0;
+		for (auto p:m1){
+			if (proc[i]%p.fi==0){
+				m1[proc[i]/p.fi]++;
+				m1[p.fi]++;
+				ok = 1;
+				break;
+			}
+		}
+		if (ok) continue;
+		for (int j=0;j<n;++j){
+			if (i==j) continue;
+			ll g = GCD(proc[i], proc[j]);
+			if (g>1LL&&g!=proc[i]){
+				m1[g]++;
+				m1[proc[i]/g]++;
+				ok = 1;
+				break;
+			}
+		}
+		if (ok) continue;
+		coprime[proc[i]]++;
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	Mint res = 1;
+	for(auto x:m1){
+		res *= x.se+1;
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
+	for (auto x:coprime){
+		res *= (Mint)(x.se+1)*(Mint)(x.se+1);
 	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    precalc();
     solve();
 }

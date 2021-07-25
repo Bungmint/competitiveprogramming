@@ -1,3 +1,11 @@
+// Problem: B - Bouzu Mekuri
+// Contest: AtCoder - AtCoder Beginner Contest 210
+// URL: https://atcoder.jp/contests/abc210/tasks/abc210_b
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,25 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	string s;
+	cin >> s;
+	for (int i=0;i<n;++i){
+		if (s[i]=='1'){
+			cout << ((i&1)? "Aoki":"Takahashi")<<endl;
+			
+			return;
+		}
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

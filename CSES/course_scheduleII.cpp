@@ -69,28 +69,50 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+vi revg[100000];
+int out[100000];
+bool vis[100000];
+priority_queue<int> pq;
+
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	vi ans;
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		u--;v--;
+		revg[v].pb(u);
+		out[u]++;
+	}
+	for (int i=0;i<n;++i) if (!out[i]) pq.push(i);
+	while(sz(pq)){
+		int x = pq.top();
+		pq.pop();
+		ans.pb(x);
+		for (int u:revg[x]){
+			out[u]--;
+			if (!out[u]) pq.push(u);
+		}
+	}
+	reverse(all(ans));
+	
+	for (int x:ans )cout << x+1 << " ";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

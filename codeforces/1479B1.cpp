@@ -69,12 +69,6 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
@@ -83,16 +77,48 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n+1), nxt(n+1), mi(n+1, n+1);
+	for (int i=1;i<=n;++i) cin>> a[i];
+	for (int i=n;i>=0;i--){
+		nxt[i] = mi[a[i]];
+		mi[a[i]] = i;
+	}
+	nxt[0] = n;
+	int x=0, y=0;
+	int res = 0;
+	for (int z = 1; z <= n; ++z)
+	{
+		// Greedy Strategy I
+		if (a[x] == a[z])
+		{
+			res += a[y] != a[z];
+			y = z;
+		}
+		else if (a[y] == a[z])
+		{
+			res += a[x] != a[z];
+			x = z;
+		}
+		// Greedy Strategy II
+		else if (nxt[x] < nxt[y])
+		{
+			res += a[x] != a[z];
+			x = z;
+		}
+		else
+		{
+			res += a[y] != a[z];
+			y = z;
+		}
+	}
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

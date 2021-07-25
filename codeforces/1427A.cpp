@@ -1,3 +1,11 @@
+// Problem: A. Avoiding Zero
+// Contest: Codeforces - Codeforces Global Round 11
+// URL: https://codeforces.com/contest/1427/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,27 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	int sum = 0;
+	for (int &e:a)cin >> e, sum += e;
+	if (sum==0){
+		cout << "NO\n";
+		return;
+	}
+	vi ans;
+	if (sum<0){
+		for (int i=0;i<n;++i) if (a[i]<0) ans.pb(a[i]);
+		for (int i=0;i<n;++i) if (a[i]>=0) ans.pb(a[i]);
+	
+	}else{
+		for (int i=0;i<n;++i) if (a[i]>0) ans.pb(a[i]);
+		for (int i=0;i<n;++i) if (a[i]<=0) ans.pb(a[i]);
+	}
+	cout << "YES\n";
+	for (int x:ans)cout << x << " ";
+	cout << "\n";
 }
 
 int main()

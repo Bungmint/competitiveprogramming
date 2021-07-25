@@ -69,28 +69,52 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll BIT[200001],n, a[200001];
+
+inline void upd(int i, int v){
+	for (;i<=n;i+=i&-i) BIT[i] += v;
+}
+inline void upd(int l, int r, int v){
+	upd(l, v);
+	upd(r+1, -v);
+}
+inline ll query(int i){
+	ll res = 0;
+	for (;i>0;i-=i&-i) res+=BIT[i];
+	return res;
+}
 
 void solve()
 {
+	int q;
+	cin >> n>>q;
+	for (int i=1;i<=n;++i) cin >> a[i];
+	while(q--){
+		int op;
+		cin >> op;
+		if (op==1){
+			int a, b, u;
+			cin >> a >> b >> u;
+			upd(a, b, u);
+		}else{
+			int k;
+			cin >> k;
+			cout << query(k)+a[k]<<"\n";
+		}
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

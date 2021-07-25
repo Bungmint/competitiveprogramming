@@ -69,28 +69,46 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+map<int,int> freq;
+int cnt = 0, n, k;
 
+void add(int x){freq[x]++;if (freq[x]==1)cnt++;}
+void remove(int x){freq[x]--;if (!freq[x])cnt--;}
+bool good(){return cnt<=k;}
 void solve()
 {
+	scanf("%d %d", &n, &k);
+	
+	vi a(n);
+	for (int i=0;i<n;++i) scanf("%d", &a[i]);
+	int l = 0;
+	int res = 0, id1 = 0, id2 = 0;
+	for (int r=0;r<n;++r){
+		add(a[r]);
+		while(!good()&&l<n){
+			remove(a[l]);
+			l++;
+		}
+		if (res<r-l+1){
+			id1 = l, id2 = r;
+			res = r-l+1;
+		}
+	}
+	printf("%d %d", id1+1, id2+1);
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    // ios_base::sync_with_stdio(false);
+    // cin.tie(NULL);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

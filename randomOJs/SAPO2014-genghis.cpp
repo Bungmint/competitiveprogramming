@@ -80,17 +80,44 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+/*
+	Lesson from this: ALWAYS USE A SLIGHTLY LARGER ARRAY/VECTOR TO PREVENT UB
+*/
+ll dp[310][310];
+int a[302];
+
+ll dping(int l, int r){
+	ll &res = dp[l][r];
+	if (res!=-1) return res;
+	if (l==r) return res = a[r+1]-a[l-1]-1;
+	if (l>r) return res = 0;
+	res = LINF;
+	for (int i=l;i<=r;++i){
+		ll cur = dping(l, i-1) + dping(i+1, r);
+		res = min(cur,res);
+	}
+	res += a[r+1]-a[l-1]-1;
+	dbg(l, r,res);
+	return res;
+}
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	for (int i=1;i<=k;++i) cin >> a[i];
+	a[0] = 0, a[k+1] = n+1;
+	sort(a, a+k+2);
+	memset(dp, -1, sizeof(dp));
+	cout << dping(1, k);
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

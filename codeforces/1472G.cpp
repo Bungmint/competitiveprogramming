@@ -69,20 +69,71 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+vi g[200000], from[200000];
+int d[200000];
+int vis[200000];
 
 void solve()
 {
+	int n,m;
+	cin >> n>>m;
+	for (int i=0;i<n;++i){
+		g[i].clear();
+		from[i].clear();
+		d[i] = INF;
+		vis[i] = -1;
+	}
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		u--;v--;
+		g[u].pb(v);
+		from[v].pb(u);
+	}
+	queue<int> q;
+	d[0] = 0;
+	q.push(0);
+	while(!q.empty()){
+		int v = q.front();
+		q.pop();
+		for (int e:g[v]){
+			if (d[e]>d[v]+1){d[e] = d[v]+1; q.push(e);}
+		}
+	}
+	vector<vi> dist(n);
+	for (int i=0;i<n;++i) dist[d[i]].pb(i);
+	for (int i=0;i<n;++i){
+		set<int> st;
+		for (int v:dist[i]){
+			st.insert(v);
+			q.push(v);
+		}
+		while(!q.empty()){
+			int v = q.front();
+			q.pop();
+			vis[v] =(vis[v]==-1? i:min(vis[v], i)) ;
+			dbg(v, vis[v]);
+			if(st.count(v)){
+				for (int x:from[v]){
+					if (vis[x]==-1) q.push(x);
+				}
+			}else{
+				for (int x:from[v]){
+					dbg(v,x, d[v], d[x]);
+					if (d[x]<d[v]&&vis[x]==-1) q.push(x);
+				}
+			}
+		}
+	}
+	for (int i=0;i<n;++i){
+		cout << vis[i]<<" ";
+	}
+	cout << "\n";
 }
 
 int main()

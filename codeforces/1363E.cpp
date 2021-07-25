@@ -69,30 +69,71 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N= 2e5+1;
+vi G[N];
+int a[N],b[N], c[N], n;
+int cnt[N][2], mi[N], sub[N];
+ll res=0;
+
+void subdfs(int V, int pV){
+	if (b[V]!=c[V])cnt[V][b[V]]++;
+	mi[V] = min(mi[pV], a[V]);
+	dbg(mi[V]);
+	for (int e:G[V]){
+		if (e!=pV){
+			subdfs(e,V);
+			for (int i=0;i<2;++i){
+				cnt[V][i] += cnt[e][i];
+			}
+		}
+	}
+}
+
+void dfs(int V, int pV){
+	for (int e:G[V]){
+		if (e!=pV){
+			dfs(e,V);
+			sub[V]+=sub[e];
+		}
+	}
+	if (a[V]==mi[V]){
+		int m = min(cnt[V][0], cnt[V][1]) - sub[V];
+		res += (ll)m * (ll)a[V]*2LL;
+		sub[V] += m;
+	}
+}
 
 void solve()
 {
+	cin >> n;
+	mi[0] = INT_MAX;
+	for (int i=1;i<=n;++i){
+		cin >> a[i] >> b[i]>> c[i];
+		mi[i] = INT_MAX;
+	}	
+	for (int i=0;i<n-1;++i){
+		int u, v;
+		cin >> u >> v;
+		G[u].pb(v);
+		G[v].pb(u);
+	}
+	subdfs(1,0);
+	if(cnt[1][0] !=cnt[1][1]){
+		cout << -1<<"\n";
+		return;
+	}
+	dfs(1,0);
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

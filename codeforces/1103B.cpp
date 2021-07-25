@@ -69,30 +69,63 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+inline char ask(int x, int y){
+	cout << "? "<< x << " "<< y <<endl;
+	char c;
+	cin >> c;
+	return c;
+}
+
 void solve()
 {
+	string s;
+	while(true){
+		cin >> s;
+		if (s=="mistake"||s=="end") return;
+		int x=-1;
+		for (int i=0;i<=29;++i){
+			char c = ask((1<<i), (1<<(i+1)));
+			if(c=='x'){
+				x = i;
+				break;
+			}
+		}
+		if (x==0){
+			char c = ask(2,3);
+			int y;
+			if (c=='x'){
+				y = 1;
+			}else{
+				y =2;
+			}
+			cout << "! "<< y << endl;
+			continue;
+		}
+		int l = (1<<x)+1, r= 1<<(x+1), ans;
+		while(l<=r){
+			int m = l + (r-l)/2;
+			char re = ask((1<<x), m);
+			if (re=='x'){
+				
+				ans = m;
+				r = m-1;
+			}else{
+				l = m+1;
+			}
+		}
+		cout << "! "<< ans << endl;
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

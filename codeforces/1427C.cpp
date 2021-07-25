@@ -1,3 +1,11 @@
+// Problem: C. The Hard Work of Paparazzi
+// Contest: Codeforces - Codeforces Global Round 11
+// URL: https://codeforces.com/contest/1427/problem/C
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,41 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dp[100001], mi[100001];
 
 void solve()
 {
+	int r, n;
+	cin >> r >> n;
+	vector<ar<int,3>> c(n+1);
+	for (int i=1;i<=n;++i){
+		cin >> c[i][0]>>c[i][1]>>c[i][2];
+	}
+	
+	for (int i=n;i>=1;--i){
+		auto [t, x, y] = c[i];
+		dp[i] = 1;
+		for (int j=1;j+i<=n&&j<=2*r;++j){
+			auto [T, X, Y] = c[i+j];
+			if (abs(x-X)+abs(Y-y)<=T-t) dp[i] = max(dp[i], 1+dp[i+j]);
+		}
+		if (i+2*r+1<=n)dp[i] = max(dp[i], mi[i+2*r+1]+1);
+		mi[i] =(i<n? max(mi[i+1], dp[i]):dp[i]);
+	}
+	int ans = 0;
+	for (int i=1;i<=n;++i){
+		auto [T,X, Y] = c[i];
+		if (abs(1-X)+abs(1-Y)<=T) ans = max(ans, dp[i]);
+	}
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

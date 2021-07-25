@@ -69,12 +69,6 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
@@ -83,16 +77,42 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	int l = 1, r= 1e9, ans = -1;
+	while(l<=r){
+		int m = l + (r-l)/2;
+		vi tmp1, tmp2;
+		for (int i=0;i<n;++i){
+			if (a[i]<=m){
+				tmp1.pb(a[i]);
+				if (i<n-1) tmp1.pb(a[i+1]);
+				i++;
+			}
+		}
+		tmp2.pb(a[0]);
+		for (int i=1;i<n;++i){
+			if (a[i]<=m){
+				tmp2.pb(a[i]);
+				if (i<n-1) tmp2.pb(a[i+1]);
+				i++;
+			}
+		}
+		if (sz(tmp1)>=k||sz(tmp2)>=k){
+			ans = m;
+			r = m-1;
+		}else{
+			l = m+1;
+		}
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

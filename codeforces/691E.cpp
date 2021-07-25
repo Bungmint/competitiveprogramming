@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,30 +68,77 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 101;
+
+struct matrix{
+	ll m[N][N];
+	matrix(){
+		memset(m, 0, sizeof(m));
+	}
+};
+
+matrix mul(matrix a, matrix b){
+	matrix res = matrix();
+	for (int i=0;i<N;i++){
+		for (int j=0;j<N;++j){
+			for (int k=0;k<N;++k){
+				res.m[i][j] = (res.m[i][j] + a.m[i][k]*b.m[k][j])%MOD;
+			}
+		}
+	}
+	
+	return res;
+}
+
+matrix pow(matrix a, ll k){
+	if (k==1) return a;
+	matrix m = pow(a, k/2);
+	if (k&1) return mul(mul(m,m), a);
+	return mul(m,m);
+}
+
 
 void solve()
 {
+	int n;
+	ll k;
+	cin >> n>>k;
+	vl a(n);
+	matrix adj = matrix();
+	
+	for (int i=0;i<n;++i) cin >> a[i];
+	if (k==1){
+		cout << n<<"\n";
+		return;
+	}
+	int cnt = 0;
+	for (int i=0;i<n;++i){
+		for (int j=0;j<n;++j){
+			if (__builtin_popcountll(a[i]^a[j])%3==0){
+				dbg(i,j, a[i]^a[j]);
+				adj.m[i][j]++;
+		
+			}
+		}
+	}
+	matrix res = pow(adj, k-1);
+	ll ans = 0;
+	for (int i=0;i<N;++i){
+		for (int j=0;j<N;++j){
+			ans = (ans+res.m[i][j])%MOD;
+		}
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+   	solve();
 }

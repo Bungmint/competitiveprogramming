@@ -69,26 +69,88 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 3e5+1;
+vi G1[N], G2[N];
+set<pi> s;
+int st[N], en[N];
+int ans = 0, timer = 0;
+
+void dfsG1(int V,int pV){
+	int u=-1;
+	if (s.empty()){
+		s.insert({st[V], V});
+	}else{
+		auto it1 = s.lb({st[V], -INF});
+		bool ok = 1;
+		if (it1!=s.end()){
+			int u = it1->se;
+			if (en[u]<=en[V]) ok = 0;
+		}
+		if (ok){
+			auto it2 = s.lb({st[V], -INF});
+			if (it2!=s.begin()){
+				it2--;
+				u = it2->se;
+				if (en[u]>=en[V]){
+					s.erase(it2);
+				}
+			}
+			s.insert({st[V], V});
+		}
+	}
+	ans = max(ans, sz(s));
+	for (int e:G1[V]){
+		if (e!=pV){
+			dfsG1(e,V);
+		}
+	}
+	
+	if (s.count({st[V], V})) s.erase({st[V], V});
+	if (u!=-1) s.insert({st[u], u});
+}
+
+void dfsG2(int V,int pV){
+	st[V] = timer++;
+	for (int e:G2[V]){
+		if (e!=pV){
+			dfsG2(e,V);
+		}
+	}
+	en[V] = timer;
+}
+
 
 void solve()
 {
+	int n;
+	cin >>n;
+	for (int i=0;i<=n;++i) G1[i].clear(), G2[i].clear();
+	for (int i=2;i<=n;++i){
+		int t;
+		cin >> t;
+		G1[t].pb(i); G1[i].pb(t);
+	}
+	for (int i=2;i<=n;++i){
+		int t;
+		cin >> t;
+		G2[t].pb(i); G2[i].pb(t);
+	}
+	timer = 0;
+	ans = 0;
+	dfsG2(1,0);
+	dfsG1(1,0);
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

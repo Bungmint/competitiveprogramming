@@ -1,3 +1,11 @@
+// Problem: B - Cycle Hit
+// Contest: AtCoder - AtCoder Beginner Contest 211
+// URL: https://atcoder.jp/contests/abc211/tasks/abc211_b
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,18 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	set<string> st;
+	for (int i=0;i<4;++i){string s;cin >> s;st.insert(s);}
+	cout << (sz(st)==4? "Yes":"No")<<endl;
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

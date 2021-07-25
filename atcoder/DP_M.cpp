@@ -1,3 +1,11 @@
+// Problem: M - Candies
+// Contest: AtCoder - Educational DP Contest
+// URL: https://atcoder.jp/contests/dp/tasks/dp_m
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -69,11 +77,18 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,70 +144,37 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
-
-void precalc()
-{
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
-}
-
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
+Mint dp[101][100002];
+Mint pref[100002];
+int a[101], n,k;
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	cin >> n>>k;
+	for (int i=1;i<=n;++i) cin >> a[i];
+	dp[0][k] = 1;
+	for (int i=1;i<=n;++i) {
+		pref[0] = dp[i-1][0];
+		for (int j=1;j<=k;++j){
+			pref[j] = pref[j-1] + dp[i-1][j];
+		}
+		dp[i][0] = pref[min(a[i], k)];
+		for (int j=1;j<=k;++j){
+			dp[i][j] = pref[min(j+a[i],k)]-pref[j-1];
+		}	
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << dp[n][0]<<endl;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    precalc();
-    solve();
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

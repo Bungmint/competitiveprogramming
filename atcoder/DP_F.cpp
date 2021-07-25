@@ -83,14 +83,41 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n,m;
+	string s,t;
+	cin >> s >> t;
+	n = sz(s), m = sz(t);
+	vector<vpi> dp(n+1, vpi(m+1,{-INF,0}));
+	for (int i=0;i<=n;++i) dp[i][0] = {0,0};
+	for (int j=0;j<=m;++j) dp[0][j] = {0,0};
+	for (int i=1;i<=n;++i){
+		for (int j=1;j<=m;++j){
+			int mx = -INF, id = -1;
+			if (dp[i-1][j].fi>mx) mx = dp[i-1][j].fi, id = 0;
+			if (dp[i][j-1].fi>mx) mx = dp[i][j-1].fi, id = 1;
+			if (s[i-1]==t[j-1]&&dp[i-1][j-1].fi+1>mx) mx = dp[i-1][j-1].fi+1, id = 2;
+			dp[i][j] = {mx, id};
+			dbg(i,j,dp[i][j]);
+		}
+	}
+	int i = n, j = m;
+	string ans ="";
+	while(i&&j){
+		int x = dp[i][j].se;
+		if (x==0) i--;
+		if (x==1)j--;
+		if (x==2) ans += t[j-1], i--, j--;
+	}
+	reverse(all(ans));
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

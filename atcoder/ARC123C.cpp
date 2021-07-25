@@ -1,3 +1,11 @@
+// Problem: C - 1, 2, 3 - Decomposition
+// Contest: AtCoder - AtCoder Regular Contest 123
+// URL: https://atcoder.jp/contests/arc123/tasks/arc123_c
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,49 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int f[20][12][5];
+ll n;
+vi num;
+
+ll bin_pow(ll a, ll b){
+	if (b==0) return 1;
+	if (b==1) return a;
+	ll m = bin_pow(a, b/2);
+	return ((b&1)? m*m*a:m*m);
+}
+
+int dp(int pos, int choice, int up){
+	int &res = f[pos][choice][up];
+	if (res!=-1) return res;
+	if (pos==sz(num)) return up==0;
+	int cur = num[pos];
+	res = 0;
+	dbg(pos, cur, up, choice);
+	for (int i=choice;i<=choice*3;++i){
+		if ((i+up)%10==cur){
+			for (int j=0;j<=choice;++j){
+				res |= !!(dp(pos+1, j, (i+up)/10));
+			}
+		}
+	}
+	return res;
+}
 
 void solve()
 {
+	ll n1;
+	cin >> n;
+	n1 = n;
+	num.clear();
+	while(n1){num.pb(n1%10);n1/=10;}
+	dbg(num);
+	memset(f, -1, sizeof(f));
+	for (int i=1;i<=10;++i){
+		if (dp(0, i, 0)){
+			cout << i << "\n";
+			return;
+		}
+	}
 }
 
 int main()

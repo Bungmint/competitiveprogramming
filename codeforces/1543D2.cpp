@@ -69,26 +69,97 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int digit = 0;
+
+int ask(int x){
+	cout << x << endl;
+	int t;
+	cin >> t;
+	return t;
+}
+
+ll bin_pow(ll a, ll b){
+	ll r = 1;
+	while(b){
+		if (b&1){
+			r *= a;
+		}
+		b/=2;
+		if (!b) break;
+		a *= a;
+	}
+	return r;
+}
+
+vi de(int x, int base){
+	vi res;
+	for (int i=digit;i>=0;i--){
+		ll v = bin_pow(base, i);
+		res.pb(x/v);
+		x%=v;
+	}
+	reverse(all(res));
+	return res;
+}
+
+ll forxor(int x, int y, int base){
+	vi dx = de(x, base), dy = de(y,base);
+	dbg(x, y, dx, dy);
+	ll r = 0;
+	ll v = 1;
+	for (int i=0;i<=digit;i++){
+		r += (ll)((dx[i]+dy[i])%base)*v;
+		v *= (ll)base;
+	}
+	dbg(x, y, r);
+	return r;
+}
+
+ll reverxor(int x, int y, int base){
+	vi dx = de(x, base), dy = de(y,base);
+	ll r = 0;
+	ll v = 1;
+	for (int i=0;i<=digit;i++){
+		r += (ll)((dx[i]+base- dy[i])%base)*v;
+		v *= (ll)base;
+	}
+	return r;
+}
+
+
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	ll xum = 0;
+	digit = (ld)18/(ld)log10(k);
+	dbg(digit);
+	for (int i=0;i<n;++i){
+		int res;
+		int q;
+		if (i%2==0){
+			q = (forxor(xum ,i,k));
+		}else {
+			q = (reverxor(xum, i, k));
+		}
+		res = ask(q);
+		if (res==1){
+			return;
+		}
+		xum = reverxor(q, xum, k);
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

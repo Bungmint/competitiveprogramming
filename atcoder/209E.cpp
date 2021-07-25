@@ -69,28 +69,82 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vector<string> t(n), pref(n), suf(n);
+	vector<string> order;
+	vi a(n), b(n);
+	for (int i=0;i<n;++i){
+		cin >> t[i];
+		pref[i] = t[i].substr(0,3);
+		suf[i] = t[i].substr(sz(t[i])-3,3);
+		order.pb(pref[i]);
+		order.pb(suf[i]);
+	}
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	
+	
+	int cnt = sz(order);
+	vector<vi> G(cnt);
+	vector<vi> revG(cnt);
+	for (int i=0;i<n;++i){
+		a[i] = lb(all(order), pref[i])-order.begin();
+		b[i] = lb(all(order), suf[i])-order.begin();
+		G[a[i]].pb(b[i]);
+		revG[b[i]].pb(a[i]);
+		dbg(a[i], b[i]);
+	}
+	
+	vi dp(cnt,0), deg(cnt);
+	queue<int> q;
+	for (int i=0;i<cnt;++i){
+		deg[i] = sz(G[i]);
+		if (!deg[i]){
+			dp[i] = -1;
+			q.push(i);
+		}
+	}
+	while(!q.empty()){
+		int v = q.front();
+		q.pop();
+		for (int e:revG[v]){
+			deg[e]--;
+			if (dp[e]==0&&dp[v]==-1){
+				dp[e] = 1;
+				q.push(e);
+			}else if (deg[e]==0&&dp[v]==1&&dp[e]==0){
+				dp[e]=-1;
+				q.push(e);
+			}
+		}
+	}
+	for (int i=0;i<n;++i){
+		if (dp[b[i]]==1){
+			cout << "Aoki\n";
+		}else if (dp[b[i]]==-1){
+			cout << "Takahashi\n";
+		}else{
+			cout << "Draw\n";
+		}
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

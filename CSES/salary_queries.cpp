@@ -69,28 +69,72 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 6e5+1;
+int bit[N], n, q, a[200001];
+vi order;
+
+void upd(int i, int v){
+	for (i++;i<=sz(order);i+=i&-i){
+		bit[i]+=v;
+	}
+}
+int query(int i){
+	int res = 0;
+	for (i++;i>0;i-=i&-i) res += bit[i];
+	return res;
+}
+
+inline int go(int x){
+	return lb(all(order), x)-order.begin();
+}
 
 void solve()
 {
+	cin >> n >> q;
+	for (int i=1;i<=n;++i){
+		cin >> a[i];
+		order.pb(a[i]);
+	}
+	vector<ar<int,3>> queries(q);
+	for (int i=0;i<q;++i){
+		char op;
+		int a, b;
+		cin >> op>>a >> b;
+		ar<int,3> Q = {0,a,b};
+		if (op=='?') Q[0] = 1, order.pb(a);
+		order.pb(b);
+		queries[i] = Q;
+	}
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	for (int i=1;i<=n;++i){
+		a[i] = go(a[i]);
+		upd(a[i], 1);
+	}
+	for (int i=0;i<q;++i){
+		ar<int,3> Q = queries[i];
+		if (Q[0]){
+			cout << query(go(Q[2])) - query(go(Q[1]) -1)<<"\n";
+		}else{
+			upd(a[Q[1]], -1);
+			a[Q[1]] = go(Q[2]);
+			upd(a[Q[1]],1);
+		}
+	}
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: B1. Wonderful Coloring - 1
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/B1
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,20 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	string s;
+	cin >> s;
+	int n = sz(s);
+	vi cnt(26);
+	for (int i=0;i<n;++i){
+		cnt[s[i]-'a']++;
+	}
+	int both = 0, single = 0;
+	for (int i=0;i<26;++i){
+		if(!cnt[i]) continue;
+		if (cnt[i]>=2) both++;
+		else single++;
+	}
+	cout << both + single/2 << "\n";
 }
 
 int main()

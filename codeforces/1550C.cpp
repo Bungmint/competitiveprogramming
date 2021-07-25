@@ -1,3 +1,11 @@
+// Problem: C. Manhattan Subarrays
+// Contest: Codeforces - Educational Codeforces Round 111 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1550/problem/C
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,39 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
+
+bool good(int a, int b, int c){
+	if (a==b||b==c) return 0;
+	if (a<b&&b<c) return 0;
+	if (a>b&&b>c) return 0;
+	return 1; 
+}
+bool good(int a, int b, int c, int d){
+	return good(a,b,c)&&good(b,c,d)&&good(a,b,d)&&good(a,c,d);
+}
+
+
+
 void solve()
 {
+	ll n;
+	cin >> n;
+	vi a(n);
+	vi order;
+	for (int i=0;i<n;++i) cin >> a[i], order.pb(a[i]);
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	for (int i=0;i<n;++i) a[i] = lb(all(order), a[i]) -order.begin();
+	ll res = n + n-1;
+	deque<int> st;
+	for (int i=0;i<n-2;++i){
+		res += good(a[i], a[i+1], a[i+2]);
+	}
+	for (int i=0;i<n-3;++i){
+		res += good(a[i], a[i+1], a[i+2], a[i+3]);
+	}
+	cout << res << "\n";
 }
 
 int main()

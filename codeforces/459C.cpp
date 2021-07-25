@@ -1,3 +1,11 @@
+// Problem: C. Pashmak and Buses
+// Contest: Codeforces - Codeforces Round #261 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/459/C
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,48 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const ld eps = 1e-9;
+
+bool great(ld a, ld b){
+	return a-b>eps;
+}
 
 void solve()
 {
+	int n, k, d;
+	cin >> n >> k >> d;
+	ld x = log10(n), y = d*log10(k);
+	if (great(x,y)){
+		puts("-1");
+		return;
+	}
+	vi seq(d);
+	vector<vi> ans(d, vi(n));
+	for (int i=0;i<n;++i){
+		for (int j=0;j<d;++j){
+			ans[j][i] = seq[j];
+		}
+		if (i==n-1) break;
+		seq[d-1]++;
+		for (int j=d-1;j>=0;j--){
+			if(seq[j]<k) break;
+			seq[j]-=k;
+			if (j)seq[j-1]++;
+		}
+	}
+	for (int i=0;i<d;++i) {
+		for (int j=0;j<n;++j) cout << ans[i][j]+1 << " ";
+		cout << "\n";
+	}
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

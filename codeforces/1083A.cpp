@@ -69,30 +69,53 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 3e5+1;
+vpi G[N];
+ll dp[N][2], w[N];
+
+void dfs(int V, int pV){
+	dp[V][0] = w[V];
+	vl choice;
+	for (auto &[e, w]:G[V]){
+		if (e==pV) continue;
+		dfs(e,V);
+		choice.pb(-w+dp[e][0]);
+	}
+	if (sz(choice)==1){
+		dp[V][0] = max(dp[V][0], dp[V][0]+choice[0]);
+	}else if (sz(choice)>=2){
+		sort(all(choice), greater<ll>());
+		dp[V][0] = max({dp[V][0], dp[V][0]+choice[0]});
+		dp[V][1] = w[V]+choice[0]+choice[1];
+	}
+	dbg(V,dp[V][0], dp[V][1]);
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> w[i];
+	for (int i=0;i<n-1;++i){
+		int u, v, w;
+		cin >> u >> v>>w;
+		G[u].pb({v,w});
+		G[v].pb({u,w});
+	}
+	dfs(1,0);
+	ll ans = 0;
+	for (int i=1;i<=n;++i) ans = max({ans, dp[i][0], dp[i][1]});
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

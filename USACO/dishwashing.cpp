@@ -1,3 +1,11 @@
+// Problem: Problem 2. Dishwashing
+// Contest: USACO - USACO 2019 February Contest, Gold
+// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=922
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,41 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+stack<int> st[100001];
+int base[100001];
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int ans = 0, placed = 0;
+	for (int i=0;i<n;++i){
+		int x; cin >> x;
+		if (x<placed){
+			ans = i;
+			break;
+		}
+		for (int j=x;j>0&&!base[j];j--){
+			base[j] = x;
+		}
+		while(!st[base[x]].empty()&&st[base[x]].top()<x){
+			placed = st[base[x]].top();
+			st[base[x]].pop();
+		}
+		st[base[x]].push(x);
+	}
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("dishes");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

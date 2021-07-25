@@ -1,3 +1,11 @@
+// Problem: Problem 1. Timeline
+// Contest: USACO - USACO 2020 February Contest, Gold
+// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=1017
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,47 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, m, c;
+	cin >> n >> m>>c;
+	vi indeg(n), earliestT(n);
+	vector<vpi> g(n);
+	for (int i=0;i<n;++i){
+		cin >> earliestT[i];
+	}
+	for (int i=0;i<c;++i){
+		int u, v, x;
+		cin >> u >> v>>x;
+		u--;v--;
+		g[u].pb({v,x});
+		indeg[v]++;
+	}
+	// Kahn's algorithm, BFS
+	queue<int> q;
+	for (int i=0;i<n;++i){
+		if (!indeg[i]) q.push(i);
+	}
+	while(sz(q)){
+		int v = q.front();
+		q.pop();
+		for (auto [e,x]:g[v]){
+			indeg[e]--;
+			earliestT[e] = max(earliestT[v]+x, earliestT[e]);
+			if (indeg[e]==0) q.push(e);
+		}
+	}
+	for (int x:earliestT) cout << x << "\n";
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("timeline");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

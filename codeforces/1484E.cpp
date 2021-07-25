@@ -1,3 +1,11 @@
+// Problem: E. Skyline Photo
+// Contest: Codeforces - Codeforces Round #709 (Div. 2, based on Technocup 2021 Final Round)
+// URL: https://codeforces.com/contest/1484/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 2500 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,100 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+struct SegTree{
+
+	int sz;
+	struct Node{
+		ll val=0;
+	};
+	vector<Node> t;
+	
+	
+	Node single(ll val){
+		return {val};
+	}
+	Node NEUTRAL = {-LINF}; //ALSO HAS TO CHANGE
+	Node merge(Node a, Node b){
+		return {max(a.val, b.val)};
+	}
+	
+	void init(int n){
+		sz = 1;
+		while(sz<n) sz*=2;
+		t.resize(sz*2);
+	}
+	void upd(int i, ll v, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        t[x] = single(v);
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    if (i < mid)
+	        upd(i, v, 2 * x + 1, l, mid);
+	    else
+	        upd(i, v, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void upd(int i, ll v)
+	{
+	    upd(i, v, 0, 0, sz);
+	}
+	Node query(int l, int r, int x, int lx, int rx)
+	{
+	    if (lx >= r || rx <= l)
+	        return NEUTRAL;
+	    if (lx >= l && rx <= r)
+	        return t[x];
+	    int mid = (lx + rx) / 2;
+	    Node a = query(l, r, 2 * x + 1, lx, mid);
+	    Node b = query(l, r, 2 * x + 2, mid, rx);
+	    
+	    return merge(a, b);
+	}
+	Node query(int l, int r)
+	{
+	    return query(l, r, 0, 0, sz);
+	}
+};
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vl h(n+1), b(n+1), l(n+1);
+	vl dp(n+1, -LINF);
+	SegTree st;
+	st.init(n+1);
+	stack<int> sta;
+	for (int i=1;i<=n;++i){
+		cin >> h[i];
+		while(!sta.empty()&&h[sta.top()]>h[i]){
+			sta.pop();
+		}
+		l[i] = (sta.empty()? 0:sta.top());
+		sta.push(i);
+	}
+	dp[0] = 0;
+	for (int i=1;i<=n;++i) cin >> b[i];
+	for (int i=1;i<=n;++i){
+		if (l[i]>0)dp[i] = dp[l[i]];
+		SegTree::Node q = st.query(l[i], i);
+		dbg(q.val);
+		dp[i] = max(dp[i], q.val+b[i]);
+		st.upd(i, dp[i]);
+		dbg(dp[i], i);
+	}
+	cout << dp[n]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

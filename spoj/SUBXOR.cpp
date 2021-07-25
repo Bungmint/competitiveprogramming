@@ -69,26 +69,81 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+const int MN = 2.5e6+1;
+const int N = 1e5+1;
+const int root =1;
+int a[N];
+int trie[MN][2];
+int cur = 1;
+ll cnt[MN];
+
+void insert(int x){
+	int now = root;
+	cnt[now]++;
+	for (int i=29;i>=0;i--){
+		int c = (x>>i)&1;
+		if (!trie[now][c]){
+			trie[now][c] = ++cur;
+		}
+		now = trie[now][c];
+		cnt[now]++;
+	}
+}
+
+ll query(int q, int k){
+	int now = root;
+	ll res = 0;
+	for (int i=29;i>=0;i--){
+		if (!now)break;
+		int l = trie[now][0], r = trie[now][1];
+		int cq = (q>>i)&1, ck = (k>>i)&1;
+		if (cq&&ck){
+			res += cnt[r];
+			now = l;
+		}else if (cq){
+			now = r;
+		}else if (ck){
+			res += cnt[l];
+			now = r;
+		}else{
+			now = l;
+		}
+	}
+	return res;
+	
+}
+
 void solve()
 {
+	for (int i=0;i<=cur;++i){
+		trie[i][0] = 0;
+		trie[i][1] = 0;
+		cnt[i] = 0;
+	}
+	cur = 1;
+	int n, k;
+	cin >> n>>k;
+	insert(0);
+	ll res = 0;
+	for (int i=1;i<=n;++i){
+		cin >> a[i];
+		a[i]^=a[i-1];
+		res+= query(a[i], k);
+		insert(a[i]);
+	}
+	cout << res << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

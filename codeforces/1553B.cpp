@@ -1,3 +1,11 @@
+// Problem: B. Reverse String
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/contest/1553/problem/B
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,36 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+string s,t;
+int n, m;
 
 void solve()
 {
+	cin >> s >> t;
+	n = sz(s), m = sz(t);
+	for (int flen = 1;flen<=m;++flen){
+		int blen = m-flen;
+		if (flen>n||blen>=n) continue;
+		string m1 = t.substr(0, flen), m2 = t.substr(flen, blen);
+		dbg(m1, m2);
+		for (int i=0;i<n;++i){
+			if (i+flen>n) break;
+			int j = i+flen-1;
+			if (j<blen) continue;
+			int k = j-blen;
+			string s1 = s.substr(i, flen);
+			string s2 = s.substr(k, blen); 
+			reverse(all(s2));
+			dbg(s1, s2);
+			if (s1==m1&&s2==m2){
+				cout << "YES\n";
+				return;
+			}
+		}
+	}
+	cout << "NO\n";
+	return;
+	
 }
 
 int main()

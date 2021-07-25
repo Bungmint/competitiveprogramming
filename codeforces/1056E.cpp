@@ -74,6 +74,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,64 +130,69 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
+const int N = 1e6+10, B=37;
+Mint p[N], inverse[N], hsh[N];
 
 void precalc()
 {
-    for (int i = 0; i < N; i++)
+	p[0] = 1;
+    for (int i = 1; i < N; i++)
     {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
+        p[i] = p[i-1]*B;
     }
-    inverse[1] = 1;
+    inverse[0] = 1;
+    inverse[1] = inv((Mint)B);
     for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
+    	inverse[i] = inverse[i-1]*inverse[1];
     }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
+    
 }
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
+
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	string s,t;
+	cin >> s >> t;
+	int m = sz(s), n=sz(t);
+	for (int i=1;i<=n;++i){
+		hsh[i] = hsh[i-1]+p[i-1]*(t[i-1]-'a'+1);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	int zr =0, one =0 ;
+	for (int i=0;i<m;++i){
+		(s[i]=='0'? zr++:one++);
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	int cnt = 0;
+	for (int z=1;z<=n-1;z++){
+		if ((ll)n-(ll)z*(ll)zr<=0||((ll)n-(ll)z*(ll)zr)%one) continue;
+		int olen = ((ll)n-(ll)z*(ll)zr)/one;
+		int pos = 1;
+		int zrep=-1, orep = -1;
+		bool ok = 1;
+		for (int i=0;i<m;++i){
+			Mint r;
+			if (s[i]=='0'){
+				r = (hsh[pos+z-1]-hsh[pos-1])*inverse[pos-1];
+				if (zrep==-1||zrep==r){
+					zrep = (int)r;
+				}else{
+					ok = 0;
+				}
+			}else{
+				r = (hsh[pos+olen-1]-hsh[pos-1])*inverse[pos-1];
+				if (orep==-1||orep==r){
+					orep = (int)r;
+				}else{
+					ok = 0;
+				}
+			}
+			pos += (s[i]=='0'? z:olen);
+			if (!ok) break;
+		}
+		if (ok&&zrep!=orep) cnt++;
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << cnt << "\n";
 }
 
 int main()
@@ -194,5 +200,10 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
     precalc();
-    solve();
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

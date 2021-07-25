@@ -73,7 +73,8 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -161,38 +162,35 @@ Mint nCk(ll n, ll k)
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n;
+	cin >> n;
+	string s;
+	cin >> s;
+	int cnt = 0, odd = 0;
+	vpi pair;
+	for (int i=0;i<n-1;++i){
+		if (s[i]=='1'&&s[i]==s[i+1]){
+			pair.pb({i,i+1});
+			cnt++;
+			i++;
+		}else if (s[i]=='1'){
+			odd++;
+		}
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	if (s[n-1]=='1'&&(pair.empty()||pair.back().se!=n-1))odd++;
+	cout << nCk(n-cnt-odd, cnt)<<"\n";
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     precalc();
-    solve();
+    int testcase;
+    cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

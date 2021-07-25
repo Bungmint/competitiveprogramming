@@ -1,3 +1,11 @@
+// Problem: E. Colors and Intervals
+// Contest: Codeforces - Codeforces Global Round 15
+// URL: https://codeforces.com/contest/1552/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,45 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n,k;
+	cin >> n >> k;
+	int lim = (n+k-2)/(k-1);
+	int cnt = 0;
+	vector<bool> used(n, false);
+	vector<vi> pos(n);
+	for (int i=0;i<n*k;++i){
+		int t;
+		cin >> t;
+		t--;
+		pos[t].pb(i);
+	}
+	vpi ans(n);
+	int ptr = 1;
+	while(cnt<n){
+		vi colors;
+		for (int i=0;i<n;++i){
+			if (!used[i]) colors.pb(i);
+		}
+		sort(all(colors), [&](int c1, int c2){
+			return pos[c1][ptr]<pos[c2][ptr];
+		});
+		for (int i=0;i<min(sz(colors), lim);++i){
+			int c = colors[i];
+			ans[c] = {pos[c][ptr-1], pos[c][ptr]};
+			used[c] = 1;
+			cnt++;
+		}
+		ptr++;
+	}
+	for (auto p:ans) cout << p.fi+1 << " "<<p.se+1 << "\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

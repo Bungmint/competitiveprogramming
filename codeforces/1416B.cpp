@@ -1,3 +1,11 @@
+// Problem: B. Make Them Equal
+// Contest: Codeforces - Codeforces Round #673 (Div. 1)
+// URL: https://codeforces.com/problemset/problem/1416/B
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,42 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int a[10001];
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int sum = 0;
+	bool same = 1;
+	for (int i=1;i<=n;++i) cin >> a[i], sum+=a[i], same&= (a[i]==a[1]);
+	if (sum%n!=0){
+		cout <<-1 << "\n";
+		return;
+	}
+	if (same){
+		cout << 0 << "\n";
+		return;
+	}
+	sum/=n;
+	vector<ar<int,3>> ans;
+	for (int i=2;i<=n;++i){
+		if (a[i]%i==0){
+			int get = a[i]/i;
+			ans.pb({i,1,get});
+		}else{
+			int give = i - (a[i]%i);
+			ans.pb({1,i, give});
+			int get = (a[i]+give)/i;
+			ans.pb({i,1,get});
+		}
+	}
+	for (int i=2;i<=n;++i){
+		ans.pb({1, i, sum});
+	}
+	cout << sz(ans)<<"\n";
+	for (auto x:ans) cout << x[0]<<" "<<x[1]<<" " << x[2] << "\n";
+	
 }
 
 int main()

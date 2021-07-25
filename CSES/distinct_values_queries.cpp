@@ -69,28 +69,97 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int a[200000];
+vi order;
+int cnt = 0, freq[200000];
+
+inline void remove(int idx){
+	freq[a[idx]]--;
+	if (freq[a[idx]]==0) cnt--;
+}
+inline void add(int idx){
+	freq[a[idx]]++;
+	if (freq[a[idx]]==1) cnt++;
+}     
+inline int get_answer(){
+	return cnt;
+}
+const int block=450; //Dont forget to set
+
+struct Query {
+    int l, r, idx;
+	inline pair<int, int> toPair() const {
+		return make_pair(l / block, ((l / block) & 1) ? -r : +r);
+	}
+};
+inline bool operator<(const Query &a, const Query &b) {
+	return a.toPair() < b.toPair();
+}
+
+using vq = vector<Query>;
+
+
+vi mo(vq queries) {
+   	vi answers(queries.size());
+    sort(queries.begin(), queries.end());
+    int cur_l = 0;
+    int cur_r = -1;
+    for (Query q : queries) {
+        while (cur_l > q.l) {
+            cur_l--;
+            add(cur_l);
+        }
+        while (cur_r < q.r) {
+            cur_r++;
+            add(cur_r);
+        }
+        while (cur_l < q.l) {
+            remove(cur_l);
+            cur_l++;
+        }
+        while (cur_r > q.r) {
+            remove(cur_r);
+            cur_r--;
+        }
+        answers[q.idx] = get_answer();
+    }
+    return answers;
+}
+
+
 
 void solve()
 {
+	int n, q;
+	cin >> n>>q;
+	for (int i=0;i<n;++i) cin >> a[i], order.pb(a[i]);
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	for (int i=0;i<n;++i){
+		a[i] = lb(all(order), a[i])-order.begin();
+	}
+	vq Q(q);
+	for (int i=0;i<q;++i){
+		int a, b;
+		cin >> a >> b;
+		a--;b--;
+		Q[i] = {a, b, i};
+	}
+	vi ans = mo(Q);
+	for (int x:ans)cout << x << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

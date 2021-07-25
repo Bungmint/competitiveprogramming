@@ -1,3 +1,11 @@
+// Problem: C. Maximize the Intersections
+// Contest: Codeforces - Codeforces Global Round 15
+// URL: https://codeforces.com/contest/1552/problem/C
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,61 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+bool ok(int x, int y, int a){
+	return (x<a&&a<y);
+}
+
 void solve()
 {
+	int n,k;
+	cin >> n >> k;
+	vector<pi> chords;
+	vector<bool> used(2*n,false);
+	int ans =0;
+	for (int i=0;i<k;++i){
+		pi p;
+		cin >> p.fi >> p.se;
+		p.fi--, p.se--;
+		used[p.fi] = 1;
+		used[p.se] = 1;
+		if (p.fi > p.se) swap(p.fi, p.se);
+		for (auto q:chords){
+			if (ok(p.fi, p.se, q.fi)&&!ok(p.fi,p.se,q.se))ans++;
+			else if (ok(p.fi,p.se, q.se)&&!ok(p.fi, p.se, q.fi)) ans++;
+		}
+		chords.pb(p);
+		dbg(ans);
+	}
+	dbg(ans);
+	for (int i=0;i<2*n;++i){
+		if (!used[i]){
+			int mx = -1;
+			int id =0;
+			for (int j=i+1;j<2*n;++j){
+				if(!used[j]){
+					int emptyL = 0, emptyR = 0;
+					for (int k=0;k<2*n;++k){
+						if (k==i||k==j) continue;
+						if (!used[k]&&ok(i, j, k)) emptyL++;
+						else if (!used[k]&&!ok(i,j,k)) emptyR++;
+					}
+	
+					if (emptyR*emptyL>mx){
+						id = j;
+						mx = emptyR*emptyL;
+					}
+				}
+			}
+			used[i] = used[id] = 1;
+			dbg(i,id);
+			for (auto p:chords){
+				if (ok(i, id, p.fi)&&!ok(i,id, p.se)) ans++;
+				else if (ok(i, id, p.se)&&!ok(i, id, p.fi))ans++;
+			}
+			chords.pb({i, id});
+		}
+	}
+	cout << ans << "\n";
 }
 
 int main()

@@ -69,28 +69,55 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int bit[100001], a[100000], cnt[100000], n;
+vi ind[100001];
+
+void setIO(string s) { // the argument is the filename without the extension
+	freopen((s+".in").c_str(),"r",stdin);
+	freopen((s+".out").c_str(),"w",stdout);
+}
+
+void upd(int i,int v){
+	for (++i;i<=n;i+=i&-i) bit[i]+=v;
+}
+int query(int i){
+	int res =0;
+	for (++i;i>0;i-=i&-i) res += bit[i];
+	return res;
+}
 
 void solve()
 {
+	cin >> n;
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		if (a[i]==n) a[i]--;
+		ind[a[i]].pb(i);
+	} 
+	for (int i=0;i<=n-1;i++){
+		cnt[i] = query(n-1)-query(a[i]);
+		upd(a[i], 1);
+	}
+	cout << 0 << "\n";
+	ll res = 0;
+	for (int i=1;i<=n-1;i++){
+		for (int x:ind[i-1]) res += cnt[x];
+		cout << res << "\n";
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    setIO("haircut");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

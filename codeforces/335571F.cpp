@@ -69,30 +69,63 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2001;
+int n, a[N];
+
+int GCD(int a, int b){
+	return (b==0? a:GCD(b, a%b));
+}
+
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int g = 0;
+	for (int i=0;i<n;++i) cin >> a[i], g = GCD(a[i], g);
+	if (g>1){
+		cout << -1 << "\n";
+		return;
+	}
+	dbg(g);
+	if (n==1){
+		if (a[0]==1){
+			cout << 0<<"\n";
+			return;
+		}
+	}
+	int ans = INF;
+	for (int i=1;i<n;++i){
+		dbg(GCD(a[i], a[i-1]));
+		if (GCD(a[i], a[i-1])==1){
+			ans = 0;
+			for (int j=0;j<n;++j){
+				if (a[j]!=1)ans ++;
+			}
+			cout << ans << "\n";
+			return;
+		}
+	}
+	for (int l = 0;l<n;++l){
+		g = a[l];
+		for (int r = l+1;r<n;++r){
+			g = GCD(a[r], g);
+			if (g==1){
+				ans = min(ans, 2*(r-l) + n- (r-l+1));
+			}
+		}
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

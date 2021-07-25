@@ -69,28 +69,58 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	
+	vector<vi> g(n+1);
+	
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		g[u].pb(v); g[v].pb(u);
+	}
+	dbg(g);
+	int res = INF;
+	for (int i=1;i<=n;++i){
+		queue<int> q;
+		vector<bool> vis(n+1);
+		vi p(n+1), dist(n+1, INF);
+		vis[i] = 1;
+		dist[i] = 0;
+		q.push(i);
+		while(!q.empty()){
+			int v = q.front();
+			q.pop();
+			for (int e:g[v]){
+				if (vis[e]&&e!=p[v]){
+					res = min(res, 1+dist[v]+dist[e]);
+				}else if (!vis[e]){
+					p[e] = v;
+					vis[e] = 1;
+					dist[e] = dist[v] + 1;
+					q.push(e);
+				}
+			}
+		}
+	}
+	cout << (res==INF? -1:res )<<"\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

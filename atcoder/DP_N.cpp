@@ -1,3 +1,11 @@
+// Problem: N - Slimes
+// Contest: AtCoder - Educational DP Contest
+// URL: https://atcoder.jp/contests/dp/tasks/dp_n
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,33 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll dp[403][403], n, a[401], pref[401];
+
+ll dping(int l, int r){
+	ll &res = dp[l][r];
+	if (res!=-1) return res;
+	if (l>=r) return 0;
+	res = LINF;
+	for (int j=l;j<r;++j){
+		res = min(res, dping(l,j)+dping(j+1, r)+pref[r]-pref[l-1]);
+	}
+	return res;
+}
 
 void solve()
 {
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> a[i], pref[i] = pref[i-1]+a[i];
+	memset(dp,-1, sizeof(dp));
+	cout << dping(1,n)<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

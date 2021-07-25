@@ -80,9 +80,23 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll d, k;
+
 
 void solve()
 {
+	cin >> d >> k;
+	int cnt = 0;
+	ll x,y;
+	x=y=0;
+	while(x*x+y*y<=d*d){
+		if (x>=y){
+			y+=k;
+		}else x+=k;
+		cnt++;
+	}
+	cout << (!(cnt&1) ? "Ashish":"Utkarsh")<<"\n";
+	
 }
 
 int main()

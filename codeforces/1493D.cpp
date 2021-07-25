@@ -1,3 +1,11 @@
+// Problem: D. GCD of an Array
+// Contest: Codeforces - Codeforces Round #705 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/1493/D
+// Memory Limit: 256 MB
+// Time Limit: 2500 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -69,11 +77,41 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
+const int N = 2e5; // Only advised to use it under 1e7 (More Memory)
+int lp[N + 1];
+unordered_map<int,int,custom_hash> primeID;
+vector<int> pr;
+void linsieve()
+{
+    for (int i = 2; i <= N; i++)
+    {
+        if (lp[i] == 0)
+        {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() && pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+        {
+            lp[i * pr[j]] = pr[j];
+        }
+    }
+    for (int i=0;i<sz(pr);++i){
+    	primeID[pr[i]] = i;
+    }
+}
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,70 +167,77 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
-
-void precalc()
-{
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
-}
-
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
-
+multiset<int> p[17984];
+set<pi> a[200000];
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n,q;
+	cin >> n >> q;
+	Mint ans = 1;
+	for (int i=0;i<n;++i){
+		int t;
+		cin >> t;
+		while(t>1){
+			int x = lp[t], cnt=0;
+			while(t%x==0){
+				cnt++;
+				t/=x;
+			}
+			a[i].insert({x,cnt});
+			p[primeID[x]].insert(cnt);
+			dbg(a[i], p[primeID[x]]);
+		}
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	for (int i=0;i<17984;++i){
+		if (sz(p[i])==n){
+			int x = *p[i].begin();
+			ans *= pow((Mint)pr[i], x);
+		} 
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	dbg(ans);
+	
+	while(q--){
+		int i, x;
+		cin >> i >> x;
+		i--;
+		while(x>1){
+			int t = lp[x], cnt=0;
+			while(x%t==0){
+				x/=t;
+				cnt++;
+			}
+			pi w = *a[i].lb({t,-INF});
+			if (w.fi!=t){
+				a[i].insert({t,cnt});
+				p[primeID[t]].insert(cnt);
+				if (sz(p[primeID[t]])==n) ans *=pow((Mint)t, *p[primeID[t]].begin());
+			}else{
+				a[i].erase(w);
+				a[i].insert({t, w.se+cnt});
+				auto it = p[primeID[t]].lb(w.se);
+				int curmin = *p[primeID[t]].begin();
+				p[primeID[t]].erase(it);
+				p[primeID[t]].insert(w.se+cnt);
+				if (sz(p[primeID[t]])==n) ans *=pow((Mint)t, *p[primeID[t]].begin()-curmin);
+			}
+		}
+		
+		
+		cout << ans << "\n";
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    precalc();
-    solve();
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    linsieve();
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

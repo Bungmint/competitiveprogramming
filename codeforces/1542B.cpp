@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,26 +68,57 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+ll pw (ll a, ll b){
+	ll r = 1;
+	while(b){
+		if (b&1){
+			r *=a;
+		}
+		b/=2;
+		a*=a;
+	}
+	return r;
+}
+
 void solve()
 {
+	ll n, a, b;
+	cin >> n >> a >> b;
+	if (n==1){
+		cout << "Yes\n";
+		return;
+	}
+	if (a==1){
+		if ((n-1)%b==0) cout << "Yes\n";
+		else cout << "No\n";
+		return;
+	}
+	ll al = 1, ar = 1;
+	for (int l=0;al<=n;l++){
+		ar = 1;
+		for (int r = 0;ar*al<=n;r++){
+			if ((n-ar*al)%(b*al)==0){
+				cout << "Yes\n";
+				return;
+			}
+			
+			ar*=a;
+		}
+		al*=a;
+	}
+	cout << "No\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

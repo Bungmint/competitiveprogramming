@@ -1,3 +1,11 @@
+// Problem: E. Clear the Multiset
+// Contest: Codeforces - Educational Codeforces Round 94 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1400/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,34 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+int dp(int l, int r, vi &a){
+	if (l>r) return 0;
+	int res = r-l+1;
+	int mi = INF, id = -1;
+	for (int i=l;i<=r;++i){
+		if (mi>a[i]) mi = a[i], id = i;
+	}
+	for (int i=l;i<=r;++i){
+		a[i]-=mi;
+	}
+	return min(res, mi + dp(l, id-1, a)+dp(id+1, r, a));
+}
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	for (int i=0;i<n;++i)cin >>a[i];
+	cout << dp(0, n-1, a)<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

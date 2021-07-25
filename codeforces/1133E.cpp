@@ -69,30 +69,45 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dp[5001][5001], b[5001], n, k;
+
+int dping(int pos, int groups){
+	if (pos>n) return 0;
+	if (groups==0) return 0;
+	if (dp[pos][groups]!=-1) return dp[pos][groups];
+	int val = 0;
+	val = max(dping(pos+1, groups), b[pos] + dping(pos+b[pos], groups-1));
+	
+	return dp[pos][groups] = val;
+}
 
 void solve()
 {
+	cin >> n >> k;
+	vi a(n+1);
+	for (int i=1;i<=n;++i){
+		cin >> a[i];
+	}
+	a[0] = -INF;
+	sort(1+all(a));
+	memset(dp, -1, sizeof(dp));
+	for (int i=1;i<=n;++i){
+		for (int j=i;j<=n;++j){
+			if (a[j]-a[i]>5) break;
+			b[i]++;
+		}
+	}
+	cout << dping(1, k)<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

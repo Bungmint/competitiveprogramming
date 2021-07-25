@@ -1,3 +1,11 @@
+// Problem: D. Multiple Testcases
+// Contest: Codeforces - Educational Codeforces Round 86 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1342/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,46 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	vi a(n), cnt(k+1), c(k+1);
+	for (int i=0;i<n;++i){
+		int t;
+		cin>> t;
+		cnt[t]++;
+		a[i] = t;
+	}
+	for (int i=k-1;i>=1;--i){
+		cnt[i] += cnt[i+1];
+	}
+	for (int i=1;i<=k;++i){
+		cin >> c[i];
+	}
+	int ans = 0;
+	for (int i=1;i<=k;++i){
+		ans = max(ans, (cnt[i]+c[i]-1)/c[i]);
+	}
+	vector<vi> res(ans);
+	sort(all(a));
+	for (int i=0;i<n;++i){
+		res[i%ans].pb(a[i]);
+	}
+	cout << ans << endl;
+	for (auto x:res){
+		cout << sz(x)<< " ";
+		for(auto y:x)cout << y<< " ";
+		cout << "\n";
+	}
+	
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

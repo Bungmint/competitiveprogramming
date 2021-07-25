@@ -1,3 +1,11 @@
+// Problem: E. Reachability from the Capital
+// Contest: Codeforces - Codeforces Round #490 (Div. 3)
+// URL: https://codeforces.com/problemset/problem/999/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,48 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+vi g[5001];
+bool vis[5001];
+bool vis2[5001];
+int cnt = 0;
+vi order;
+
+void dfs(int v){
+	vis[v] = 1;
+	for (int e:g[v]) if (!vis[e]) dfs(e);
+}
+
+void topsort(int v){
+	vis2[v] = 1;
+	for (int e:g[v]) if (!vis2[e]) topsort(e);
+	order.pb(v);
+}
+
 
 void solve()
 {
+	int n, m, s;
+	cin >> n >> m >> s;
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		g[u].pb(v);
+	}
+	for (int i=1;i<=n;++i){
+		if (!vis2[i])topsort(i);
+	}
+	reverse(all(order));
+	dfs(s);
+	for (int x:order) if (!vis[x]) dfs(x), cnt++;
+	cout << cnt << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: E. Fixed Points
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,29 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	vi a(n);
+	vector<vi> dp(n+1, vi(n+1));
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		a[i]--;
+	}
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<=i;++j){
+			dp[i][j] = dp[i-1][j];
+			dbg(a[i-1], j-1);
+			if (j)dp[i][j] = max(dp[i][j], dp[i-1][j-1]+!!(a[i-1]==j-1));
+		}
+	}
+	int res = INF;
+	for (int i=0;i<=n;++i){
+		if (dp[n][i]>=k){
+			res=min(res, n-i);
+		}
+	}
+	cout << (res==INF? -1:res )<< "\n";
+	
 }
 
 int main()

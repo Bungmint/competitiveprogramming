@@ -69,30 +69,70 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+bool grid[501][501], vis[501][501];
+int destR, destC, n, m;
+int dx[4] = {0,0,-1,1}, dy[4] = {-1, 1, 0,0};
+int cnt[501][501];
+
 
 void solve()
 {
+	cin >> n >> m;
+	for (int i=0;i<n;++i){
+		string s;
+		cin >> s;
+		for (int j=0;j<m;++j){
+			grid[i][j] = (s[j]=='.'? 0:1);
+		}
+	}
+	int stR, stC;
+	cin >> stR >> stC >> destR >> destC;
+	stR--;stC--;destR--; destC--;
+	
+	vis[stR][stC]=1;
+	queue<pi> q;
+	q.push({stR, stC});
+	grid[stR][stC] = 0;
+	cnt[stR][stC] = 1;
+	while(!q.empty()){
+		int x = q.front().fi, y = q.front().se;
+		q.pop();
+		dbg(x,y);
+		if (grid[x][y]&&(x!=stR||y!=stC)){
+			continue;
+		}
+		for (int i=0;i<4;++i){
+			int nx = x+dx[i], ny = y+dy[i];
+			if (nx<0||nx>=n||ny<0||ny>=m) continue;
+			if (!cnt[nx][ny]){
+				cnt[nx][ny] = 1;
+				q.push({nx,ny});
+			}else{
+				cnt[nx][ny]++;
+			}
+		}
+	}
+	bool ok = 0;
+	if (cnt[destR][destC]){
+		if (grid[destR][destC]){
+			ok=1;
+		}else{
+			
+			if (cnt[destR][destC]>=2) ok = 1;
+		}
+	}
+	
+	cout << (ok? "YES":"NO")<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

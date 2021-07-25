@@ -69,11 +69,18 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,70 +136,70 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
+const int N = 502;
+const Mint B = 37;
+Mint power[N], inverse[N];
 
 void precalc()
 {
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
+	power[0] = inverse[0]=1;
+	inverse[1] = inv(B);
+	for (int i=1;i<N;++i) power[i] = power[i-1]*B;
+	for (int i=2;i<N;++i) inverse[i] = inverse[i-1]*inverse[1];
 }
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n, m;
+	cin >> n >> m;
+	vector<string> a(2*n+1);
+	vector<vector<Mint>> hsh(2*n+1, vector<Mint>(m+1));
+	for (int i=1;i<=2*n;++i) cin >> a[i];
+	for (int i=1;i<=2*n;++i){
+		for (int j=1;j<=m;++j) hsh[i][j] = hsh[i][j-1] + power[j-1]*(a[i][j-1]-'A'+1);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	
+	int L =1, R=m,ans=-1;
+	while(L<=R){
+		dbg(L,R);
+		int mid = L +(R-L)/2;
+		bool ok = 0;
+		for (int l=1;l+mid-1<=m;++l){
+			int r = l+mid-1;
+			unordered_set<int,custom_hash> st;
+			for (int i=n+1;i<=2*n;++i) st.insert((int)(hsh[i][r]-hsh[i][l-1]));
+			bool cur = 1;
+			for (int i=1;i<=n;++i){
+				if (st.count((int)(hsh[i][r]-hsh[i][l-1]))){
+					cur = 0;
+					break;
+				}
+			}
+			ok |=cur;
+		}
+		if (ok){
+			ans=mid;
+			R = mid-1;
+		}else  L = mid+1;
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	
+	cout << ans<<endl;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     precalc();
-    solve();
+    #ifndef LOCAL
+    	setIO("cownomics");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

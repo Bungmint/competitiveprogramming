@@ -74,6 +74,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -129,70 +130,73 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
 
-void precalc()
-{
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
-}
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
-
+Mint dp[1001][1001][5]; 
+/*
+	Connected Component DP
+	dp_i,j,k - i: 1 to i
+			   j: j components
+			   k: 0: Merged
+			 	  1: New inside (Has two neighboring components)
+			 	  2: New outside (Only one neighbor)
+			 	  3: Front/back inside 
+			 	  4: Front/back outside (The very outskirt)
+			
+*/
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n;
+	cin >> n;
+	dp[0][0][0] = 1;
+	for (int i=1;i<=n;++i){ 
+		for (int j=1;j<=n;++j){
+			//Merged
+			if (j+1<=n){
+				dp[i][j][0] += dp[i-1][j+1][0]*(j);
+				dp[i][j][0] += dp[i-1][j+1][1]*(j-2);
+				dp[i][j][0] += dp[i-1][j+1][2]*(j-1);
+				dp[i][j][0] += dp[i-1][j+1][3]*(j-1);
+				dp[i][j][0] += dp[i-1][j+1][4]*(j);
+			}
+			//New
+			//Inside
+			if (j-1>=2) dp[i][j][1] += (dp[i-1][j-1][0] + dp[-1+i][j-1][1]+dp[-1+i][j-1][2] + dp[i-1][j-1][3] + dp[i-1][j-1][4])*(j-2);
+			
+			//Outside
+			
+			dp[i][j][2] += (dp[i-1][j-1][0] + dp[i-1][j-1][1]+dp[i-1][j-1][2] + dp[i-1][j-1][3] + dp[i-1][j-1][4]);
+			if (j-1) dp[i][j][2] += (dp[i-1][j-1][0] + dp[i-1][j-1][1]+dp[i-1][j-1][2] + dp[i-1][j-1][3] + dp[i-1][j-1][4]);
+			
+			//Front/back
+			//Inside
+			if (j>=2){
+				dp[i][j][3] += dp[i-1][j][0]*(2*j-2);
+				dp[i][j][3] += dp[i-1][j][1]*(2*j-4);
+				dp[i][j][3] += dp[i-1][j][2]*(2*j-3);
+				dp[i][j][3] += dp[i-1][j][3]*(2*j-3);
+				dp[i][j][3] += dp[i-1][j][4]*(2*j-2);
+			}
+			
+			//Outside
+			if (j>=1){
+				dp[i][j][4] += dp[i-1][j][0]*(2);
+				dp[i][j][4] += dp[i-1][j][1]*(2);
+				if (j>=2)dp[i][j][4] += dp[i-1][j][2]*(1);
+				dp[i][j][4] += dp[i-1][j][3]*(2);
+				dp[i][j][4] += dp[i-1][j][4]*(1);
+			}
+			dbg(i, j,dp[i][j][0], dp[i][j][1], dp[i][j][2],dp[i][j][3], dp[i][j][4]);
+		}
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	dbg(dp[n][1][0], dp[n][1][1], dp[n][1][2],dp[n][1][3], dp[n][1][4]);
+	cout << dp[n][1][0]+dp[n][1][1]+dp[n][1][2]+dp[n][1][3]+dp[n][1][4]<<"\n";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    precalc();
     solve();
 }

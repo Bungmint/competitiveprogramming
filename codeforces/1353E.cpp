@@ -1,3 +1,11 @@
+// Problem: E. K-periodic Garland
+// Contest: Codeforces - Codeforces Round #642 (Div. 3)
+// URL: https://codeforces.com/problemset/problem/1353/E
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,37 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+int solve(string&s){
+	int n = sz(s);
+	int all = count(all(s), '1');
+	int ans = all;
+	vi res(n);
+	int pref = 0;
+	for (int i=0;i<n;++i){
+		int cur = (s[i]=='1');
+		pref += cur;
+		res[i] = 1-cur;
+		if (i>0) res[i] += min(res[i-1], pref-cur);
+		ans = min(ans, res[i]+all-pref);
+	}
+	return ans;
+}
+
 void solve()
 {
+	int n, k;
+	string s;
+	cin >> n >> k>>s;
+	vector<string> val(k);
+	int cnt = count(all(s), '1');
+	for (int i=0;i<n;++i){
+		val[i%k] += s[i];
+	}
+	int ans = INF;
+	for (auto &it:val){
+		ans = min(ans, solve(it)+cnt-(int)count(all(it),'1'));
+	}
+	cout << ans << "\n";
 }
 
 int main()

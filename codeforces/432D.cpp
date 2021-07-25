@@ -74,6 +74,8 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int B = 37;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -128,65 +130,53 @@ ostream &operator<<(ostream &os, Mint x){
 	os << x.v;
 	return os;
 }
+const int N = 1e5+100;
+Mint p[N], inverse[N], hsh[N];
+int a[N];
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
-
-void precalc()
-{
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
-}
-
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
+void precalc(){
+	p[0] = 1;
+	for (int i=1;i<N;++i) p[i] = p[i-1]*B;
+	inverse[0] = 1;
+	inverse[1] = inv((Mint)B);
+	for (int i=2;i<N;++i) inverse[i] = inverse[i-1] * inverse[1];
 }
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	string s;
+	cin >> s;
+	int n = sz(s);
+	for (int i=1;i<=n;++i){
+		hsh[i] = hsh[i-1]+p[i-1]*(s[i-1]-'A'+1);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	for (int i=2;i<=n-1;++i){
+		int l = 0, r = n-i+1, ans = -1;
+		while(l<=r){
+			int m = l + (r-l)/2;
+			if(hsh[m]==(hsh[i+m-1]-hsh[i-1])*inverse[i-1]){
+				ans = m;
+				l = m+1;
+			}else r = m-1;
+		}
+		if (ans==0||ans==-1) continue;
+		a[1]++;
+		a[ans+1]--;
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	for (int i=1;i<N;++i){
+		a[i] +=a[i-1];
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
+	vpi ans;
+	for (int i=1;i<=n;++i){
+		if (hsh[i]==(hsh[n]-hsh[n-i])*inverse[n-i]){
+			if (i==n) ans.pb({i, 1});
+			else if (i<n&&i>1) ans.pb({i,1+ a[i]});
+			else ans.pb({i, a[i]+2});
+		}
 	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << sz(ans)<<"\n";
+	for (pi x:ans) cout << x.fi << " "<< x.se <<"\n";
 }
 
 int main()

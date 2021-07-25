@@ -1,3 +1,11 @@
+// Problem: B. Running for Gold
+// Contest: Codeforces - Codeforces Global Round 15
+// URL: https://codeforces.com/contest/1552/problem/B
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,41 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+bool cmp(ar<int,5> p, ar<int,5> q){
+	int cnt = 0;
+	for (int i=0;i<5;++i){
+		cnt += !!(p[i]<q[i]);
+	}
+	return cnt>=3;
+}
+
 void solve()
 {
+	int n;
+	cin>> n;
+	vector<ar<int,5>> a(n);
+	for (int i=0;i<n;++i){
+		for (int j=0;j<5;++j){
+			cin >> a[i][j];
+		}
+	}
+	ar<int,5> best = {INF,INF,INF,INF,INF};
+	int id = -1;
+	for (int i=0;i<n;++i){
+		if (cmp(a[i], best)){
+			best = a[i];
+			id = i;
+		}
+	}
+	for (int i=0;i<n;++i){
+		if (!cmp(best,a[i])&&i!=id){
+			cout << -1 << "\n";
+			return;
+		}
+	}
+	cout << id+1 << "\n";
+	
+	
 }
 
 int main()

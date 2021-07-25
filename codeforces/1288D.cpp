@@ -69,30 +69,52 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 3e5+1;
+int a[N][8];
+bool b[N][8];
+int c[256];
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	for (int i=0;i<n;++i) for (int j=0;j<m;++j) cin >> a[i][j];
+	int l = 0, r = 1e9, id1, id2;
+	while(l<=r){
+		int mid = l + (r-l)/2;
+		memset(c, -1, sizeof(c));
+		bool ok = 0;
+		for (int i=0;i<n;++i){
+			int mask = 0;
+			for (int j=0;j<m;++j){
+				if (a[i][j]>=mid) mask+= (1<<j);
+			}
+			dbg(mid,mask, (1<<m)-1, c[mask]);
+			if (c[mask]==-1) c[mask] = i;
+			for (int j=0;j<(1<<m);++j){
+				if ((j|mask)==((1<<m)-1)&&c[j]!=-1){
+					id1 = i;
+					id2 = c[j];
+					ok = 1;
+					break;
+				}
+			}
+			if (ok) break;
+		} 
+		if (ok) l = mid+1;
+		else r = mid-1;
+	}
+	cout << id1+1 << " "<< id2+1 << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

@@ -1,3 +1,11 @@
+// Problem: B2. Wonderful Coloring - 2
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/B2
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,31 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	vi a(n), ans(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	map<int,vi> m1;
+	vi useless;
+	for (int i=0;i<n;++i){
+		m1[a[i]].pb(i);
+	}
+	for (auto x:m1){
+		if (sz(x.se)<k){
+			for (auto y:x.se) useless.pb(y);
+		}else{
+			for (int i=0;i<k;++i){
+				ans[x.se[i]] = i+1;
+			}
+		}
+	}
+	int s = sz(useless);
+	s = (s/k)*k;
+	for (int i=0;i<s;++i){
+		ans[useless[i]] = (i%k)+1;
+	}
+	for (int x:ans)cout << x << " ";
+	cout << "\n";
 }
 
 int main()

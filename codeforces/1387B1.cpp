@@ -1,3 +1,11 @@
+// Problem: B1. Village (Minimum)
+// Contest: Codeforces - Baltic Olympiad in Informatics 2020, Day 2 (IOI, Unofficial Mirror Contest, Unrated)
+// URL: https://codeforces.com/contest/1387/problem/B1
+// Memory Limit: 256 MB
+// Time Limit: 750 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,59 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e5+1;
+vi g[N];
+int indeg[N];
+bool vis[N];
+int a[N];
+
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int ans = 0;
+	iota(a, a+N, 0);
+	for (int i=0;i<n-1;++i){int u,v;cin >> u >> v;g[u].pb(v), g[v].pb(u);indeg[u]++, indeg[v]++;}
+	queue<int> q;
+	for (int i=2;i<=n;++i){
+		if (indeg[i]==1) q.push(i);
+	}
+	while(sz(q)){
+		int v = q.front();
+		q.pop();
+		int k = -1;
+		for (int e:g[v]){
+			if (indeg[e]==1) continue;
+			indeg[e]--;
+			k = e;
+			if (indeg[e]==1) q.push(e);
+		}
+		if (k==-1) break;
+		if (!vis[v]){
+			vis[v] = vis[k] = 1;
+			swap(a[v], a[k]);
+			ans += 2;
+		}
+	}
+	for (int i=1;i<=n;++i){
+		if (!vis[i]){
+			ans += 2;
+			int k = g[i][0];
+			swap(a[i], a[k]);
+			break;
+		}
+	}
+	cout << ans << endl;
+	for (int i=1;i<=n;++i) cout << a[i]<< " ";
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

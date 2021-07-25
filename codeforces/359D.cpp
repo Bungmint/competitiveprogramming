@@ -80,17 +80,55 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int a[300000], spar[300000][20], n, cnt[1000001];
 
 void solve()
 {
+	cin >> n;
+	for (int i=0;i<n;++i) cin >> a[i], spar[i][0] = a[i];
+	for (int j=1;j<20;++j){
+		for (int i=0;i+(1<<j)<=n;++i) spar[i][j] = gcd(spar[i][j-1], spar[i+(1<<(j-1))][j-1]);
+	}
+	int l = 1, r = n, val=-1;
+	vi ans;
+	while(l<=r){
+		int m = l + (r-l)/2;
+		int lg = log2(m);
+		vi cur;
+		memset(cnt, 0, sizeof(cnt));
+		for (int i=0;i<m;++i){
+			cnt[a[i]]++;
+			dbg(a[i]);
+		}
+		int x = gcd(spar[0][lg], spar[m-1-(1<<lg)+1][lg]);
+		if (cnt[x]) cur.pb(0);
+		for (int i=m;i<n;++i){
+			cnt[a[i]]++;
+			cnt[a[i-m]]--;
+			x = gcd(spar[i-m+1][lg], spar[i-(1<<lg)+1][lg]);
+			dbg(i,m,x);
+			if (cnt[x]) cur.pb(i-m+1);
+		}
+		
+		
+		if (sz(cur)){
+			ans = cur;
+			l = m+1;
+			val = m-1;
+		}else r = m-1;
+		
+	}
+	cout << sz(ans) << " "<< val << endl;
+	for (int x:ans) cout << x+1 << " ";
+	cout << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -69,30 +69,55 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+1;
+ll a[N];
+int b[N];
+bool vis[N];
+vi order;
+vi G[N];
+
+void dfs(int V){
+	vis[V] = 1;
+	for (int e:G[V]) if (!vis[e]) dfs(e);
+	order.pb(V);
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> a[i];
+	for (int i=1;i<=n;++i){
+		int t;
+		cin >> t;
+		if (t!=-1) G[i].pb(t);
+		b[i] = t;
+	}
+	for (int i=1;i<=n;++i) if (!vis[i]) dfs(i);
+	reverse(all(order));
+	ll res = 0;
+	vi ans(n);
+	int l = 0, r = n-1;
+	for (int x:order){
+		if (a[x]>0){
+			res += a[x];
+			if (b[x]!= -1) a[b[x]]+= a[x];
+			ans[l] = x;
+			l++;
+		}else res += a[x], ans[r] = x, r--;;
+	}
+	cout << res << "\n";
+	for (int x:ans) cout << x << " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

@@ -1,3 +1,11 @@
+// Problem: L - Deque
+// Contest: AtCoder - Educational DP Contest
+// URL: https://atcoder.jp/contests/dp/tasks/dp_l
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,35 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll dp[3001][3001], n, a[3001];
+
+ll dping(int l, int r){
+	ll &res = dp[l][r];
+	if (res!=-1) return res;
+	if (l>r) return res=0;
+	if (l==r) return res = ((n&1)? a[l]:-a[l]);
+	if (n%2==(r-l+1)%2){
+		res = max(dping(l+1, r)+a[l], a[r]+dping(l,r-1));
+	}else{
+		res = min(dping(l+1,r)-a[l], dping(l,r-1)-a[r]);
+	}
+	return res;
+}
 
 void solve()
 {
+	cin >> n;
+	memset(dp,-1,sizeof(dp));
+	for (int i=0;i<n;++i) cin >> a[i];
+	cout << dping(0, n-1);
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

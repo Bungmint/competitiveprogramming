@@ -69,26 +69,74 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e5+1;
+vpi G[N];
+int a[N], cnt[N];
+ll s;
+
+void predfs(int V, int pV){
+	for (auto &[e, w]:G[V]){
+		if (e==pV) continue;
+		a[e] = w;
+		predfs(e,V);
+	}
+}
+
+void dfs(int V, int pV){
+	bool leaf = 1;
+	for (auto &[e,w]:G[V]){
+		if (e==pV) continue;
+		leaf = 0;
+		dfs(e,V);
+		cnt[V] += cnt[e];
+	}
+	if (leaf) cnt[V] = 1;
+}
 
 void solve()
 {
+	int n;
+	cin >> n>>s;
+	for (int i=1;i<=n;++i) G[i].clear(), a[i] = 0, cnt[i]=0;
+	for (int i=0;i<n-1;++i){
+		int u, v, w;
+		cin >> u >> v >> w;
+		G[u].pb({v,w});
+		G[v].pb({u,w});
+	}
+	predfs(1,0);
+	dfs(1,0);
+	assert(a[1] ==0);
+	set<pl> st;
+	ll cur = 0;
+	for (int i=2;i<=n;++i){
+		cur += (ll)cnt[i]*(ll)a[i];
+		st.insert({ (ll)cnt[i]*(ll)a[i]- (ll)cnt[i]*(ll)(a[i]/2), i});
+	}
+	int ans = 0;
+	while(cur>s){
+		pl p = *--st.end();
+		cur -= p.fi;
+		int i = p.se;
+		st.erase(p);
+		a[i]/=2;
+		
+		st.insert({ (ll)cnt[i]*(ll)a[i]- (ll)cnt[i]*(ll)(a[i]/2), i});
+		ans++;
+		dbg(cur,p);
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

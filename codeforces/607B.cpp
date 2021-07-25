@@ -69,30 +69,54 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 501;
+int dp[N][N];
+int a[N];
+
+bool is_pal(int l, int r){
+	while(l<=r){
+		if (a[l]!=a[r]) return 0;
+		l++;r--;
+	}
+	return 1;
+}
+
+int dping(int l, int r){
+	if (l>r) return 0;
+	if (l==r) return 1;
+	if (dp[l][r] != -1) return dp[l][r];
+	int ans = INF;
+	ans = min(ans, 1+ dping(l+1,r));
+	if (a[l]==a[l+1]){
+		ans = min(ans, 1+dping(l+2,r));
+	}
+	for (int j=l+2;j<=r;++j){
+		if (a[l]==a[j]){
+			ans = min(ans, dping(l+1, j-1) + dping(j+1, r));
+		}
+	}
+	return dp[l][r] = ans;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=1;i<=n;++i){
+		cin >> a[i];
+	}
+	memset(dp, -1, sizeof(dp));
+	cout << dping(1, n)<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

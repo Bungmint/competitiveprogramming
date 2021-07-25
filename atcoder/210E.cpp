@@ -1,3 +1,11 @@
+// Problem: E - Ring MST
+// Contest: AtCoder - AtCoder Beginner Contest 210
+// URL: https://atcoder.jp/contests/abc210/tasks/abc210_e
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,48 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+struct Edge{
+	ll a, w;
+	bool operator<(const Edge& other) const{
+		return  w<other.w;
+	}
+};
+
+ll GCD(ll a, ll b){
+	return (b==0? a:GCD(b, a%b));
+}
+
+
+
 void solve()
 {
+	ll n, m;
+	cin>>n>>m;
+	vector<Edge> edges(m);
+	for (int i=0;i<m;++i) cin >> edges[i].a >> edges[i].w;
+	sort(all(edges));
+	ll res = 0;
+	ll g = n;
+	for (int i=0;i<m;++i){
+		Edge e = edges[i];
+		ll g1 = GCD(g, e.a);
+		res += (g-g1)*e.w;
+		g = g1;
+	}
+	
+	if (g!=1){
+		cout << -1 << endl;
+		return;
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

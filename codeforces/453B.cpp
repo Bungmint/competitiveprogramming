@@ -69,30 +69,66 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int p[16] = {2,3,5,7,11,13,17, 19, 23,29,31,37,41,43,47,53};
+pi dp[100][1<<16];
+int n, a[100], nmask[59];
+
+int dping(int pos, int mask){
+	if (pos==n) return 0;
+	if (dp[pos][mask].fi!=-1) return dp[pos][mask].fi;
+	int b = 1;
+	int mi = a[pos] - 1 + dping(pos+1, mask);
+	for (int i=1;i<=58;++i){
+		if (nmask[i]&mask) continue;
+		int nxt = dping(pos+1, mask^nmask[i]) + abs(a[pos]- i);
+		if (nxt<mi){
+			b = i;
+			mi = nxt;
+		}
+	}
+	dp[pos][mask] = {mi, b};
+	return dp[pos][mask].fi;
+}
 
 void solve()
 {
+	for (int i=0;i<100;++i) for (int j=0;j<(1<<16);++j){
+		dp[i][j] = {-1, -1};
+	}
+	cin >> n;
+	for (int i=0;i<n;++i) cin >> a[i];
+	for (int i=1;i<=58;++i){
+		for (int j=0;j<16;++j){
+			if (i%p[j]==0){
+				nmask[i]^=(1<<j);
+			}
+		}
+	}
+	dping(0,0);
+	int pos = 0;
+	int mask = 0;
+	vi ans;
+	while(pos<n){
+		pi q = dp[pos][mask];
+		ans.pb(q.se);
+		pos++;
+		for (int i=0;i<16;++i){
+			if (q.se%p[i]==0){
+				mask^= (1<<i);
+			}
+		}
+	}
+	for (int x:ans) cout << x << " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

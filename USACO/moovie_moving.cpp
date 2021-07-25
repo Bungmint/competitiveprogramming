@@ -80,17 +80,56 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dp[1<<20];
+int n, L;
+int d[20], cnt[20];
+vi start[20];
 
 void solve()
 {
+	cin >> n >> L;
+	for (int i=0;i<n;++i){
+		cin >> d[i]>>cnt[i];
+		// dbg(i, d[i], cnt[i]);
+		for (int j=0;j<cnt[i];++j){
+			int t;
+			cin >> t;
+			start[i].pb(t);
+		}
+		dbg(i, start[i]);
+	}
+	int ans = INF;
+	memset(dp, -1, sizeof(dp));
+	dp[0] = 0;
+	for (int mask=1;mask<(1<<n);++mask){
+		for (int last = 0;last<n;++last){
+			if (!((1<<last)&mask)) continue;
+			int prevMask = mask - (1<<last);
+			if (dp[prevMask]==-1) continue;
+			int id = upper_bound(all(start[last]), dp[prevMask])-start[last].begin();
+			dbg(mask, last, id, dp[prevMask]);
+			if (!id) continue;
+			if (start[last][--id]+d[last]>dp[prevMask]){
+				dp[mask] = max(dp[mask], start[last][id]+d[last]);
+				dbg(mask, last, dp[mask]);
+			}
+		}
+		if (dp[mask]>=L){
+			ans = min(ans, __builtin_popcount(mask));
+		}
+	}
+	cout << (ans==INF? -1:ans);
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("movie");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

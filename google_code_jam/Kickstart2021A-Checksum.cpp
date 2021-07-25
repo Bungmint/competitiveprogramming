@@ -1,3 +1,11 @@
+// Problem: Checksum
+// Contest: Google Coding Competitions - Round A 2021 - Kick Start 2021
+// URL: https://codingcompetitions.withgoogle.com/kickstart/round/0000000000436140/000000000068c2c3
+// Memory Limit: 1024 MB
+// Time Limit: 20000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,67 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+// From the USACO tutorial lol
+struct DSU {
+	vector<int> e;
+	DSU(int N) { e = vector<int>(N, -1); }
+
+	// get representive component (uses path compression)
+	// To use rollback, disable path compression
+	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	
+	bool same_set(int a, int b) { return get(a) == get(b); }
+	
+	int size(int x) { return -e[get(x)]; }
+	
+	bool unite(int x, int y) {  // union by size
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
+};
+
+struct edge{
+	int u, v, w;
+	bool operator>(const edge& other) const{
+		return w>other.w;
+	}
+};
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vector<vi> a(n, vi(n)), b(n, vi(n));
+	vector<edge> v;
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j){
+		cin >> a[i][j];
+	}
+	for (int i=0;i<n;++i) for (int j=0;j<n;++j) cin >> b[i][j];
+	for (int i=0;i<n;++i){
+		for (int j=0;j<n;++j){
+			if (a[i][j]==-1){
+				v.pb({i, j+n, b[i][j]});
+			}
+		}
+	}
+	sort(all(v), greater<edge>());
+	for (int i=0;i<2*n;++i){
+		int t;
+		cin>>t;
+	}
+	
+	DSU dsu(2*n);
+	ll res = 0;
+	for (int i=0;i<sz(v);++i){
+		edge e = v[i];
+		if (!dsu.same_set(e.u,e.v)){
+			dsu.unite(e.u,e.v);
+		}else res += e.w;
+	}
+	cout<<res << "\n";
 }
 
 int main()
@@ -91,8 +158,9 @@ int main()
     cin.tie(NULL);
     int testcase;
     cin >> testcase;
-    while (testcase--)
+    for (int i=1;i<=testcase;++i)
     {
+    	cout << "Case #"<<i << ": ";
         solve();
     }
 }

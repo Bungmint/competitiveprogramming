@@ -129,64 +129,75 @@ ostream &operator<<(ostream &os, Mint x){
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
+const int N = 5011, B = 37;
+Mint p[N], inverse[N],hsh[N], rev_hsh[N];
+Mint hshed[N][N];
+int n;
+int k_pal[N][N];
+int cnt[30];
 
 void precalc()
 {
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
+	p[0] = 1;
+    for (int i=1;i<N;++i){
+    	p[i]=p[i-1]*B;
     }
-    inverse[1] = 1;
+    inverse[0] = 1;
+    inverse[1] = inv((Mint)B);
     for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
+    	inverse[i] = inverse[i-1]*inverse[1];
     }
 }
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
+void go(int k){
+	if (k==1){
+		for (int i=1;i<=n;++i){
+			for (int j=i;j<=n;++j){
+				hshed[i][j] = (hsh[j]-hsh[i-1])*inverse[i-1];
+				if (hshed[i][j]==(rev_hsh[i]-rev_hsh[j+1])*inverse[n-j]){
+					k_pal[i][j] = k;
+					cnt[k]++;
+				}
+			}
+		}
+	}else{
+		for (int i=1;i<=n;++i){
+			for (int j=i+1;j<=n;++j){
+				int t = (j-i+1)/2;
+				
+				if (hshed[i][i+t-1]!= hshed[j-t+1][j]) continue;
+				dbg();
+				if (k_pal[i][i+t-1]>=k-1&&k_pal[j-t+1][j]>=k-1){
+					k_pal[i][j] = k;
+					cnt[k]++;
+				}
+			}
+		}
+	}
 }
-
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	string s;
+	cin >> s;
+	n = sz(s);
+	dbg(n);
+	for (int i=1;i<=n;++i){
+		hsh[i] = hsh[i-1] + p[i-1]*(s[i-1]-'a'+1);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	for (int i=n;i>=1;i--){
+		rev_hsh[i] = rev_hsh[i+1] + p[n-i]*(s[i-1]-'a'+1);
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	for (int k=1;k<30;++k){
+		go(k);
+		
+		if (!cnt[k]) break;
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
+	for (int i=1;i<=n;++i){
+		if (i<30){
+			cout << cnt[i]<<" ";
+		}else cout << 0 << " ";
 	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
 }
 
 int main()

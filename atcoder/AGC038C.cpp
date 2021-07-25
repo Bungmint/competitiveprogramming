@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,30 +68,117 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 998244353;
+const int N = 1e6+100; // Only advised to use it under 1e7 (More Memory)
+int lp[N + 1], f[N], g[N],h[N], d[N];
+vector<int> pr, divisor;
+void linsieve()
+{
+    for (int i = 2; i <= N; i++)
+    {
+        if (lp[i] == 0)
+        {
+            lp[i] = i;
+            pr.push_back(i);
+        }
+        for (int j = 0; j < (int)pr.size() && pr[j] <= lp[i] && i * pr[j] <= N; ++j)
+        {
+            lp[i * pr[j]] = pr[j];
+        }
+    }
+}
+
+inline ll add(ll a, ll b){
+	return (a+b+MOD)%MOD;	
+}
+
+inline ll mult(ll a, ll b){
+	return ((a%MOD)*(b%MOD))%MOD;
+}
+
+
+ll modpow(ll a, ll b){
+	ll r = 1;
+	while(b){
+		if (b&1) r = mult(r, a);
+		a = mult(a, a);
+		b/=2;
+	}
+	return r;
+}
+
+inline ll divide(ll a, ll b){
+	return ((a%MOD)*modpow(b, MOD-2))%MOD;
+}
+
+void conv(int x){
+	if (x==1){
+		divisor.pb(1);
+		return;
+	}
+	vpi primes;
+	while(x>1){
+		int p = lp[x];
+		int cnt = 0;
+		while(x%p==0){cnt++;x/=p;}
+		primes.pb({p, cnt});
+	}
+	divisor.pb(1);
+	for (int i=0;i<sz(primes);++i){
+		int s = sz(divisor);
+		ll v = primes[i].fi;
+		for (int k=1;k<=primes[i].se;++k){
+			for(int j=0;j<s;++j){
+				divisor.pb(divisor[j]*v);
+			}
+			v*=primes[i].fi;
+		}
+	}
+}
+
 
 void solve()
 {
+	for (int i=1;i<=1000000;++i){
+		for (int j=i;j<=1000000;j+=i){
+			d[j]++;
+		}
+	}
+	int n;
+	cin >> n;
+	vl a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	for (int i=0;i<n;++i){
+		divisor.clear();
+		conv(a[i]);
+		for (int d:divisor){
+			f[d] = add(f[d], a[i]);
+			g[d] = add(g[d], a[i]*a[i]);
+		}
+	}
+	ll ans = 0;
+	for (int i=1;i<=1000000;++i){
+		h[i] = add(mult(f[i], f[i]), -g[i]);
+		h[i] = divide(h[i], 2);
+	}
+	for (int i=1000000;i>=1;--i){
+		for (int j=2;j*i<=1000000;j++){
+			h[i] = add(h[i], -h[j*i]);
+		}
+		ans = add(ans, divide(h[i], i));
+	}
+	
+	cout << ans<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    linsieve();
+    solve();
 }

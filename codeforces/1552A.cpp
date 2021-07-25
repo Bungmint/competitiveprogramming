@@ -1,3 +1,11 @@
+// Problem: A. Subsequence Permutation
+// Contest: Codeforces - Codeforces Global Round 15
+// URL: https://codeforces.com/contest/1552/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,17 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	string s, t;
+	cin >> s;
+	t = s;
+	sort(all(t));
+	int cnt = 0;
+	for (int i=0;i<n;++i){
+		if (s[i]!=t[i]) cnt++;
+	}
+	cout << cnt << "\n";
 }
 
 int main()

@@ -80,17 +80,51 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 200001;
+vi G[N];
+int subtree[N];
+ll f[N], g[N], n;
+
+void dfs1(int v,int pv){
+	subtree[v] = 1;
+	for (int e:G[v]){
+		if (e==pv) continue;
+		dfs1(e,v);
+		subtree[v] += subtree[e];
+		f[v] += f[e];
+	}
+	f[v] += subtree[v];
+}
+void dfs2(int v,int pv){
+	if(v!=1){
+		g[v] = n- subtree[v]+ f[pv]-subtree[v] -f[v]+g[pv];
+	}
+	for (int e:G[v]){
+		if (e!=pv)dfs2(e,v);
+	}
+}
 
 void solve()
 {
+	cin >> n;
+	for (int i=1;i<=n-1;++i){
+		int u,v;
+		cin >> u >> v;
+		G[u].pb(v), G[v].pb(u);
+	}
+	dfs1(1,0);
+	dfs2(1,0);
+	ll r = 0;
+	for (int i=1;i<=n;++i) r = max(r, f[i]+g[i]);
+	cout << r << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

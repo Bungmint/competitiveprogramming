@@ -1,3 +1,11 @@
+// Problem: E. Permutation Shift
+// Contest: Codeforces - Harbour.Space Scholarship Contest 2021-2022 (open for everyone, rated, Div. 1 + Div. 2)
+// URL: https://codeforces.com/contest/1553/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,54 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int n,m;
+
+void dfs(int v, int &cnt, vi &g, vector<bool> &vis){
+	vis[v] = 1;
+	cnt++;
+	if (!vis[g[v]]) dfs(g[v], cnt, g, vis);
+}
+
+int calc(vi &a, vi& perm, vi&pos){
+	vi g(n);
+	vector<bool> vis(n, false);
+	int res = 0;
+	for (int i=0;i<n;++i){
+		g[pos[perm[i]]] = (i);
+	}
+	for (int i=0;i<n;++i){
+		if (!vis[i]){
+			dfs(i, res, g, vis);
+			res--;
+		}
+	}
+	dbg(g, perm);
+	return res;
+}
 
 void solve()
 {
+	cin >> n >> m;
+	vi a(n), cnt(n), pos(n);
+	for (int i=0;i<n;++i){
+		cin >> a[i];
+		a[i]--;
+		pos[a[i]] = i;
+		cnt[(i-a[i]+n)%n]++;
+	}
+	vi ans;
+	for (int i=0;i<n;++i){
+		if (cnt[i]<n/3) continue;
+		vi perm(n);
+		for (int j=0;j<n;++j){
+			perm[j] = (j-i+n)%n;
+		}
+		int v = calc(a, perm, pos);
+		if (v<=m) ans.pb(i);
+	}
+	cout << sz(ans)<<" ";
+	for (int x:ans) cout << x <<  " ";
+	cout << "\n";
 }
 
 int main()

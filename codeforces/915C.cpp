@@ -1,3 +1,11 @@
+// Problem: C. Permute Digits
+// Contest: Codeforces - Educational Codeforces Round 36 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/915/C
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,69 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll f[1<<19][2];
+ll power[19];
+vi aDig, bDig;
+
+
+ll dp(int mask, bool low){
+	ll &res = f[mask][low];
+	if (res!=-1) return res;
+	if (mask==(1<<sz(aDig))-1) return res = 0LL;
+	int cnt = __builtin_popcount(mask);
+	int DMT = (low? 9:bDig[cnt]);
+	res = -LINF*2;
+	for (int i=0;i<sz(aDig);++i){
+		if (mask&(1<<i)) continue;
+		if (aDig[i]>DMT) continue;
+		res = max(res, power[sz(aDig)-1-cnt]*aDig[i]+dp(mask+(1<<i), low|(aDig[i]<DMT)));
+	}
+	return res;
+}
 
 void solve()
 {
+	ll a, b;
+	cin >> a >> b;
+	while(a){
+		aDig.pb(a%10);
+		a/=10;
+	}
+	while(b){
+		bDig.pb(b%10);
+		b/=10;
+	}
+	reverse(all(aDig)), reverse(all(bDig));
+	if (sz(aDig)>sz(bDig)){
+		cout << 0 << endl;
+		return;
+	}
+	if (sz(aDig)<sz(bDig)){
+		sort(all(aDig), greater<int> ());
+		for (int x:aDig) cout << x;
+		cout << endl;
+		return;
+	}
+	memset(f, -1, sizeof(f));
+	ll res = 0;
+	for (int i=0;i<sz(aDig);++i){
+		if (aDig[i]&&aDig[i]<=bDig[0]){
+			res = max(res, power[sz(aDig)-1]*aDig[i] + dp((1LL<<i), (aDig[i]<bDig[0])));
+		}
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    power[0] = 1LL;
+    for (int i=1;i<19;++i){
+    	power[i] = power[i-1]*10;
+    }
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

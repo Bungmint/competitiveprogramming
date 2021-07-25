@@ -10,7 +10,6 @@ using vpi = vector<pair<int, int>>;
 using pl = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pl>;
-using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -69,30 +68,93 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 998244353;
+
+ll dp[505][505];
+
+inline ll add(ll a, ll b){
+	return (a+b+MOD)%MOD;
+}
+
+inline ll mult(ll a, ll b){
+	return ((a%MOD)*(b%MOD))%MOD;
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vl a(n+1);
+	for (int i=1;i<=n;++i){
+		char c;
+		cin >> c;
+		if (c=='-'){
+			a[i] = -1;
+		}else{
+			cin >> a[i];
+		}
+	}
+	ll ans = 0;
+	for (int i=1;i<=n;++i){
+		if (a[i] ==-1) continue;
+		memset(dp, 0,sizeof(dp));
+		dp[0][0] = 1;
+		for (int pos=1;pos<=n;++pos){
+			for (int S=0;S<=n;S++){
+				if (pos<i){
+					if (a[pos] == -1){
+						if (S>=1) dp[pos][S-1] = add(dp[pos][S-1], dp[pos-1][S]);
+						else dp[pos][S] = add(dp[pos][S], dp[pos-1][S]);
+						
+						dp[pos][S]= add(dp[pos][S], dp[pos-1][S]);
+					}else{
+						if (a[pos]>a[i]){
+							dp[pos][S] = add(dp[pos][S], add(dp[pos-1][S], dp[pos-1][S]));
+						}else{
+							if (S<n)dp[pos][S+1] =add(dp[pos-1][S],dp[pos][S+1]);
+							
+							dp[pos][S] = add(dp[pos][S], dp[pos-1][S]);
+						}
+					} 
+				}
+				if (pos==i){
+					if (S<n) dp[pos][S+1] = add(dp[pos][S+1], dp[pos-1][S]);
+				}
+				if (pos>i){
+					if (a[pos] == -1){
+						if (S>=1) dp[pos][S-1] = add(dp[pos][S-1], dp[pos-1][S]);
+						else dp[pos][S] = add(dp[pos][S], dp[pos-1][S]);
+						
+						dp[pos][S]= add(dp[pos][S], dp[pos-1][S]);
+					}else{
+						if (a[pos]>=a[i]){
+							dp[pos][S] = add(dp[pos][S], add(dp[pos-1][S], dp[pos-1][S]));
+						}else{
+							if (S<n)dp[pos][S+1] =add(dp[pos-1][S],dp[pos][S+1]);
+							dp[pos][S] = add(dp[pos][S], dp[pos-1][S]);
+						}
+					}
+					dp[pos][0] = 0;
+				}
+				
+			}
+		}
+		for (int S=1;S<=n;S++){
+			
+			ans = add(ans, mult(dp[n][S], a[i]));
+		}
+		
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

@@ -1,3 +1,11 @@
+// Problem: D. AB-string
+// Contest: Codeforces - Educational Codeforces Round 74 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1238/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,36 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	string s;
+	int n;
+	cin >> n >>s;
+	int cnt = 1;
+	vi dp(n+1);
+	vi prevC;
+	ll res = 0;
+	for (int i=2;i<=n;++i){
+		if (s[i-2]!=s[i-1]){
+			dp[i] = i-1-cnt;
+			prevC.pb(cnt);
+			cnt = 1;
+		}else{
+			cnt++;
+			dp[i] = dp[i-1]+1;
+			if (cnt==2&&!prevC.empty()) dp[i]+=prevC.back()-1;
+		}
+		dbg(dp[i]);
+		res += dp[i];
+	}
+	cout << res << endl;
+	
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

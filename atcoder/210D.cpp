@@ -1,3 +1,11 @@
+// Problem: D - National Railway
+// Contest: AtCoder - AtCoder Beginner Contest 210
+// URL: https://atcoder.jp/contests/abc210/tasks/abc210_d
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,40 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
+
 void solve()
 {
+	ll h, w, c;
+	cin >> h >> w>>c;
+	vector<vl> grid(h+1, vl(w+1)), mi(h+1, vl(w+1,LINF)), mi2(h+1, vl(w+1,LINF));
+	for (int i=1;i<=h;++i) for (int j=1;j<=w;++j) cin >> grid[i][j];
+	ll ans = LINF;
+	for (int i=1;i<=h;++i) for (int j=1;j<=w;++j){
+		ll cur = grid[i][j]+ c*(i+j);
+		if (mi[i-1][j]!=LINF||mi[i][j-1]!=LINF){
+			cur = min(mi[i-1][j], mi[i][j-1]) + cur;
+			ans = min(ans, cur);
+		}
+		mi[i][j] = min(grid[i][j]-c*(i+j), min(mi[i-1][j], mi[i][j-1]));
+	}
+	dbg(ans);
+	for (int i=1;i<=h;++i) for (int j=w;j>=1;--j){
+		ll cur = grid[i][j] + c*(i-j);
+		ans = min(ans, cur + mi2[i-1][j]);
+		mi2[i][j] = min(mi2[i-1][j], grid[i][j]-c*(i-j));
+		if (j<w) ans = min(ans, cur+mi2[i][j+1]), mi2[i][j] = min(mi2[i][j], mi2[i][j+1]);
+	}
+	
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: B. Maximum Cost Deletion
+// Contest: Codeforces - Educational Codeforces Round 111 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1550/problem/B
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,23 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, a, b;
+	cin >> n >> a >> b;
+	string s;
+	cin >> s;
+	if (b>=0){
+		cout << n*(a+b)<<"\n";
+		return;
+	}
+	int cnt = 1;
+	for (int i=1;i<n;++i){
+		if (s[i]!=s[i-1]) cnt++;
+	}
+	dbg(cnt);
+	cnt = (cnt+2)/2;
+	dbg(cnt, b);
+	cout << n*a + b*cnt << "\n";
+	
 }
 
 int main()

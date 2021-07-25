@@ -1,3 +1,11 @@
+// Problem: Planets Queries I
+// Contest: CSES - CSES Problem Set
+// URL: https://cses.fi/problemset/task/1750
+// Memory Limit: 512 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,34 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+1, LOG = 30;
+int succ[N][LOG], n, q, k, x;
 
 void solve()
 {
+	cin >> n>>q;
+	for (int i=1;i<=n;++i){
+		cin >> succ[i][0];
+	}
+	for (int j=1;j<LOG;++j){
+		for (int i=1;i<=n;++i)
+			succ[i][j] = succ[succ[i][j-1]][j-1];
+	}
+	while(q--){
+		cin >> x >>k;
+		for (int i=LOG-1;i>=0;i--){
+			if (k&(1<<i)) x = succ[x][i];
+		}
+		cout << x << "\n";
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

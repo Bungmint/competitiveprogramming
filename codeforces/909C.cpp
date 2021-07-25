@@ -74,6 +74,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -158,34 +159,35 @@ Mint nCk(ll n, ll k)
     return fact[n] * inv_fact[k] * inv_fact[n - k];
 }
 
+Mint dp[5001][5001];
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	int n;
+	cin >> n;
+	vi a(n+1);
+	for (int i=1;i<=n;++i){
+		char c;
+		cin >> c;
+		if (c=='f'){
+			a[i] = 1;
+		}
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	dp[0][0] = 1;
+	for (int i=1;i<=n;++i){
+		if (a[i-1]==1){
+			for (int j=0;j<n;++j){
+				dp[i][j+1] = dp[i-1][j];
+			}
+		}else{
+			for (int j=n;j>=0;--j){
+				dp[i][j] += dp[i-1][j];
+				if (j<n)dp[i][j] += dp[i][j+1];
+			}
+		}
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
+	for (int i=0;i<=n;++i) ans += dp[n][i];
 	cout << ans << "\n";
 }
 
@@ -193,6 +195,5 @@ int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    precalc();
     solve();
 }

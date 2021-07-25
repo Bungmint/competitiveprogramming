@@ -69,26 +69,73 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+bool sorted(vi &a){
+	for (int i=0;i<sz(a);++i) if (a[i]!=i) return 0;
+	return 1;
+}
+
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	vi ans;
+	int mex;
+	map<int,int> m1;
+	for (int i=0;i<n;++i) m1[a[i]]++;
+	for (int i=0;i<2*n;++i){
+		if (sorted(a)){
+			break;
+		}
+		dbg(m1);
+		for (int j=0;j<=n;++j){
+			if (!m1[j]){
+				mex = j;
+				break;
+			}
+		}
+		if (mex==n){
+			for (int j=0;j<=n;++j) if (a[j] !=j){
+				ans.pb(j);
+				m1[a[j]]--;
+				a[j] = mex;
+				m1[a[j]]++;
+				break;
+			}
+			for (int j=0;j<=n;++j){
+				if (!m1[j]){
+					mex = j;
+					break;
+				}
+			}
+			ans.pb(mex);
+			m1[a[mex]]--;
+			a[mex] = mex;
+			m1[a[mex]]++;
+			dbg(ans);
+		}else{
+			ans.pb(mex);
+			m1[a[mex]]--;
+			a[mex] = mex;
+			m1[a[mex]]++;
+		}
+	}
+	cout << sz(ans)<<"\n";
+	for (int x:ans )cout << x+1 << " ";
+	cout << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

@@ -1,3 +1,11 @@
+// Problem: D. Array Differentiation
+// Contest: Codeforces - Codeforces Global Round 15
+// URL: https://codeforces.com/contest/1552/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,38 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	set<int> st;
+	for (int i=0;i<n;++i) cin >> a[i], a[i] = abs(a[i]), st.insert(a[i]);
+	sort(all(a));
+	if (sz(st)<n||st.count(0)){
+		cout << "YES\n";
+		return;
+	}
+	bool ok = 0;
+	for (int mask=1;mask<(1<<n);++mask){
+		int cnt = 0;
+		vi on;
+		for (int j=0;j<n;++j){
+			if (mask&(1<<j)){
+				on.pb(j);
+				cnt++;
+			}
+		}
+		for (int m = 0;m<(1<<cnt);++m){
+			int c = 0;
+			for (int j=0;j<cnt;++j){
+				if (m&(1<<j)) c +=a[on[j]];
+				else c -= a[on[j]];
+			}
+			for (int j=0;j<n;++j){
+				if (!(mask&(1<<j))&&c==a[j]) ok = 1;
+			}
+		}
+	}
+	cout << (ok? "YES":"NO")<<endl;
 }
 
 int main()

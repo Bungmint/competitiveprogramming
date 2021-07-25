@@ -80,17 +80,40 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int n,k, a[10001], dp[10001][1001];
 
 void solve()
 {
+	cin >> n>>k;
+	for (int i=1;i<=n;++i) cin >> a[i];
+	memset(dp,-1,sizeof(dp));
+	dp[0][0] = 0;
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<=min(i-1,k);++j){
+			if (dp[i-1][j]==-1) continue;
+			if (j==0){
+				dp[i][j+1] = a[i];
+				dp[i][0] = max(dp[i][0], dp[i-1][0]+a[i]);
+			}
+			if (j<k&&j){
+				dp[i][j+1] = max(dp[i-1][j],a[i]);
+				dp[i][0] = max(dp[i][0], dp[i-j-1][0]+dp[i][j+1]*(j+1));
+			}
+			dbg(dp[i][0]);
+		}
+	}
+	cout << dp[n][0]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("teamwork");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

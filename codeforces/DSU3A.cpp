@@ -69,30 +69,75 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5+1;
+int p[N], SZ[N];
+vpi mem;
+vi snap;
+int cnt;
+
+int get(int x){return (x==p[x]? x: get(p[x]));}
+
+void merge(int x, int y){
+	x = get(x), y = get(y);
+	if (x==y) return;
+	mem.pb({x, SZ[x]}); mem.pb({y, SZ[y]});
+	if (SZ[x]>SZ[y]) swap(x,y);
+	SZ[y]+=SZ[x];
+	p[x] = y;
+	cnt--;
+}
+
+void snapshot(){
+	snap.pb(sz(mem));
+}
+
+void rollback(){
+	int c = 0;
+	int v = snap.back();
+	snap.pop_back();
+	while(sz(mem)!=v){
+		pi x = mem.back();
+		p[x.fi] = x.fi;
+		SZ[x.se] = x.se;
+		mem.pop_back();
+		c++;
+	}	
+	c/=2;
+	cnt +=c;
+}
+
 
 void solve()
 {
+	int n, m;
+	cin >> n >> m;
+	for (int i=1;i<=n;++i) SZ[i] = 1, p[i] = i;
+	cnt = n;
+	for (int i=0;i<m;++i){
+		string s;
+		cin >> s;
+		if (s=="union"){
+			int u,v;
+			cin >> u >> v;
+			merge(u,v);
+			cout << cnt << "\n";
+		}else if (s=="persist"){
+			snapshot();
+		}else{
+			rollback();
+			cout << cnt << "\n";
+		} 
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

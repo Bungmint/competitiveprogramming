@@ -79,18 +79,52 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 2019201997;
+const int xMul = 2019201913, yMul = 2019201949, N = 7501;
+int n, k; 
+
+
+vpi edges[1300000];
+
+// From the USACO tutorial lol
+struct DSU {
+	vector<int> e;
+	DSU(int N) { e = vector<int>(N, -1); }
+
+	// get representive component (uses path compression)
+	// To use rollback, disable path compression
+	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	
+	bool same_set(int a, int b) { return get(a) == get(b); }
+	
+	int size(int x) { return -e[get(x)]; }
+	
+	bool unite(int x, int y) {  // union by size
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
+};
+
 
 void solve()
 {
+	cin >> n>>k;
+	cout << MOD-84*(k-1)-48*n;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("walk");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

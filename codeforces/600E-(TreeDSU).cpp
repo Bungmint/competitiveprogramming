@@ -80,17 +80,72 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 1e5+1;
+int c[N], st[N], ft[N], ver[N], subtree[N], timer = 0;
+ll ans[N], sum[N];
+vi g[N];
+int freq[N], hi = 0;
+
+void dfsSubtree(int v,int pv){
+	st[v] = timer++;
+	ver[st[v]] = v;
+	subtree[v] = 1;
+	for (int e:g[v]) if (e!=pv) dfsSubtree(e,v), subtree[v]+=subtree[e];
+	ft[v] = timer;
+}
+
+void dfs(int v, int pv, bool keep){
+	int bigChild=-1, mx = 0;
+	for (int e:g[v]){
+		if (e!=pv&&subtree[e]>mx) bigChild = e, mx = subtree[e];
+	}
+	for (int e:g[v]){
+		if (e!=pv&&e!=bigChild) dfs(e,v,0);
+	}
+	if (bigChild!=-1) dfs(bigChild,v,1);
+	for (int e:g[v]){
+		if (e!=pv&&e!=bigChild){
+			for (int j=st[e];j<ft[e];++j){
+				sum[freq[c[ver[j]]]]-=c[ver[j]];
+				freq[c[ver[j]]]++;
+				hi = max(freq[c[ver[j]]], hi);
+				sum[freq[c[ver[j]]]]+=c[ver[j]];
+			}
+		}
+	}
+	sum[freq[c[v]]]-=c[v], freq[c[v]]++, sum[freq[c[v]]]+=c[v];
+	hi = max(freq[c[v]], hi);
+	dbg(v, hi);
+	ans[v] = sum[hi];
+	
+	if (!keep){
+		hi = 0;
+		for (int j=st[v];j<ft[v];++j){
+			sum[freq[c[ver[j]]]]-=c[ver[j]];
+			freq[c[ver[j]]]--;
+			sum[freq[c[ver[j]]]]+=c[ver[j]];
+		}
+	}
+}
 
 void solve()
 {
+	int n;
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> c[i];
+	for (int i=0;i<n-1;++i){int u,v;cin >> u >> v;g[u].pb(v), g[v].pb(u);}
+	dfsSubtree(1,0);
+	dfs(1,0,0);
+	for (int i=1;i<=n;++i) cout << ans[i]<< " ";
+	cout << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

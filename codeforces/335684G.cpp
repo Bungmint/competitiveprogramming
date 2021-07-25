@@ -1,3 +1,11 @@
+// Problem: G. Thor
+// Contest: Codeforces - Round #29
+// URL: https://codeforces.com/group/XrvsTsJWMb/contest/335684/problem/G
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,47 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n, q;
+	cin>>n >>q;
+	vpi apps(n+1);
+	int cnt = 0;
+	vpi timeline;
+	int last = -1;
+	while(q--){
+		int op, v;
+		cin >>op>>v;
+		if (op==1) {
+			timeline.pb({apps[v].fi+apps[v].se+1, v});
+			cnt++;
+			apps[v].se++;
+		}else if (op==2){
+			cnt-=apps[v].se;
+			apps[v] = {apps[v].fi+apps[v].se,0};
+		}else{
+			v--;
+			if (last<v) {
+				
+				for (int j=last+1;j<=v;j++){
+					pi p = timeline[j];
+					if (p.fi>apps[p.se].fi){
+						cnt--;
+						apps[p.se].fi++;
+						apps[p.se].se--;
+					}
+				}
+				last = v;
+			}
+		}
+		cout << cnt<<"\n";
+	}
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

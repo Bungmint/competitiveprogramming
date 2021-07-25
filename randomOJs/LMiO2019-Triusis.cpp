@@ -80,17 +80,34 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int MAXN = 2e5+1;
+int n, m;
+int a[MAXN];
 
 void solve()
 {
+	cin >> n >>m;
+	for (int i=1;i<=n;++i) cin >> a[i], a[i] = m*i-a[i];
+	vi LIS;
+	LIS.pb(0);
+	for (int i=1;i<=n;++i){
+		if (LIS.back()<=a[i]){
+			LIS.pb(a[i]);
+		}else if (a[i]>=0){
+			int x = upper_bound(all(LIS), a[i])-LIS.begin();
+			LIS[x] = a[i];
+		}
+	}
+	dbg(LIS);
+	cout << n+1-sz(LIS)<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

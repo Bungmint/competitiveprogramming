@@ -1,3 +1,11 @@
+// Problem: Robot Turtles
+// Contest: Kattis
+// URL: https://open.kattis.com/problems/robotturtles
+// Memory Limit: 1024 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,70 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int dx[] = {0, 1, 0, -1}, dy[] = {1, 0, -1, 0};
+string no = "no solution";
+
+bool good(int x, int y){
+	return (x>=0&&x<8&&y>=0&&y<8);
+}
 
 void solve()
 {
+	vector<vector<char>> grid(8, vector<char>(8));
+	static int d[8][8][4] = {};
+	memset(d, 0x3f, sizeof(d));
+	int stx, sty, enx, eny;
+	for (int i=0;i<8;++i) for (int j=0;j<8;++j){
+		cin >> grid[i][j];
+		if (grid[i][j]=='T') stx = i, sty = j;
+		if (grid[i][j]=='D') enx = i, eny = j;
+	}
+	dbg(grid);
+	d[stx][sty][0] = 0;
+	pqg<pair<ar<int,4>, string>> pq;
+	pq.push({{0, stx, sty, 0}, ""});
+	while(sz(pq)){
+		auto [dist, x, y, dir] = pq.top().fi;
+		string m = pq.top().se;
+		if (grid[x][y] == 'D'){
+			cout << m << endl;
+			return;
+		}
+		pq.pop();
+		if (dist>d[x][y][dir]) continue;
+		for (int i=0;i<4;++i){
+			if (i==dir) continue;
+			int k = min(abs(i-dir), 4- abs(i-dir));
+			assert(k>=0);
+			if (d[x][y][i]>d[x][y][dir]+k){
+				d[x][y][i] = dist + k;
+				string s; int v = (i-dir+4)%4;
+				if (v==2) s = "LL";
+				if (v==1) s = "R";
+				if (v==3) s = "L";
+				pq.push({{dist+k, x,y,i}, m+s});
+			}
+		}
+		// Forward normally
+		int nx = dx[dir]+x, ny = dy[dir]+y;
+		if (good(nx, ny)&&grid[nx][ny]!='C'&&grid[nx][ny]!='I'&&d[nx][ny][dir]>dist+1){
+			d[nx][ny][dir] =dist +1;
+			pq.push({{dist+1,nx, ny, dir}, m+'F'});
+		} 
+		if (good(nx,ny)&&grid[nx][ny]=='I'&&d[nx][ny][dir]>dist+2){
+			d[nx][ny][dir] =dist+2;
+			pq.push({{dist+2, nx, ny, dir}, m+"XF"});
+		}
+	}
+	cout << no << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,3 +1,11 @@
+// Problem: D. Fill The Bag
+// Contest: Codeforces - Educational Codeforces Round 82 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1303/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,8 +89,69 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+
+int brute_force(vi &a, int lim, int pos, ll n){
+	if (n==0) return 0;
+	if (pos==-1) return -1;
+	if (!((1LL<<pos)&n)) return brute_force(a, lim, pos-1, n);
+	if (a[pos]){
+		a[pos]--;
+		int v= brute_force(a, lim, pos-1, n-(1LL<<pos));
+		a[pos]++;
+		return v;
+	}
+	
+	
+	int bigger = -1;
+	int res = -1;
+	for (int j=pos+1;j<=lim;++j) if (a[j]){bigger = j;break;}
+	// Not using the big boi
+	vi b = a;
+	ll sum = 0;
+	for (int j=pos-1;j>=0;j--){
+		ll k= min((ll)a[j], ((1LL<<pos)-sum)/(1LL<<j));
+		sum += k*(1LL<<j);
+		b[j]-=k;
+	}
+	dbg(lim, pos, n, sum);
+	if (sum==(1LL<<pos)){
+		int v =  brute_force(b, pos, pos-1, n-(1LL<<pos));
+		if (v>=0){
+			res = v;
+		}
+	}
+	dbg(res);
+	// using it
+	if (bigger!=-1){
+		a[bigger]--;
+		for (int j=bigger-1;j>=pos;j--) a[j]++;
+		int k = bigger-pos;
+		int v = brute_force(a, pos, pos-1, n-(1LL<<pos));
+		if (v>=0){
+			v+=k;
+			res = (res<0? v:min(res,v));
+		}
+	}
+	
+	dbg(n, pos, res);
+	return res;
+}
+
 void solve()
 {
+	ll n;
+	int m;
+	cin >> n>> m;
+	vi a(m);
+	for (int i=0;i<m;++i) cin >> a[i];
+	if (n>=(ll)1e14){puts("-1");return;}
+	vi cnt(48);
+	for (int i=0;i<m;++i){
+		int lg = log2(a[i]);
+		cnt[lg]++;
+	}
+	int lg = log2(n);
+	cout << brute_force(cnt, 30, lg, n)<< "\n";
 }
 
 int main()

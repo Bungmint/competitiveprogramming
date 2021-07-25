@@ -80,17 +80,52 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 401;
+int n, K, dp[N][N], nxt[N][N], a[N], prefMin[N];
+vi order;
 
 void solve()
 {
+	cin >> n >> K;
+	for (int i=1;i<=n;++i) cin >> a[i], order.pb(a[i]);
+	sort(all(order));
+	order.resize(unique(all(order))-order.begin());
+	for (int i=1;i<=n;++i) a[i] = lb(all(order), a[i])-order.begin();
+	int cnt = sz(order);
+	for (int j=0;j<cnt;++j) for (int k=0;k<=K;++k) dp[j][k] = INF;
+	for (int j=0;j<cnt;++j) dp[j][0] = 0;
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<cnt;++j) for (int k=0;k<=K;++k) nxt[j][k] = INF;
+		for (int k=0;k<=K;++k){
+			prefMin[k] = INF;
+			for (int j=0;j<cnt;++j) prefMin[k] = min(prefMin[k], dp[j][k]);
+		}
+		
+		for (int j=0;j<cnt;++j) for (int k=0;k<=K;++k){
+			// No change
+			if (dp[j][k]==INF||a[i]>j) continue;
+			nxt[j][k] = min(nxt[j][k], dp[j][k] + order[j]- order[a[i]]);
+		}
+		for (int j=0;j<cnt;++j) for (int k=0;k<K;++k){
+			if (a[i]>j) continue;
+			nxt[j][k+1] = min(nxt[j][k+1], prefMin[k] + order[j]-order[a[i]]);
+		}
+		for (int j=0;j<cnt;++j) for (int k=0;k<=K;++k) dp[j][k] = nxt[j][k];
+	}
+	int ans = INF;
+	for (int j=0;j<cnt;++j) for (int k=0;k<=K;++k) ans =min(ans, dp[j][k]);
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    #ifndef LOCAL
+    	setIO("snakes");
+    #endif
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

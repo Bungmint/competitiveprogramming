@@ -69,30 +69,67 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
-
+const int N = 2e6+100;
+int n, a[N];
+pi dp[1001][1001];
+string s;
+set<int> removed;
 void solve()
 {
+	cin >> s;
+	n = sz(s);
+	vector<vi> ans;
+	while(true){
+		vi cur;
+		vi front;
+		vi back;
+		for (int i=0;i<n;++i){
+			if (removed.count(i)!=0) continue;
+			if (s[i]=='('){
+				front.pb(i);
+			}else back.pb(i);
+		}
+		int l =-1;
+		for (int i=0;i<sz(front);++i){
+			int idx = front[i];
+			int t = upper_bound(all(back), idx)-back.begin();
+			dbg(i, t);
+			if (sz(back)-t<=i){
+				l = i-1;
+				break;
+			}else{
+				l = i;
+			}
+		}
+		dbg(front, back);
+		dbg(l);
+		for (int i=0;i<=l;++i){
+			cur.pb(front[i]);
+			cur.pb(back[sz(back)-i-1]);
+			removed.insert(front[i]);
+			removed.insert(back[sz(back)-i-1]);
+		}
+		dbg(cur);
+		if (cur.empty()) break;
+		sort(all(cur));
+		ans.pb(cur);
+	}
+	cout << sz(ans)<<"\n";
+	for (vi x:ans){
+		cout << sz(x)<<"\n";
+		for (int y:x) cout << y+1 << " ";
+		cout << "\n";
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+   	solve();
 }

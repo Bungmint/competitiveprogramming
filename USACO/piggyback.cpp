@@ -81,16 +81,51 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+void bfs(int source, vl&d, vector<vi>&g){
+	fill(all(d), LINF);
+	queue<int> q;
+	d[source] = 0;
+	q.push(source);
+	while(sz(q)){
+		int v = q.front();
+		q.pop();
+		for (int e:g[v]){
+			if (d[e]>d[v]+1){
+				d[e] = d[v]+1;
+				q.push(e);
+			}
+		}
+	}
+}
+
 void solve()
 {
+	ll bessie, elsie, together, n, m;
+	cin >> bessie>>elsie>>together>> n>>m;
+	ll comb = min(bessie+elsie, together);
+	vector<vi> g(n+1);
+	vl fromBarn(n+1), fromBessie(n+1), fromElsie(n+1);
+	for (int i=0;i<m;++i){
+		int u,v;
+		cin >> u >> v;
+		g[u].pb(v), g[v].pb(u);
+	}
+	bfs(1, fromBessie, g), bfs(2, fromElsie, g), bfs(n, fromBarn, g);
+	ll ans = LINF;
+	for (int i=1;i<=n;++i){
+		if (fromBessie[i]==LINF) continue;
+		ans = min(ans, fromBessie[i]*bessie+fromElsie[i]*elsie+comb*fromBarn[i]);
+	}
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    setIO("piggyback");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

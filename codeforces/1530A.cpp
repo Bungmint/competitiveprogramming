@@ -1,3 +1,11 @@
+// Problem: A. Binary Decimal
+// Contest: Codeforces - Codeforces Round #733 (Div. 1 + Div. 2, based on VK Cup 2021 - Elimination (Engine))
+// URL: https://codeforces.com/contest/1530/problem/A
+// Memory Limit: 512 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,15 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	int ans = 0;
+	while(n){
+		ans = max(ans, n%10);
+		n/=10;
+	}
+	cout << ans << "\n";
+	
 }
 
 int main()

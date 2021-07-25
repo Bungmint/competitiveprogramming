@@ -74,6 +74,9 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+char a[3] = {'a', 'b', 'c'};
+int n, m;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -123,70 +126,73 @@ template<int MOD, int RT> struct mint {
 	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
 using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
-
+using Mint9 = mint<998244353, 5>;
 ostream &operator<<(ostream &os, Mint x){
 	os << x.v;
 	return os;
 }
 
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
+const int N = 6e5+10;
+const int B = 37;
+Mint p[N], inverse[N];
+Mint9 p2[N], inverse2[N];
+set<pi> st;
 
 void precalc()
 {
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
+	p[0] =1;
+    for (int i=1;i<N;++i) p[i] = p[i-1]*B;
+    inverse[0] = 1;
+    inverse[1] = inv((Mint)B);
+    for (int i=2;i<N;++i) inverse[i] = inverse[i-1] * inverse[i-1];
+    p2[0] =1;
+    for (int i=1;i<N;++i) p2[i] = p2[i-1]*B;
+    inverse2[0] = 1;
+    inverse2[1] = inv((Mint9)B);
+    for (int i=2;i<N;++i) inverse2[i] = inverse2[i-1] * inverse2[i-1];
 }
 
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
 
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	cin >> n >> m;
+	for (int i=0;i<n;++i){
+		string s;
+		cin >> s;
+		Mint hsh1=0;
+		Mint9 hsh2 = 0;
+		for (int j=0;j<sz(s);++j){
+			hsh1 += p[j]*(s[j]-'a'+1);
+			hsh2 += p2[j]*(s[j]-'a'+1);
+		}
+		st.insert({(int)hsh1, (int)hsh2});
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	while(m--){
+		string s;
+		cin >> s;
+		Mint hsh1 = 0;
+		Mint9 hsh2 = 0;
+		for (int j=0;j<sz(s);++j){
+			hsh1 += p[j]*(s[j]-'a'+1);
+			hsh2 += p2[j]*(s[j]-'a'+1);
+		}
+		bool ok = 0;
+		for (int i=0;i<sz(s);++i){
+			for (int j=0;j<3;++j){
+				Mint h1 = hsh1;
+				Mint9 h2 = hsh2;
+				if (a[j]==s[i]) continue;
+				h1 -= p[i]*(s[i]-'a'+1);
+				h1 += p[i] *(a[j]-'a'+1);
+				h2 -= p2[i]*(s[i]-'a'+1);
+				h2 += p2[i] *(a[j]-'a'+1);
+				if (st.count({(int)h1, (int)h2})) ok = 1;
+			}
+			if (ok) break;
+		}
+		cout << (ok? "YES\n":"NO\n");
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
 }
 
 int main()
@@ -194,5 +200,10 @@ int main()
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
     precalc();
-    solve();
+    int testcase=1;
+    //cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

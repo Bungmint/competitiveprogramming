@@ -1,3 +1,11 @@
+// Problem: C. Pursuit
+// Contest: Codeforces - Codeforces Round #733 (Div. 1 + Div. 2, based on VK Cup 2021 - Elimination (Engine))
+// URL: https://codeforces.com/contest/1530/problem/C
+// Memory Limit: 512 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,38 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n), b(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	for (int i=0;i<n;++i) cin >> b[i];
+	sort(all(a), greater<int> ()), sort(all(b), greater<int> ());
+	int t = n - n/4;
+	int aSum = 0, bSum = 0;
+	for (int i=0;i<t;++i) aSum += a[i], bSum += b[i];
+	if (aSum>=bSum){
+		cout << 0<<"\n";
+		return;
+	}
+	int l = 1, r=n, ans = 1;
+	while(l<=r){
+		int m = l + (r-l)/2;
+		t = (n+m) - (n+m)/4;
+		vi newA(n+m), newB(n+m);
+		for (int i=0;i<n+m;++i){
+			if (i<n) newA[i] = a[i], newB[i] = b[i];
+			else newA[i] = 100, newB[i] = 0;
+		}
+		sort(all(newA), greater<int>()), sort(all(newB), greater<int>());
+		aSum = 0, bSum = 0;
+		for (int i=0;i<t;++i) aSum += newA[i], bSum += newB[i];
+		dbg(m, aSum, bSum);
+		if (aSum>=bSum){
+			ans = m;
+			r = m-1;
+		}else l = m+1;
+	}
+	cout << ans << "\n";
 }
 
 int main()

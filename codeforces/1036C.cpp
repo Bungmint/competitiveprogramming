@@ -1,3 +1,11 @@
+// Problem: C. Classy Numbers
+// Contest: Codeforces - Educational Codeforces Round 50 (Rated for Div. 2)
+// URL: https://codeforces.com/problemset/problem/1036/C
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,9 +88,46 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+ll f[20][2][5];
+vi num;
+
+void init(ll x){
+	memset(f, -1, sizeof(f));
+	num.clear();
+	while(x){
+		num.pb(x%10);
+		x/=10;
+	}
+	reverse(all(num));
+	dbg(num);
+}
+
+
+ll dp(int pos, bool mask, int real){
+	if (pos==sz(num)){
+		return (real<=3);
+	}
+	if (real==4) return 0;
+	ll&res = f[pos][mask][real];
+	if (res!=-1) return res;
+	int DMT = (mask? 9:num[pos]);
+	
+	res = 0;
+	for (int i=0;i<=DMT;++i){
+		res += dp(pos+1, mask|(i<DMT), real+(i>0));
+	}
+	return res;
+}
 
 void solve()
 {
+	ll l, r;
+	cin >> l >> r;
+	init(r);
+	ll x = dp(0, 0,0);
+	init(l-1);
+	x-= dp(0,0,0);
+	cout << x << "\n";
 }
 
 int main()

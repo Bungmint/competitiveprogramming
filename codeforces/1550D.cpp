@@ -1,3 +1,11 @@
+// Problem: D. Excellent Arrays
+// Contest: Codeforces - Educational Codeforces Round 111 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1550/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -69,11 +77,18 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -153,6 +168,7 @@ void precalc()
 
 Mint nCk(ll n, ll k)
 {
+	if (k<0) return 0;
     if (n < k)
         return 0LL;
     return fact[n] * inv_fact[k] * inv_fact[n - k];
@@ -161,38 +177,41 @@ Mint nCk(ll n, ll k)
 
 void solve()
 {
-	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
-	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
+	int n,l,r;
+	cin >> n>>l>>r;
+	int x = (n+1)/2, y = n- x;
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
+	int k = min(r-n, 1-l);
+	if (n&1){
+		ans += k*(nCk(n, x)+nCk(n,y));
+		dbg(k, ans);
+		for (int i=k+1;;++i){
+			dbg(ans);
+			int L = max(1,l+i), R =min(r-i,n);
+			dbg(L,R, x-(L-1), y-(n-R), y-(L-1));
+			if (L>R+1) break;
+			ans += nCk(R-L+1, x-(L-1))+ nCk(R-L+1, y-(L-1));
+		}
+	}else{
+		ans += k*(nCk(n,x));
+		for (int i=k+1;;++i){
+			int L = max(1,l+i), R = min(r-i,n);
+			if (L>R+1) break;
+			ans += nCk(R-L+1, x-(L-1));
+		}
 	}
-	cout << ans << "\n";
+	cout << ans << "\n";	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     precalc();
-    solve();
+    int testcase;
+    cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

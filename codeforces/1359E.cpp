@@ -73,7 +73,8 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -162,29 +163,16 @@ Mint nCk(ll n, ll k)
 void solve()
 {
 	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
+	cin >> n >> k;
+	if (k>n){
+		cout << 0 << "\n";
 		return;
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
+	for (int i=1;i<=n;++i){
+		int above =n/i - 1;
+		if (above<k-1) break;
+		ans += nCk(above, k-1);
 	}
 	cout << ans << "\n";
 }

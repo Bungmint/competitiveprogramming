@@ -80,17 +80,48 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int mx[71], nxt[71], cur[71];
+int dp[71][71], n, m,k, grid[71][71];
 
 void solve()
 {
+	cin >> n >> m>>k;
+	for (int i=1;i<=n;++i)for(int j=1;j<=m;++j) cin >> grid[i][j];
+	memset(mx, -1, sizeof(mx));
+	mx[0] = 0;
+	int lim = m/2;
+	for (int i=1;i<=n;++i){
+		memset(dp, -1, sizeof(dp));
+		memset(cur, -1, sizeof(cur));
+		dp[0][0] = 0;
+		for (int j=1;j<=m;++j){
+			for (int chose = lim-1;chose>=0;--chose){
+				for (int rem=0;rem<k;++rem){
+					if (dp[chose][rem]==-1) continue;
+					dp[chose+1][(rem+grid[i][j])%k] = max(dp[chose+1][(rem+grid[i][j])%k], dp[chose][rem]+grid[i][j]);
+					cur[(rem+grid[i][j])%k] = max(cur[(rem+grid[i][j])%k], dp[chose+1][(rem+grid[i][j])%k]);
+				}
+			}
+		}
+		memset(nxt, -1, sizeof(nxt));
+		nxt[0] = 0;
+		for (int j=0;j<k;++j) for(int rem=0;rem<k;++rem){
+			if (cur[j]==-1||mx[rem]==-1) continue;
+			nxt[(j+rem)%k] = max(nxt[(j+rem)%k], cur[j]+mx[rem]);
+		}
+		
+		for (int i=0;i<k;++i) mx[i] = max(mx[i], nxt[i]);
+		
+	}
+	cout << mx[0]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

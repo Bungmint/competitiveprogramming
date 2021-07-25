@@ -81,16 +81,63 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+void dfs(int v, int pv, vi&d, vector<vi>&g, vi&p){
+	for (int e:g[v]){
+		if (e!=pv){
+			p[e] = v;
+			d[e] = d[v] +1;
+			dfs(e,v, d, g,p);
+		}
+	}
+}
+
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	vector<vi> g(n+1);
+	for (int i=0;i<n-1;++i){
+		int u,v;
+		cin >> u >> v;
+		g[u].pb(v);
+		g[v].pb(u);
+	}
+	vi dist(n+1, INF), distLeaf(n+1, INF), p(n+1);
+	dist[k] = 0;
+	dfs(k, 0, dist, g, p);
+	queue<int> q;
+	for (int i=1;i<=n;++i){
+		if (sz(g[i])==1&&i!=k){
+			q.push(i);
+			distLeaf[i] = 0;
+		}
+	}
+	while(sz(q)){
+		int v = q.front();
+		 q.pop();
+		for (int e:g[v]){
+			if (distLeaf[e]>distLeaf[v]+1){
+				distLeaf[e] = distLeaf[v]+1;
+				q.push(e);
+			}
+		}
+	}
+	int ans = 0;
+	for (int i=1;i<=n;++i){
+		if (i==k) continue;
+		dbg(dist[i], distLeaf[i]);
+		if (dist[p[i]]<distLeaf[p[i]]&&dist[i]>=distLeaf[i]) ans++;
+	}
+	cout << ans;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    setIO("atlarge");
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

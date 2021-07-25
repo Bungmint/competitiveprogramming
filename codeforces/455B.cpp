@@ -69,30 +69,67 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 2e5;
+int trie[N][26];
+bool win[N], lose[N];
+const int root = 1;
+int cur = 1;
+
+void insert(string& s){
+	int now = root;
+	for (int i=0;i<sz(s);++i){
+		int c = s[i]-'a';
+		if (!trie[now][c]){
+			trie[now][c] = ++cur;
+		}
+		now = trie[now][c];
+	}
+}
+
+void go(int v=root){
+	int cnt=0;
+	win[v] = 0, lose[v] = 0;
+	for (int i=0;i<26;++i){
+		if (trie[v][i]){
+			cnt++;
+			go(trie[v][i]);
+			win[v]|=!win[trie[v][i]];
+			lose[v]|=!lose[trie[v][i]];
+		}
+	}
+	if (cnt==0){
+		win[v] = 0;
+		lose[v] = 1;
+	}
+}
 
 void solve()
 {
+	int n, k;
+	cin >> n >> k;
+	for (int i=0;i<n;++i){
+		string s;
+		cin >> s;
+		insert(s);
+	}
+	go();
+	if (win[1]&&lose[1]){
+		cout << "First"<<"\n";
+	}else if(win[1]){
+		cout << (k&1? "First": "Second")<<"\n";
+	}else{
+		cout << "Second"<<"\n";
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
-    while (testcase--)
-    {
-        solve();
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
+    solve();
 }

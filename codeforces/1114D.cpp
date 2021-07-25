@@ -1,3 +1,11 @@
+// Problem: D. Flood Fill
+// Contest: Codeforces - Codeforces Round #538 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/1114/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -81,16 +89,45 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+int LCS(vi&a, vi&b){
+	int n = sz(a);
+	dbg(a, b);
+	vector<vi> dp(n+1, vi(n+1));
+	for (int i=1;i<=n;++i){
+		for (int j=1;j<=n;++j){
+			dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+			if (a[i-1]==b[j-1]) dp[i][j] = max(dp[i][j], dp[i-1][j-1]+1);
+		}
+	}
+	return dp[n][n];
+}
+
 void solve()
 {
+	int n;
+	cin >> n;
+	int prev = 0;
+	vi a, b;
+	for (int i=0;i<n;++i){
+		int t;
+		cin >> t;
+		if (prev!=t) a.pb(t);
+		prev = t;
+	}
+	n = sz(a);
+	b = a, reverse(all(b));
+	int x = LCS(a, b);
+	
+	dbg(x);
+	cout << n-1-x/2 << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

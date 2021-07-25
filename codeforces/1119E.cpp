@@ -1,3 +1,11 @@
+// Problem: E. Pavel and Triangles
+// Contest: Codeforces - Codeforces Global Round 2
+// URL: https://codeforces.com/problemset/problem/1119/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,14 +91,28 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	vi a(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	ll ans = 0;
+	ll leftover=0;
+	for (int i=0;i<n;++i){
+		int x = min((ll)a[i]/2LL, leftover);
+		int y = (a[i]-2*x)/3;
+		dbg(x,y, leftover);
+		ans += x+y;
+		leftover += a[i]-3*x-3*y;
+	}
+	cout << ans << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

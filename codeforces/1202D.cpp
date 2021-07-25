@@ -69,12 +69,6 @@ struct custom_hash
     }
 };
 
-void setIO(string s)
-{
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
@@ -83,12 +77,52 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int n;
+	cin >> n;
+	string s = "";
+	for (int i=1;i*i<=n;++i){
+		if (n%i==0){
+			int a = i, b = n/i;
+			if (a+b+2<=100000){
+				for (int j=0;j<a;++j){
+					s += '1';
+				}
+				s+="33";
+				for (int j=0;j<b;++j){
+					s+='7';
+				}
+				cout << s << "\n";
+				return;
+			}
+		}
+	}
+	
+	ll l = 1, r = 1e5, k, alpha;
+	while(l<=r){
+		ll m = l + (r-l)/2;
+		if ((m-1)*m/2<=n){
+			k = m;
+			l = m+1;
+		}else r = m-1;
+	}
+	alpha = n - k*(k-1)/2;
+	s += '1';
+	for (int i=0;i<k-2;++i){
+		s += '3';
+	}
+	for (int i=0;i<alpha;++i){
+		s += '1';
+	}
+	for (int i=0;i<2;++i) s += '3';
+	s += '7';
+	dbg(sz(s));
+	cout << s << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
     int testcase;
     cin >> testcase;
     while (testcase--)

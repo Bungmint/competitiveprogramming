@@ -1,3 +1,11 @@
+// Problem: B. Putting Plates
+// Contest: Codeforces - Codeforces Round #733 (Div. 1 + Div. 2, based on VK Cup 2021 - Elimination (Engine))
+// URL: https://codeforces.com/contest/1530/problem/B
+// Memory Limit: 512 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,46 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int h, w;
+	cin >> h >> w;
+	if ((h&1)&&(w&1)){
+		for (int i=0;i<h;++i){
+			for (int j=0;j<w;++j){
+				if (!(i&1)&&!(j&1)&&(i==0||j==0||i==h-1||j==w-1)) cout << 1;
+				else cout << 0;
+			}
+			cout << "\n";
+		}
+	}else if (h&1){
+		for (int i=0;i<h;++i){
+			for (int j=0;j<w;++j){
+				if (!(i&1)&&!(j&1)&&(i==0||j==0||i==h-1||j==w-1)) cout << 1;
+				else if (j==w-1&&!(i&1)&&(i>=2)&&i<=h-3) cout << 1;
+				else cout << 0;
+			}
+			cout << "\n";
+		}
+	}else if (w&1){
+		for (int i=0;i<h;++i){
+			for (int j=0;j<w;++j){
+				if (!(i&1)&&!(j&1)&&(i==0||j==0||i==h-1||j==w-1)) cout << 1;
+				else if (i==h-1&&!(j&1)&&(j>=2)&&j<=w-3) cout << 1;
+				else cout << 0;
+			}
+			cout << "\n";
+		}
+	}else{
+		for (int i=0;i<h;++i){
+			for (int j=0;j<w;++j){
+				if (!(i&1)&&!(j&1)&&(i==0||j==0||i==h-1||j==w-1)) cout << 1;
+				else if (j==w-1&&!(i&1)&&(i>=2)) cout << 1;
+				else if (i==h-1&&!(j&1)&&(j>=2)&&(j<=w-3))cout << 1;
+				else cout << 0;
+			}
+			cout << "\n";
+		}
+	}
+	cout << "\n";
 }
 
 int main()

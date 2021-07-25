@@ -80,17 +80,42 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+int a[101],n, k;
+int dp[(int)1e5+10];
+bitset<101> cache[(int)1e5+10];
+
+int dping(int x){
+	int &res = dp[x];
+	if (res!=-1) return res;
+	if (x<a[0]) return res =0;
+	for (int i=0;i<n;++i){
+		if (x<a[i]) break;
+		int k = dping(x-a[i]);
+		cache[x][k] = 1;
+	}
+	for (int i=0;i<=n;++i){
+		if (!cache[x][i]){
+			res = i;
+			break;
+		}
+	}
+	return res;
+}
 
 void solve()
 {
+	cin >> n>>k;
+	for (int i=0;i<n;++i) cin >> a[i];
+	memset(dp, -1, sizeof(dp));
+	cout << (dping(k)? "First":"Second")<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

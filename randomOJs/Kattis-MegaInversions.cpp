@@ -81,16 +81,48 @@ const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 
+template<typename T>
+struct BIT{
+	T n;
+	vector<T> bit;
+	BIT(int x){n=x;bit.resize(x+1);}
+	void init(){bit.assign(n+1, 0);}
+	void upd(int i, T v){
+		for (;i<=n;i+=i&-i) bit[i]+=v;	
+	}
+	T query(int i){
+		T res = 0;
+		for (;i>0;i-=i&-i) res+=bit[i];
+		return res;
+	}
+};
+
 void solve()
 {
+	int n;
+	cin >> n;
+	BIT<ll> bit(n);
+	vi a(n), b(n);
+	for (int i=0;i<n;++i) cin >> a[i];
+	for (int i=0;i<n;++i){
+		b[i] = bit.query(n)-bit.query(a[i]);
+		bit.upd(a[i], 1);
+	}
+	bit.init();
+	ll res = 0;
+	for (int i=0;i<n;++i){
+		res += bit.query(n)-bit.query(a[i]);
+		bit.upd(a[i], b[i]);
+	}
+	cout << res << endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

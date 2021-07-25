@@ -1,3 +1,11 @@
+// Problem: E. Marbles
+// Contest: Codeforces - Codeforces Round #585 (Div. 2)
+// URL: https://codeforces.com/contest/1215/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -80,17 +88,55 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+const int N = 4e5+10;
+ll dp[1<<20], a[N], pref[N][20], lastInd[20];
+ll extraMoves[20][20], cnt[20];
+int n;
 
 void solve()
 {
+	cin >> n;
+	for (int i=1;i<=n;++i) cin >> a[i], a[i]--;
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<20;++j) pref[i][j] = pref[i-1][j];
+		pref[i][a[i]]++;
+		cnt[a[i]]++;
+	}
+	for (int i=1;i<=n;++i){
+		for (int j=0;j<20;++j){
+			if (a[i]==j) continue;
+			extraMoves[a[i]][j] += (ll)cnt[a[i]]* ((ll)pref[i-1][j]-(ll)pref[lastInd[a[i]]][j]);
+		}
+		cnt[a[i]]--;
+		lastInd[a[i]] = i;
+	}
+	fill(dp, dp+(1<<20), LINF);
+	dp[0] = 0;
+	for (int mask=1;mask<(1<<20);++mask){
+		for (int last = 0; last<20;++last){
+			if (!(mask&(1<<last))) continue;
+			int prevMask = mask - (1<<last);
+			if (dp[prevMask]==INF) continue;
+			if (!lastInd[last]) dp[mask]=min(dp[mask],dp[prevMask]);
+			else{
+				ll res = 0;
+				for (int j=0;j<20;++j){
+					if ((1<<j)&mask) continue;
+					res += extraMoves[last][j];
+				}
+				dp[mask] = min(dp[mask], dp[prevMask]+res);
+			}
+		}
+	}
+	cout << dp[(1<<20)-1]<<endl;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int testcase;
-    cin >> testcase;
+    int testcase=1;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

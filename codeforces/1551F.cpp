@@ -1,3 +1,11 @@
+// Problem: F. Equidistant Vertices
+// Contest: Codeforces - Codeforces Round #734 (Div. 3)
+// URL: https://codeforces.com/contest/1551/problem/F
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -69,11 +77,18 @@ struct custom_hash
     }
 };
 
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 const int INF = 1e9;
 const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -159,40 +174,64 @@ Mint nCk(ll n, ll k)
 }
 
 
+
+
 void solve()
 {
 	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
+	cin >> n >> k;
+	vector<vi> g(n+1);
+	for (int i=0;i<n-1;++i){
+		int u, v;
+		cin >> u >> v;
+		g[u].pb(v), g[v].pb(u);
+	}
+	if (k==2){
+		cout <<  n*(n-1)/2 << "\n";
 		return;
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
-	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
-	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
-	}
-	dbg(L, R);
 	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
+	for (int i=1;i<=n;++i){
+		if (sz(g[i])<k) continue;
+		vi cnt(n);
+		vector<vector<Mint>> dp(n, vector<Mint>(k+1));
+		for (int j=0;j<n;++j) dp[j][0] = 1;
+		function<void(int, int, int)> dfs = [&](int v, int pv, int d){
+			dbg(i, v, pv, d);
+			cnt[d]++;
+			for (int e:g[v]){
+				if (e!=pv) dfs(e,v, d+1);
+			}
+		};
+		for (int e:g[i]){
+			fill(all(cnt), 0);
+			dfs(e, i, 1);
+			dbg(cnt);
+			for (int d=0;d<n;++d){
+				for (int j=k-1;j>=0;j--){
+					dp[d][j+1] += dp[d][j]*cnt[d];
+					
+				}
+			}
+			dbg(dp);
+		}
+		for (int j=0;j<n;++j){
+			ans += dp[j][k];
+		}
 	}
 	cout << ans << "\n";
+	
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     precalc();
-    solve();
+    int testcase;
+    cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

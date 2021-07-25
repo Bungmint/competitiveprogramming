@@ -1,3 +1,11 @@
+// Problem: A. Find The Array
+// Contest: Codeforces - Educational Codeforces Round 111 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1550/problem/A
+// Memory Limit: 256 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
@@ -83,6 +91,13 @@ const int MOD = 1e9 + 7; //998244353;
 
 void solve()
 {
+	int s;
+	cin >> s;
+	int k = sqrt(s);
+	int ans = k;
+	ans += s!=k*k;
+	cout << ans << "\n";
+	
 }
 
 int main()
