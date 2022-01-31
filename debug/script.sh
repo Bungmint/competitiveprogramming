@@ -1,7 +1,7 @@
 set -e
-g++ code.cpp -o code
-g++ gen.cpp -o gen
-g++ brute.cpp -o brute
+g++ ./debug/code.cpp -o code
+g++ ./debug/gen.cpp -o gen
+g++ ./debug/brute.cpp -o brute
 for((i = 1; ; ++i)); do
     ./gen $i > input_file
     ./code < input_file > myAnswer
