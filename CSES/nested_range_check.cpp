@@ -1,14 +1,83 @@
-#pragma GCC optimize("Ofast")
-#pragma GCC target("avx2,avx,fma")
-#include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
-using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+// Problem: Nested Ranges Check
+// Contest: CSES - CSES Problem Set
+// URL: https://cses.fi/problemset/task/2168/
+// Memory Limit: 512 MB
+// Time Limit: 1000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
 
-struct custom_hash
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+
+#define all(v) (v).begin(), (v).end()
+#define ar array
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -25,122 +94,82 @@ struct custom_hash
     }
 };
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-const int N = 2e5 + 100;
-pair<int, int> ranges[N];
-vector<int> st[2 * N], en[2 * N];
-struct Fenwick
+void setIO(string s)
 {
-    int sz;
-    vector<int> vec;
-    void init(int n)
-    {
-        sz = n + 1;
-        vec.resize(sz + 1);
-    }
-    void upd(int i, int v)
-    {
-        i++;
-        for (int j = i; j <= sz; j += j & (-j))
-        {
-            vec[j] += v;
-        }
-    }
-    int query(int i)
-    {
-        i++;
-        int ans = 0LL;
-        while (i > 0)
-        {
-            ans += vec[i];
-            i -= i & (-i);
-        }
-        return ans;
-    }
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
+const int N = 2e5+1;
+struct seg{
+	int l, r, id;
+}a[N];
+
+vector<seg> segs[N*2];
+
+template<typename T>
+struct BIT{
+	int N;
+	vector<T> bit;
+	BIT(int n){bit.resize(n+1);N = n;}
+	void upd(int i, T v){
+		for (++i;i<=N;i+=i&-i) bit[i]+=v;	
+	}
+	T query(int i){
+		T res = 0;
+		for (++i;i>0;i-=i&-i) res+=bit[i];
+		return res;
+	}
 };
 
 void solve()
 {
-    int n;
-    cin >> n;
-    Fenwick fw1, fw2;
-    set<int> set1;
-    unordered_map<int, int> m1;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> ranges[i].first >> ranges[i].second;
-        set1.insert(ranges[i].first);
-        set1.insert(ranges[i].second);
-    }
-    int cnt = 0;
-    for (auto it = set1.begin(); it != set1.end(); it++)
-    {
-        m1[*it] = cnt;
-        cnt++;
-    }
-    for (int i = 0; i < n; i++)
-    {
-        ranges[i].first = m1[ranges[i].first];
-        st[ranges[i].first].PB(i);
-        ranges[i].second = m1[ranges[i].second];
-        en[ranges[i].second].PB(i);
-    }
-    vector<pair<bool, bool>> ans(n);
-    fw1.init(cnt);
-    fw2.init(cnt);
-    for (int i = 0; i < cnt; i++)
-    {
-        for (auto e : en[i])
-        {
-            ans[e].first = (fw1.query(ranges[e].first) - 1 >= 1);
-        }
-        for (auto e : en[i])
-        {
-            fw1.upd(ranges[e].first, -1);
-        }
-        fw1.upd(i, (int)st[i].size());
-    }
-    for (int i = 0; i < cnt; i++)
-    {
-        for (auto e : en[i])
-        {
-            fw2.upd(ranges[e].first, 1);
-        }
-        int cur = fw2.query(i);
-        for (auto e : en[i])
-        {
-            ans[e].second = (cur - fw2.query(ranges[e].first - 1) - 1 >= 1);
-        }
-    }
-    for (int i = 0; i < n; i++)
-    {
-        cout << ans[i].second << " ";
-    }
-    cout << "\n";
-    for (int i = 0; i < n; i++)
-    {
-        cout << ans[i].first << " ";
-    }
-    cout << "\n";
+	int n;
+	cin >> n;
+	vi order;
+	F0R(i, n){
+		cin >> a[i].l >> a[i].r;
+		a[i].id = i;
+		order.pb(a[i].l), order.pb(a[i].r);
+	}
+	sort(all(order)), order.resize(unique(all(order))-order.begin());
+	F0R(i, n) a[i].l = lb(all(order),a[i].l)-order.begin(), a[i].r = lb(all(order), a[i].r)-order.begin();
+	F0R(i, n){
+		segs[a[i].l].pb(a[i]), segs[a[i].r].pb(a[i]);
+	}
+	BIT<int> fw1(sz(order)), fw2(sz(order));
+	bitset<N> contain = {}, contained = {};
+	F0R(i, sz(order)){
+		for(seg& x:segs[i]){
+			if (x.l==i){
+				fw1.upd(i, 1);
+				fw2.upd(x.r, 1);
+			}else if (x.r==i){
+				contained[x.id] = !!(fw1.query(x.l)-1);
+				fw2.upd(x.r, -1);
+				fw2.upd(x.l, 1);
+			}
+		}
+		for(seg& x:segs[i]){
+			if (x.r==i){
+				fw1.upd(x.l, -1);
+				contain[x.id] = !!(fw2.query(x.r)-fw2.query(x.l-1)-1);
+			}
+		}
+	}
+	F0R(i, n) cout << contain[i]<<" ";
+	cout << "\n";
+	F0R(i, n) cout << contained[i] << " ";
 }
 
 int main()
 {
-#ifndef ONLINE_JUDGE
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-#endif
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
-
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

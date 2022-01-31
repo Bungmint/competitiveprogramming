@@ -1,14 +1,83 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
-#include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
-using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+// Problem: D. Bananas in a Microwave
+// Contest: Codeforces - CodeCraft-21 and Codeforces Round #711 (Div. 2)
+// URL: https://codeforces.com/contest/1498/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
 
-struct custom_hash
+#pragma GCC optimize("O3")
+#pragma GCC target("sse4")
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+
+#define all(v) (v).begin(), (v).end()
+#define ar array
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -23,75 +92,70 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
-const int DIV = 1e5;
-
-ll ceil(ll a, ll b)
+void setIO(string s)
 {
-    return (a + b - 1) / b;
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
 }
+
+const ll MX = 100000;
+int dp[MX+1];
+int cnt[MX+1];
 
 void solve()
 {
-    int n, m;
-    cin >> n >> m;
-    vector<bool> vis(m + 1, false);
-    vis[0] = true;
-    vector<ll> ans(m + 1, -1);
-    ans[0] = 0;
-    for (int i = 0; i < n; i++)
-    {
-        auto new_vis = vis;
-        ll t, x, y;
-        cin >> t >> x >> y;
-        auto operation = [&](long long &curr) {
-            if (t == 1)
-            {
-                curr = curr + ceil(x, DIV);
-            }
-            else
-                curr = ceil(curr * x, DIV);
-        };
-        for (int k = 0; k <= m; k++)
-        {
-            if (vis[k])
-            {
-                ll curr = k;
-                operation(curr);
-                for (int a = 1; a <= y;)
-                {
-                    if (curr > m)
-                        break;
-                    if (vis[curr])
-                        break;
-                    new_vis[curr] = true;
-                    ans[curr] = i + 1;
-                    a++;
-                    operation(curr);
-                }
-            }
-        }
-        vis = new_vis;
-    }
-    for (int i = 1; i <= m; i++)
-        cout << ans[i] << " ";
-    cout << "\n";
+	int n, m;
+	cin >> n >> m;
+	memset(dp, -1, sizeof(dp));
+	dp[0] = 0;
+	FOR(time,1,1+ n){
+		ll t, x, y;
+		cin >> t >> x >> y;
+		if (t==1){
+			ll v = (x+MX-1)/MX;
+			dbg(v);
+			vi last(v, -1);
+			FOR(i, 0, m+1){
+				if (dp[i]!=-1){
+					last[i%v] = i;
+				}else{
+					if (i - last[i%v]<=v*y&&last[i%v]!=-1) dp[i] = time;
+				}
+			}
+		}else{
+			memset(cnt, 0, sizeof(cnt));
+			FOR(i, 0, m+1){
+				ll nxt = (ll)(x*(ll)i + MX-1)/MX;
+				if (dp[i]!=-1){
+					cnt[i] = 0;
+					if (nxt<=m) cnt[nxt] = 1;
+				}else{
+					if (cnt[i]&&cnt[i]<=y){
+						dp[i] = time;
+						if (nxt<=m) cnt[nxt] = 1 + cnt[i];
+					}
+				}
+			}
+		}
+	}
+	FOR(i, 1, m+1) cout << dp[i]<<" ";
+	cout << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

@@ -1,9 +1,83 @@
+// Problem: Simple Sum
+// Contest: CodeChef - November Challenge 2015
+// URL: https://www.codechef.com/NOV15/problems/SMPLSUM
+// Memory Limit: 256 MB
+// Time Limit: 1500 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
 #pragma GCC optimize("O3")
 #pragma GCC target("sse4")
 #include <bits/stdc++.h>
 using namespace std;
 
-struct custom_hash
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+
+#define all(v) (v).begin(), (v).end()
+#define ar array
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -18,62 +92,59 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-const int N = 1e7;
-int big[N+1];
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
-inline void pre(){
-	for (int i=1;i<=N;i++){big[i]=1;}
-	for (int i=2;i<=N;i++){
-		if (big[i]==1){
-			for (int j=i;j<=N;j+=i) big[j] = i;
+const int N = 1e7;
+ll mu[N+1], pp[N+1];
+vi pr;
+
+void linM(){
+	mu[1] = 1;
+	FOR(i, 2, N+1){
+		if (!mu[i]){
+			mu[i] = (ll)i*i - i + 1LL;
+			pp[i] = i;
+			pr.pb(i);
+		}
+		for (int j=0;j<sz(pr)&&i*pr[j]<=N;++j){
+			if (i%pr[j]==0){
+				pp[i*pr[j]] = pr[j]*pp[i];
+				ll tmp = pp[i*pr[j]]*pp[i*pr[j]];
+				mu[i*pr[j]] = mu[i/pp[i]]* (tmp- (tmp-1)/(pr[j]+1));
+				break;
+			}else{
+				mu[i*pr[j]] = mu[i]*mu[pr[j]];
+				pp[i*pr[j]] = pr[j];
+			}
 		}
 	}
-}
-ll pow(ll a, ll b){
-	if (b==1 ) return a;
-	ll m = pow(a,b/2);
-	if (b%2==0) return m*m;
-	return m*m*a;
 }
 
 void solve()
 {
 	int n;
 	cin >> n;
-	ll ans = 1LL;
-	while(n>1){
-		ll prime = big[n];
-		ll cnt = 0;
-		while(n%prime==0){
-			cnt++;
-			n/=prime;
-		}
-		if (cnt==1){
-			ans *= (pow(prime, 2)- prime+1);
-			continue;
-		}
-		ans *= (pow(prime, 2*cnt+1)+1)/(prime+1);
-	}
-	cout << ans << "\n";
+	cout << mu[n]<<"\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    pre();
-    int t;
-    cin >> t;
-    while (t--)
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    linM();
+    int testcase=1;
+    cin >> testcase;
+    while (testcase--)
     {
         solve();
     }
