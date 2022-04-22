@@ -1,27 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: E. Tree Painting
+// Contest: Codeforces - Educational Codeforces Round 67 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1187/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -49,80 +76,81 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
-}
-
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
-const int N = 200001;
-vi G[N];
-int subtree[N];
-ll f[N], g[N], n;
-
-void dfs1(int v,int pv){
-	subtree[v] = 1;
-	for (int e:G[v]){
-		if (e==pv) continue;
-		dfs1(e,v);
-		subtree[v] += subtree[e];
-		f[v] += f[e];
-	}
-	f[v] += subtree[v];
-}
-void dfs2(int v,int pv){
-	if(v!=1){
-		g[v] = n- subtree[v]+ f[pv]-subtree[v] -f[v]+g[pv];
-	}
-	for (int e:G[v]){
-		if (e!=pv)dfs2(e,v);
-	}
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
 void solve()
 {
+	int n;
 	cin >> n;
-	for (int i=1;i<=n-1;++i){
-		int u,v;
+	vector<vi> g(n);
+	REP(n - 1) {
+		int u, v;
 		cin >> u >> v;
-		G[u].pb(v), G[v].pb(u);
+		u--, v--;
+		g[u].pb(v), g[v].pb(u);
 	}
-	dfs1(1,0);
-	dfs2(1,0);
-	ll r = 0;
-	for (int i=1;i<=n;++i) r = max(r, f[i]+g[i]);
-	cout << r << endl;
+	vl f(n), gg(n), subtree(n);
+	auto dfs1 = y_combinator([&](auto dfs1, int u, int pu) -> void{
+		subtree[u] = 1;
+		for (auto &v : g[u]) {
+			if (v != pu) {
+				dfs1(v, u);
+				subtree[u] += subtree[v];
+				f[u] += f[v];
+			}
+		}
+		f[u] += subtree[u];
+		dbg(u, f[u]);
+	});
+	auto dfs2 = y_combinator([&](auto dfs2, int u, int pu) -> void{
+		if (pu >= 0) {
+			gg[u] = gg[pu] + n - subtree[u] + f[pu] - subtree[pu] - f[u];
+		}
+		dbg(u, gg[u]);
+		for (auto &v : g[u]) {
+			if (v != pu) {
+				dfs2(v, u);
+			}
+		}
+	});
+	dfs1(0, -1), dfs2(0, -1);
+	ll ans{};
+	F0R(i, n) {
+		ckmax(ans, f[i] + gg[i] + n - subtree[i]);
+	}
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

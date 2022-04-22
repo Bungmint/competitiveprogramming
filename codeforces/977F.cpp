@@ -1,22 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: F. Consecutive Subsequence
+// Contest: Codeforces - Codeforces Round #479 (Div. 3)
+// URL: https://codeforces.com/contest/977/problem/F
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -44,76 +76,69 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
 void solve()
 {
-	set<pi> st;
 	int n;
 	cin >> n;
-	vi v(n);
-	int mx = 0, fv = 0;
-	for (int i=0;i<n;i++){
-		int t;
-		cin >> t;
-		v[i] = t;
-		auto it2 = st.lower_bound({t-1, -INF});
-		if (it2==st.end()||it2->first!=t-1){
-			auto it1 = st.lower_bound({t, -INF});
-			if (it1==st.end()||it1->first!=t){
-				st.insert({t,1});
-				if (!mx) fv = t, mx = 1;
-			}
-		}else{
-			int cnt = it2->second +1;
-			auto it1 = st.lower_bound({t,-INF});
-			if (it1==st.end()||it1->first!=t){
-				st.insert({t, cnt});
-				if(mx<cnt) mx = cnt, fv = t;
-			}else{
-				if (it1->second<cnt){
-					st.erase(it1);
-					st.insert({t,cnt});
-					if(mx<cnt) mx = cnt, fv = t;
-				}
-			}
-		}
+	map<int, int> lis, tail;
+	vi p(n);
+	F0R(i, n) {
+		int x;
+		cin >> x;
+		if (lis.count(x - 1) && ckmax(lis[x], lis[x - 1] + 1)) tail[x] = i, p[i] = tail[x - 1];
+		else if (ckmax(lis[x], 1)) tail[x] = i, p[i] = -1;
 	}
-	int start=fv-mx+1;
-	cout << mx << "\n";
-	for (int i=0;i<n;i++){
-		if (v[i]==start) start++, cout << i+1 << " ";
+	int cur = 0;
+	int ans = 0;
+	vi res;
+	for (auto &[x, len] : lis) {
+		if (ckmax(ans, len)) cur = tail[x];
 	}
-	cout << "\n";
+	while (cur != -1) {
+		res.pb(cur);
+		cur = p[cur];
+	}
+	reverse(all(res));
+	cout << ans << "\n";
+	for (auto &e : res) cout << e + 1<< " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

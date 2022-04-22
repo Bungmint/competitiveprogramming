@@ -16,12 +16,17 @@ template<int MOD, int RT> struct mint {
 	mint() { v = 0; }
 	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
 		if (v < 0) v += MOD; }
-	friend bool operator==(const mint& a, const mint& b) { 
-		return a.v == b.v; }
+	bool operator==(const mint& o) const{
+		return v == o.v; }
 	friend bool operator!=(const mint& a, const mint& b) { 
 		return !(a == b); }
 	friend bool operator<(const mint& a, const mint& b) { 
 		return a.v < b.v; }
+	friend istream& operator>>(istream& is, const mint& o){
+		ll v; is >> v; o = mint(v); return is; }
+	friend ostream& operator<<(ostream& os, const mint& o){
+		os << o.v; return os; }
+	
 	mint& operator+=(const mint& m) { 
 		if ((v += m.v) >= MOD) v -= MOD; 
 		return *this; }
@@ -46,12 +51,8 @@ template<int MOD, int RT> struct mint {
 	friend mint operator*(mint a, const mint& b) { return a *= b; }
 	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
-using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
 
-ostream &operator<<(ostream &os, Mint x){
-	os << x.v;
-	return os;
-}
+using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
 
 const int N = 1e6+10;
 Mint fact[N], inv_fact[N], inverse[N];

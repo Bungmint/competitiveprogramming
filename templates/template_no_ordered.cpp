@@ -1,6 +1,6 @@
-//Copyright © 2021 Youngmin Park. All rights reserved.
-#pragma GCC optimize("O3")
-#pragma GCC target("avx2")
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -12,9 +12,10 @@ using pll = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
@@ -32,7 +33,7 @@ const ll LINF = 1e18;
 const int MOD = 1e9 + 7; //998244353;
 const ld PI = acos((ld)-1.0);
 const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
 template <typename T>
@@ -70,31 +71,29 @@ void dbg_out(Head H, Tail... T)
 #define dbg(...) 42
 #endif
 
-struct chash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-    size_t operator()(pair<uint64_t,uint64_t> x) const {
-		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
 void solve()

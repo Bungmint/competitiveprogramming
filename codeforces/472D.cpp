@@ -1,27 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: D. Design Tutorial: Inverse the Problem
+// Contest: Codeforces - Codeforces Round #270
+// URL: https://codeforces.com/contest/472/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -49,39 +76,37 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
-vpi g[2001];
-ll d[2001];
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
 // From the USACO tutorial lol
 struct DSU {
 	vector<int> e;
-	vector<int> mem;
-	vector<pair<pi,pi>> ev;
 	DSU(int N) { e = vector<int>(N, -1); }
 
 	// get representive component (uses path compression)
@@ -95,83 +120,67 @@ struct DSU {
 	bool unite(int x, int y) {  // union by size
 		x = get(x), y = get(y);
 		if (x == y) return false;
-		ev.pb({{x, e[x]}, {y,e[y]}});
 		if (e[x] > e[y]) swap(x, y);
 		e[x] += e[y]; e[y] = x;
 		return true;
 	}
-	
-	void snapshot(){
-		mem.pb(sz(ev));
-	}
-	
-	void rollback(){
-		if (mem.empty())return;
-		int SZ = mem.back();
-		mem.pop_back();
-		while(sz(ev)!=SZ){
-			pair<pi,pi> p = ev.back();
-			e[p.fi.fi] = p.fi.se;
-			e[p.se.fi] = p.se.se;
-			ev.pop_back();
-		}
-	}
 };
 
-void dfs(int v, int pV){
-	for (auto [e,w]:g[v]){
-		if (e!=pV){
-			d[e] = w+d[v];
-			dfs(e,v);
-		}
+struct Edge{
+	int u, v, w;
+	bool operator<(const Edge& other) const{
+		return w < other.w;
 	}
-}
+};
 
 void solve()
 {
 	int n;
 	cin >> n;
-	vector<vi> grid(n+1, vi(n+1));
-	for (int i=1;i<=n;++i) for (int j=1;j<=n;++j){
-		cin >> grid[i][j];
+	DSU dsu(n);
+	vector<vi> grid(n, vi(n));
+	vector<vpi> g(n);
+	for (auto &e : grid) for (auto &ee : e) cin >> ee;
+	vector<Edge> edges;
+	F0R(i, n) F0R(j, i) {
+		if (grid[i][i] || grid[i][j] != grid[j][i] || grid[i][j] == 0) {
+			cout << "NO";
+			return;
+		}
+		edges.pb({i, j, grid[i][j]});
 	}
-	bool ok = 1;
-	for (int i=1;i<=n;++i){
-		if (grid[i][i]) ok = 0;
-	}
-	for (int i=1;i<=n;++i) for (int j=1;j<=n;++j) if (grid[i][j]!=grid[j][i]) ok = 0;
-	if (!ok){
-		cout << "NO\n";
-		return;
-	}
-	DSU dsu(n+1);
-	vector<pair<int,pi>> Edge;
-	for (int i=1;i<=n;++i) for (int j=i+1;j<=n;++j) Edge.pb({ grid[i][j], {i,j}});
-	sort(all(Edge));
-	for (int i=0;i<sz(Edge);++i){
-		int u = Edge[i].se.fi, v = Edge[i].se.se;
-		int w = Edge[i].fi;
-		if (!dsu.same_set(u,v)){
-			dsu.unite(u,v);
-			if (!w) ok = 0;
-			g[u].pb({v,w});
-			g[v].pb({u,w});
+	sort(all(edges));
+	for (auto &[u, v, w] : edges) {
+		if (dsu.unite(u, v)) {
+			g[u].pb({v, w});
+			g[v].pb({u, w});
 		}
 	}
-	for (int i=1;i<=n;++i){
-		memset(d, 0, sizeof(d));
-		dfs(i,0);
-		for (int j=1;j<=n;++j){
-			if (d[j]!=grid[i][j]) ok = 0;
+	F0R(i, n) {
+		vi d(n);
+		auto dfs = y_combinator([&](auto dfs, int u, int pu)->void{
+			for (auto &[v, w] : g[u]) {
+				if (v != pu) {
+					d[v] = d[u] + w;
+					dfs(v, u);
+				}
+			}
+		});
+		dfs(i, -1);
+		F0R(j, n) {
+			if (grid[i][j] != d[j]) {
+				cout << "NO";
+				return;
+			}
 		}
 	}
-	cout << (ok? "YES":"NO")<<"\n";
+	cout << "YES";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

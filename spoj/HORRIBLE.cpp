@@ -1,76 +1,162 @@
+// Problem: Horrible Queries
+// Contest: SPOJ - Classical
+// URL: https://www.spoj.com/problems/HORRIBLE/
+// Memory Limit: 1536 MB
+// Time Limit: 2329 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
-
 using namespace std;
+
 using ll = long long;
-ll B1[100000 + 7];
-ll B2[100000 + 7];
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
-void add(ll b[], int idx, ll x)
+#define all(v) (v).begin(), (v).end()
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
-    while (idx <= 100005)
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
+
+#define int long long
+const int N = 2e5 + 200;
+ll b[N], c[N];
+int n, q;
+
+void upd(int i, int v, ll t[]) {
+	for (; i <= n; i += i & -i) t[i] += v;
+}
+ll query(int r, ll t[]) {
+	ll ret{};
+	for (; r; r -= r & -r) ret += t[r];
+	return ret;
+}
+void range_upd(int l, int r, int v) {
+	upd(l, v, b), upd(r + 1, -v, b);
+	upd(l, 1LL * l * v, c), upd(r + 1, -1LL * (r + 1) * v, c);
+}
+ll query(int r) {
+	return query(r, b) * (r + 1) - query(r, c);
+}
+ll query(int l, int r) {
+	return query(r) - query(l - 1);
+}
+
+void solve()
+{
+	cin >> n >> q;
+	memset(b, 0, sizeof(ll) * (n + 199));
+	memset(c, 0, sizeof(ll) * (n + 199));
+	REP(q) {
+		int t;
+		cin >> t;
+		if (t) {
+			int l, r;
+			cin >> l >> r;
+			cout << query(l, r) << '\n';
+		}else{
+			int l, r, v;
+			cin >> l >> r >> v;
+			range_upd(l, r, v);
+		}
+	}
+	
+}
+
+int32_t main()
+{
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    cin >> testcase;
+    while (testcase--)
     {
-        b[idx] += x;
-        idx += idx & -idx;
+        solve();
     }
-}
-
-void range_add(int l, int r, ll x)
-{
-    add(B1, l, x);
-    add(B1, r + 1, -x);
-    add(B2, l, x * (l - 1));
-    add(B2, r + 1, -x * r);
-}
-
-ll sum(ll b[], int idx)
-{
-    ll total = 0;
-    while (idx > 0)
-    {
-        total += b[idx];
-        idx -= idx & (-idx);
-    }
-    return total;
-}
-
-ll prefix_sum(int idx)
-{
-    return sum(B1, idx) * idx - sum(B2, idx);
-}
-
-ll range_sum(int l, int r)
-{
-    return prefix_sum(r) - prefix_sum(l - 1);
-}
-
-int main()
-{
-    ios_base::sync_with_stdio(0), cin.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        memset(B1, 0, sizeof(B1));
-        memset(B2, 0, sizeof(B2));
-        int n, c;
-        cin >> n >> c;
-        for (int i = 1; i <= c; i++)
-        {
-            int task, p, q;
-            cin >> task >> p >> q;
-            switch (task)
-            {
-            case 0:
-                ll v;
-                cin >> v;
-                range_add(p, q, v);
-                break;
-            case 1:
-                ll ans = range_sum(p, q);
-                cout << ans << "\n";
-                break;
-            }
-        }
-    }
-    return 0;
 }

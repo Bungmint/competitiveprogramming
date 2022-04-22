@@ -105,41 +105,24 @@ void setIO(string s)
     freopen((s + ".out").c_str(), "w", stdout);
 }
 
-vi ind;
-
-int getCompInd(int x){
-	return lb(all(ind), x)-begin(ind);
-}
-
 void solve()
 {
 	int n;
 	cin >> n;
-	vpl seg(n);
-	F0R(i, n)cin >> seg[i].fi >> seg[i].se, seg[i].se++;
-	vpl upd;
-	F0R(i,n) upd.pb({seg[i].fi, 1}), upd.pb({seg[i].se, -1});
-	sort(all(upd));
-	vl cnt(n+1);
-	ll prevLoc = -1;
-	ll cur = 0;
-	F0R(i, sz(upd)){
-		vpl tmp;
-		tmp.pb(upd[i]);
-		ll k = upd[i].fi;
-		while(i+1<sz(upd)&&upd[i+1].fi==k){
-			tmp.pb(upd[i+1]), i++;
-		}
-		if (cur)cnt[cur] += (k-prevLoc);
-		prevLoc = k;
-		for (auto [x, t]:tmp){
-			if (t==-1) cur--;
-			else  cur++;
-		}
+	vpl ranges(n);
+	vl ind, pref, ans(n+1);
+	for (auto&[i, j]:ranges) cin >> i >> j, ind.pb(i), ind.pb(j+1);
+	sort(all(ind)), ind.resize(unique(all(ind))-ind.begin());
+	pref.resize(sz(ind));
+	auto getInd = [&](ll x){
+		return lb(all(ind), x) - ind.begin();
+	};
+	for (auto&[i, j]:ranges){
+		pref[getInd(i)]++;
+		pref[getInd(j+1)]--;
 	}
-	FOR(i, 1, n+1){
-		cout << cnt[i]<<" ";
-	}
+	FOR(i, 0, sz(ind)-1) pref[i+1] += pref[i], ans[pref[i]] += ind[i+1] - ind[i];
+	FOR(i, 1, n+1) cout << ans[i] << " ";
 }
 
 int main()

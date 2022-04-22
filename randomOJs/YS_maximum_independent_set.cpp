@@ -6,8 +6,9 @@
 // 
 // Powered by CP Editor (https://cpeditor.org)
 
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+//Copyright © 2021 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -19,9 +20,10 @@ using pll = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
@@ -74,94 +76,107 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct chash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-    size_t operator()(pair<uint64_t,uint64_t> x) const {
-		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
-int dp1[1<<20];
-int maxDP[1<<20];
-int dp2[1<<20];
+int dp1[1 << 20], hasEdge[1 << 20];
+bool dp2[1 << 20];
+bool edge[40][40];
+int ans, m1, m2;
 
 void solve()
 {
 	int n, m;
-	cin >>n >> m;
+	cin >> n >> m;
 	vector<vi> g(n);
-	REP(m){
+	REP(m) {
 		int u, v;
 		cin >> u >> v;
+		// u--, v--;
 		g[u].pb(v), g[v].pb(u);
+		edge[u][v] = edge[v][u] = 1;
 	}
-	int n0 = n/2, n1 = n - n0;
-	F0R(mask, (1<<n0)){
-		dp1[mask] = mask;
-		bitset<20> forb = {};
-		F0R(i, n0) if (mask&(1<<i)) for (int e:g[i]) if (e<n0) forb[e]=1;
-		F0R(i, n0) if((mask&(1<<i))&&forb[i]) dp1[mask]=0;
-	}
-	F0R(mask, (1<<n0)){
-		if (dp1[mask]>=0) maxDP[mask] = dp1[mask];
-		int cnt = __builtin_popcount(maxDP[mask]);
-		F0R(i, n0) if (mask&(1<<i)){
-			int prevM = mask-(1<<i);
-			int cur = __builtin_popcount(maxDP[prevM]);
-			if (ckmax(cnt, cur)) maxDP[mask] = maxDP[prevM];
-		}
-	}
-	int mx = 0, id1=0, id2=0;
-	F0R(mask, (1<<n1)){
-		bitset<20> forb2 = {};
-		dp2[mask] = mask;
-		int curM = (1<<n0)-1;
-		F0R(i, n1) if (mask&(1<<i)){
-			for (int e:g[i+n0]){
-				if (e<n0) curM &= ((1<<n0)-1 -(1<<e));
-				else forb2[e] = 1;
+	int half = n / 2;
+	FOR(mask, 1, 1 << half) {
+		F0R(i, half) {
+			if (!(mask & (1 << i))) continue;
+			int prevMask = mask - (1 << i);
+			bool add = 1;
+			F0R(j, half) {
+				if ((prevMask & (1 << j)) && edge[j][i]) {
+					add = 0;
+					break;
+				}
 			}
-		}
-		F0R(i, n1) if ((mask&(1<<i))&&forb2[i+n0]) dp2[mask]=0;
-		if (dp2[mask]==mask){
-			int cnt = __builtin_popcount(mask)+__builtin_popcount(maxDP[curM]);
-			if (ckmax(mx, cnt)){
-				id1 = maxDP[curM], id2 = mask;
+			if (add && dp1[prevMask] == prevMask) {
+				dp1[mask] = dp1[prevMask] + (1 << i);
+			}else{
+				if (__builtin_popcount(dp1[mask]) < __builtin_popcount(dp1[prevMask])) {
+					dp1[mask] = dp1[prevMask];
+				}
 			}
 		}
 	}
-	cout << mx << endl;
-	F0R(i, n0) if (id1&(1<<i)) cout << i << " ";
-	F0R(i, n1) if (id2&(1<<i)) cout << n0+i << " ";
+	dp2[0] = 1;
+	FOR(mask, 1, 1 << (n - half)) {
+		F0R(i, n - half) {
+			if (!((mask) & (1 << i))) continue;
+			int prevMask = mask - (1 << i);
+			if (!dp2[prevMask]) continue;
+			bool add = 1;
+			F0R(j, n - half) {
+				if ((prevMask & (1 << j)) && edge[half + j][i + half]) {
+					add = 0;
+					break;
+				}
+			}
+			if (!add) continue;
+			dp2[mask] = 1;
+			hasEdge[mask] = hasEdge[prevMask];
+			F0R(j, half) {
+				if (edge[half + i][j] && !(hasEdge[mask] & (1 << j))) hasEdge[mask] += (1 << j);
+			}
+			int other = dp1[(1 << half) - 1 - hasEdge[mask]];
+			int cur = __builtin_popcount(mask) + __builtin_popcount(other);
+			if (ckmax(ans, cur)) {
+				m1 = other, m2 = mask;
+			}
+		}
+	}
+	cout << ans << "\n";
+	F0R(i, half) if (m1 & (1 << i)) cout << i << " ";
+	F0R(i, n - half) if (m2 & (1 << i)) cout << i + half << " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

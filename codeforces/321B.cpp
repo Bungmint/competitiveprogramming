@@ -1,21 +1,53 @@
+// Problem: B. Ciel and Duel
+// Contest: Codeforces - Codeforces Round #190 (Div. 1)
+// URL: https://codeforces.com/contest/321/problem/B
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using vvi = vector<vector<int>>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -43,10 +75,10 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -61,100 +93,78 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
 void solve()
 {
-	int n, m;
+	int n, m, ans = 0;
 	cin >> n >> m;
-	vi me(m);
-	multiset<int> att, def, att1, def1;
-	for (int i=0;i<n;i++){
-		string s;
-		int t;
-		cin >> s>>t;
-		if (s=="ATK") att.insert(t);
-		else def.insert(t);
+	vi att, def, ciel(m);
+	REP(n){
+		string s; int str;
+		cin >> s >> str;
+		if (s.front()=='A') att.pb(str);
+		else def.pb(str+1);
 	}
-	for (int i=0;i<m;i++) cin >> me[i];
-	sort(all(me));
-	def1 = def, att1 = att;
-	for (int i=0;i<m;i++){
-		if (!def1.empty()&&*def1.begin()<me[i]){
-			def1.erase(def1.begin());
-			continue;
+	for (auto&e:ciel)cin >> e;
+	sort(all(att));
+	sort(all(def));
+	sort(all(ciel));
+	// Can break through?
+	{
+		multiset<int> st(all(ciel));
+		bool pos = 1;
+		int tmp = 0;
+		// Def
+		for (auto&e:def){
+			if (auto it = st.lb(e);it==st.end()){
+				pos = 0;
+				break;
+			}else st.erase(it);
 		}
-		if (!att1.empty()&&*att1.begin()<=me[i]){
-			att1.erase(att1.begin());
+		// ATTACK
+		for (auto&e:att){
+			if (auto it = st.lb(e);it==st.end()){
+				pos = 0;
+				break;
+			}else tmp += *it-e, st.erase(it);
 		}
-	}
-	if (sz(att1)||sz(def1)){
-		int ans = 0LL;
-		for (int i=1;i<=m;i++){
-			att1 = att;
-			int cur = 0;
-			bool ok = 1;
-			for (int j=0;j<i;j++){
-				if (att1.empty()||*att1.begin()>me[m-i+j]){ok=0; break;}
-				cur += me[m-i+j]-*att1.begin();
-				att1.erase(att1.begin());
-			}
-			if (!ok) break;
-			ans = max(ans, cur);
-		}
-		
-		
-		cout << ans << "\n";
-		return;
+		for (auto&e:st) tmp += e;
+		if (pos) ckmax(ans, tmp);
 	}
 	
-	
-	
-	int saved = 0;
-	int ans =0;
-	for (int i=1;i<=m;i++){
-		att1 = att;
-		int cur = 0;
+	// Not breaking through
+	FOR(i, 1, min(sz(att), sz(ciel))+1){
 		bool ok = 1;
-		
-		for (int j=0;j<i;j++){
-			dbg(att1, me, ans);
-			if (att1.empty()||*att1.begin()>me[m-i+j]){ok=0; break;}
-			cur += me[m-i+j]-*att1.begin();
-			att1.erase(att1.begin());
+		int tmp = 0;
+		FOR(j, 0, i){
+			if (ciel[m-j-1]<att[j]){
+				ok = 0;
+				break;
+			}
+			tmp += ciel[m-j-1]-att[j];
 		}
-		if (!ok) break;
-		ans = max(ans, cur);
+		if (ok) ckmax(ans, tmp);
 	}
-	dbg(ans);
-	int cur = 0;
-	for (int i=0;i<m;i++){
-		dbg(def, att);
-		if (!def.empty()&&*def.begin()<me[i]){
-			def.erase(def.begin());
-		}
-		else if (!att.empty()&&*att.begin()<=me[i]){
-			cur += me[i]-*att.begin();
-			att.erase(att.begin());
-		}else{
-			saved+=me[i];
-		}
-	}
-	cout << max(cur + saved, ans) << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
-    //cin >> testcase;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

@@ -1,0 +1,237 @@
+// Problem: E - Max Min
+// Contest: AtCoder - AtCoder Beginner Contest 247
+// URL: https://atcoder.jp/contests/abc247/tasks/abc247_e
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
+
+#define all(v) (v).begin(), (v).end()
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
+
+template<typename T>
+struct SparseTableMin{
+	vector<vector<T>> spar;
+	inline T merge(const T& a, const T& b){ // change this
+		return min(a, b);
+	} 
+	SparseTableMin(const vector<T>& a){
+		int lg = 32 - __builtin_clz(sz(a));
+		spar.assign(sz(a), vi(lg, 0));
+		for (int i = 0; i < sz(a); ++i) spar[i][0] = a[i];
+		for (int j = 1; j < lg; ++j) 
+			for (int i = 0; i + (1 << j) <= sz(a); ++i)
+				spar[i][j] = merge(spar[i][j - 1], spar[i + (1 << (j - 1))][j - 1]);
+	}
+	SparseTableMin(T a[], int n){
+		int lg = 32 - __builtin_clz(n);
+		spar.assign(n, vi(lg, 0));
+		for (int i = 0; i < n; ++i) spar[i][0] = a[i];
+		for (int j = 1; j < lg; ++j) 
+			for (int i = 0; i + (1 << j) <= n; ++i)
+				spar[i][j] = merge(spar[i][j - 1], spar[i + (1 << (j - 1))][j - 1]);
+	}
+	T query(int a, int b){
+		assert(a <= b);
+		int dif = 31 - __builtin_clz(b - a + 1);
+		return merge(spar[a][dif], spar[b - (1 << dif) + 1][dif]);
+	}
+};
+
+template<typename T>
+struct SparseTableMax{
+	vector<vector<T>> spar;
+	inline T merge(const T& a, const T& b){ // change this
+		return max(a, b);
+	} 
+	SparseTableMax(const vector<T>& a){
+		int lg = 32 - __builtin_clz(sz(a));
+		spar.assign(sz(a), vi(lg, 0));
+		for (int i = 0; i < sz(a); ++i) spar[i][0] = a[i];
+		for (int j = 1; j < lg; ++j) 
+			for (int i = 0; i + (1 << j) <= sz(a); ++i)
+				spar[i][j] = merge(spar[i][j - 1], spar[i + (1 << (j - 1))][j - 1]);
+	}
+	SparseTableMax(T a[], int n){
+		int lg = 32 - __builtin_clz(n);
+		spar.assign(n, vi(lg, 0));
+		for (int i = 0; i < n; ++i) spar[i][0] = a[i];
+		for (int j = 1; j < lg; ++j) 
+			for (int i = 0; i + (1 << j) <= n; ++i)
+				spar[i][j] = merge(spar[i][j - 1], spar[i + (1 << (j - 1))][j - 1]);
+	}
+	T query(int a, int b){
+		assert(a <= b);
+		int dif = 31 - __builtin_clz(b - a + 1);
+		return merge(spar[a][dif], spar[b - (1 << dif) + 1][dif]);
+	}
+};
+
+void solve()
+{
+	int n, x, y;
+	cin >> n >> x >> y;
+	vi a(n);
+	for (auto &e : a) cin >> e;
+	SparseTableMin<int> spmi(a);
+	SparseTableMax<int> spma(a);
+	ll ans = {};
+	F0R(i, n) {
+		int l = i, r = n - 1, miL = -1, mxL = -1;
+		int miR = -1, mxR = -1;
+		while (l <= r) {
+			int mid = (l + r) / 2;
+			int z = spmi.query(i, mid);
+			if (z == y) {
+				miL = mid, r = mid - 1;
+			}else if (z > y) {
+				l = mid + 1;
+			}else r = mid - 1;
+		}
+		l = i, r = n - 1;
+		while (l <= r) {
+			int mid = (l + r) / 2;
+			int z = spmi.query(i, mid);
+			if (z == y) {
+				miR = mid, l = mid + 1;
+			}else if (z > y) {
+				l = mid + 1;
+			}else r = mid - 1;
+		}
+		l = i, r = n - 1;
+		while (l <= r) {
+			int mid = (l + r) / 2;
+			int z = spma.query(i, mid);
+			if (z == x) {
+				mxL = mid, r = mid - 1;
+			}else if (z > x) {
+				r = mid - 1;
+			}else l = mid + 1;
+		}
+		l = i, r = n - 1;
+		while (l <= r) {
+			int mid = (l + r) / 2;
+			int z = spma.query(i, mid);
+			if (z == x) {
+				mxR = mid, l = mid + 1;
+			}else if (z > x) {
+				r = mid - 1;
+			}else l = mid + 1;
+		}
+		dbg(miL, miR, mxL, mxR);
+		if (miL >= 0 && mxL >= 0) {
+			
+			int L = max(miL, mxL);
+			int R = min(mxR, miR);
+			ans += max(0, R - L + 1);
+		}
+	}
+	cout << ans << "\n";
+}
+
+int main()
+{
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
+}

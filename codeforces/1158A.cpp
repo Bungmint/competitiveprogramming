@@ -108,47 +108,25 @@ void setIO(string s)
 void solve()
 {
 	int n, m;
-	cin>> n>>m;
-	vi b, g;
-	vl pref(m);
-	REP(n){
-		int x;
-		cin>>x;
-		b.pb(x);
+	cin >> n >> m;
+	vi a(n), b(m);
+	for (auto&e:a) cin >> e;
+	for (auto&e:b) cin >> e;
+	sort(all(a)), sort(all(b));
+	if (a[n-1]>b[0]){
+		puts("-1");
+		return;
 	}
-	REP(m){
-		int x;
-		cin >> x;
-		g.pb(x);
+	ll ans = accumulate(all(a), 0LL);
+	ans *= m;
+	dbg(ans);
+	if (a[n-1]==b[0]){
+		FOR(i, 1, m) ans += b[i] - a[n-1];
+	}else{
+		FOR(i, 1, m) ans += b[i] - a[n-1];
+		ans += b[0] - a[n-2];	
 	}
-	sort(all(b), greater<int>()), sort(all(g), greater<int>());
-	F0R(i, m){
-		if (i)pref[i] = pref[i-1]+ g[i];
-		else pref[i] = g[i];
-	}
-	ll ans = 0;
-	int j = 0;
-	F0R(i, n){
-		int cnt = 0;
-		ll val = 0;
-		while(j<m&&cnt<m-1&&g[j]>=b[i]){
-			val += g[j];
-			j++;
-			cnt++;
-		}
-		if (cnt==m-1&&j<m&&g[j]==b[i]){
-			val += g[j];
-			j++;
-			cnt++;
-		}
-		val += 1LL*(m-cnt)*b[i];
-		ans += val;
-		dbg(val);
-	}
-	cout << (j==m&&(b[0]<=g[m-1])? ans:-1);
-	
-	
-	
+	cout << ans;
 }
 
 int main()

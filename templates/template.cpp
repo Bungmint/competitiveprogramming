@@ -33,7 +33,7 @@ using ld = long double;
 
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+const int MOD = 1e9 + 7; // 998244353;
 const ld PI = acos((ld)-1.0);
 const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -102,7 +102,10 @@ int main()
 {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    int tc;
+#ifdef LOCAL
+    setIO("a");
+#endif
+    int tc = 1;
     cin >> tc;
     while (tc--)
     {

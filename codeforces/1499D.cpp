@@ -1,39 +1,109 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+// Problem: D. The Number of Pairs
+// Contest: Codeforces - Educational Codeforces Round 106 (Rated for Div. 2)
+// URL: https://codeforces.com/contest/1499/problem/D
+// Memory Limit: 512 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
+#pragma GCC optimize("O3")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
 const int INF = 1e9;
 const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-const int N = 2e7 + 10;  // Only advised to use it under 1e7 (More Memory)
-int lp[N + 1], pre[N];
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
+
+const int N = 2e7; // Only advised to use it under 1e7 (More Memory)
+int lp[N + 1], val[N + 1];
 vector<int> pr;
 void linsieve()
 {
@@ -49,83 +119,42 @@ void linsieve()
             lp[i * pr[j]] = pr[j];
         }
     }
-    for (int i = 2; i < N; i++)
-    {
-        pre[i] = pre[i / lp[i]] + (lp[i / lp[i]] != lp[i]);
+    val[1] = 0;
+    for (int i = 2; i <= N; i++){
+    	if (lp[i] != lp[i / lp[i]]) val[i] = val[i / lp[i]] + 1;
+    	else val[i] = val[i / lp[i]];
     }
-}
-
-int gcd(int a, int b, int &x, int &y)
-{
-    x = 1, y = 0;
-    int x1 = 0, y1 = 1, a1 = a, b1 = b;
-    while (b1)
-    {
-        int q = a1 / b1;
-        tie(x, x1) = make_tuple(x1, x - q * x1);
-        tie(y, y1) = make_tuple(y1, y - q * y1);
-        tie(a1, b1) = make_tuple(b1, a1 - q * b1);
-    }
-    return a1;
-}
-
-ll pospair(int num)
-{
-    ll ans = 1LL;
-    while (num > 1)
-    {
-        int prim = lp[num];
-        while (num % prim == 0)
-        {
-            num /= prim;
-        }
-        ans *= 2LL;
-    }
-    return ans;
-}
-
-ll mod_pow(ll base, ll exp)
-{
-    if (exp == 0)
-        return 1LL;
-    if (exp == 1)
-        return base;
-    ll m = mod_pow(base, exp / 2);
-    if (exp % 2 == 0)
-        return (m * m);
-    return (((m * m)) * base);
 }
 
 void solve()
 {
-    int c, d, x;
-    cin >> c >> d >> x;
-    ll ans = 0;
-    for (int i = 1; i * i <= x; i++)
-    {
-        if (x % i != 0)
-            continue;
-        int k1 = i + d, k2 = x / i + d;
-        if (k1 % c == 0)
-            ans += mod_pow(2, pre[k1 / c]);
-        if (k2 % c == 0 && k1 != k2)
-            ans += mod_pow(2, pre[k2 / c]);
-    }
-    cout << ans << "\n";
+	int c, d, x;
+	cin >> c >> d >> x;
+	ll ans = 0;
+	for (int i = 1; i * i <= x; i++){
+		if (x % i == 0){
+			if ((x / i + d) % c == 0){
+				dbg((x / i + d) / c);
+				ans += (1LL << val[(x / i + d) / c]);
+			}
+			if (i * i != x && (i + d) % c == 0){
+				dbg((i + d) / c);
+				ans += (1LL << val[(i + d) / c]);
+			}
+		}
+	}
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     linsieve();
-    int t;
-    cin >> t;
-    while (t--)
+    int testcase=1;
+    cin >> testcase;
+    while (testcase--)
     {
         solve();
     }
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
 }

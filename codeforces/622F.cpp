@@ -1,27 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: F. The Sum of the k-th Powers
+// Contest: Codeforces - Educational Codeforces Round 7
+// URL: https://codeforces.com/problemset/problem/622/F
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -49,31 +76,32 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -92,12 +120,17 @@ template<int MOD, int RT> struct mint {
 	mint() { v = 0; }
 	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
 		if (v < 0) v += MOD; }
-	friend bool operator==(const mint& a, const mint& b) { 
-		return a.v == b.v; }
+	bool operator==(const mint& o) const{
+		return v == o.v; }
 	friend bool operator!=(const mint& a, const mint& b) { 
 		return !(a == b); }
 	friend bool operator<(const mint& a, const mint& b) { 
 		return a.v < b.v; }
+	friend istream& operator>>(istream& is, const mint& o){
+		ll v; is >> v; o = mint(v); return is; }
+	friend ostream& operator<<(ostream& os, const mint& o){
+		os << o.v; return os; }
+	
 	mint& operator+=(const mint& m) { 
 		if ((v += m.v) >= MOD) v -= MOD; 
 		return *this; }
@@ -122,77 +155,76 @@ template<int MOD, int RT> struct mint {
 	friend mint operator*(mint a, const mint& b) { return a *= b; }
 	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
+
 using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
+using vmi = vector<Mint>;
 
-ostream &operator<<(ostream &os, Mint x){
-	os << x.v;
-	return os;
-}
-
-const int N = 1e6+10;
-Mint fact[N], inv_fact[N], inverse[N];
-
-void precalc()
-{
-    for (int i = 0; i < N; i++)
-    {
-        if (i == 0)
-            fact[i] = 1LL;
-        else
-            fact[i] =  fact[i - 1] *i;
-    }
-    inverse[1] = 1;
-    for (int i=2;i<N;++i){
-    	inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
-    }
-    inv_fact[0] = inv_fact[1] = 1;
-    for (ll i=2;i<N;++i){
-    	inv_fact[i] = inv_fact[i-1] * inverse[i];
-    }
-}
-
-Mint nCk(ll n, ll k)
-{
-    if (n < k)
-        return 0LL;
-    return fact[n] * inv_fact[k] * inv_fact[n - k];
-}
+// const int N = 1e6+10;
+// Mint fact[N], inv_fact[N], inverse[N];
+// 
+// void precalc()
+// {
+    // for (int i = 0; i < N; i++)
+    // {
+        // if (i == 0)
+            // fact[i] = 1LL;
+        // else
+            // fact[i] =  fact[i - 1] *i;
+    // }
+    // inverse[1] = 1;
+    // for (int i=2;i<N;++i){
+    	// inverse[i] = MOD-(MOD/i)*inverse[MOD%i];
+    // }
+    // inv_fact[0] = inv_fact[1] = 1;
+    // for (ll i=2;i<N;++i){
+    	// inv_fact[i] = inv_fact[i-1] * inverse[i];
+    // }
+// }
+// 
+// Mint nCk(ll n, ll k)
+// {
+    // if (n < k)
+        // return 0LL;
+    // return fact[n] * inv_fact[k] * inv_fact[n - k];
+// }
 
 
 void solve()
 {
 	int n, k;
-	cin>> n>>k;
-	if (k==0){
-		cout << n << "\n";
-		return;
+	cin >> n >> k;
+	vmi a(k + 3), L(k + 3, (Mint)1), R(k + 3, (Mint)1);
+	Mint product = 1, ans = 0;
+	FOR(i, 1, k + 3){
+		a[i] = a[i - 1] + pow((Mint)i, k);
+		if (i == n){
+			cout << a[i] << "\n";
+			return;
+		}
+		product *= (n - i);
 	}
-	int deg = k+1;
-	vector<Mint> y(deg+1), L(deg+1, 1), R(deg+1,1);
-	for (int i=0;i<=deg;++i){
-		y[i] = pow((Mint)i, k);
-		if (i)y[i] += y[i-1];
+	FOR(i, 2, k + 3){
+		L[i] = L[i - 1];
+		L[i] *= i - 1;
 	}
-	dbg(y);
-	for (int i=0;i<deg;++i){
-		L[i+1] = L[i] * (n-i);
+	ROF(i, 1, k + 2){
+		R[i] = R[i + 1];
+		R[i] *= -(k + 2 - i);
 	}
-	for (int i=deg;i>=1;i--){
-		R[i-1] = R[i] * (n-i);
+	FOR(i, 1, k + 3){
+		ans += product * a[i] / ((n - i) * L[i] * R[i]);
 	}
-	dbg(L, R);
-	Mint ans = 0;
-	for (int i=0;i<=deg;++i){
-		if ((deg-i)&1) ans -= L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-		else ans += L[i]*R[i]*y[i]*inv_fact[deg-i]*inv_fact[i];
-	}
-	cout << ans << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    precalc();
-    solve();
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

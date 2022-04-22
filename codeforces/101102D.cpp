@@ -6,8 +6,9 @@
 // 
 // Powered by CP Editor (https://cpeditor.org)
 
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -19,9 +20,10 @@ using pll = pair<ll, ll>;
 using vl = vector<ll>;
 using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
@@ -74,87 +76,108 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct chash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-    size_t operator()(pair<uint64_t,uint64_t> x) const {
-		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
-int grid[1000][1000];
+#define int long long
+
+ll calc(ll n) {
+	return n * (n - 1) / 2;
+}
 
 void solve()
 {
-	int r,c;
+	int r, c;
 	cin >> r >> c;
-	F0R(i, r) F0R(j, c)cin >> grid[i][j];
-	vector<vi> maxC(r, vi(c));
-	F0R(j, c) F0R(i, r){
-		if (i==0){
-			maxC[i][j] = 1;
-		}else{
-			maxC[i][j] = (grid[i-1][j]==grid[i][j]? maxC[i-1][j]+1:1);
-		}
-	}
-	dbg(maxC);
+	vpi a(c);
+	vi L(c), R(c), pref(c);
 	ll ans = 0;
-	F0R(i, r){// Top row
-		stack<int> s1,s2;
-		vi L(c), R(c), dupe(c, -1);
-		F0R(j, c){
-			while(sz(s1)&&maxC[i][s1.top()]>=maxC[i][j]&&grid[i][s1.top()]==grid[i][j]){
-				if (maxC[i][s1.top()]==maxC[i][j]) {dupe[j]=s1.top();break;}
-				s1.pop();
-			}
-			L[j] = (sz(s1)? s1.top():-1);
-			s1.push(j);
+	F0R(i, r) {
+		pref[0] = 0;
+		F0R(j, c) {
+			int x;
+			cin >> x;
+			if (a[j].fi != x) a[j] = {x, 1};
+			else a[j].se++;
+			if (j) pref[j] = pref[j - 1];
+			pref[j] += a[j].se;
+		}	
+		stack<int> st;
+		map<pii, vi> mp;
+		F0R(j, c) {
+			while (sz(st) && a[st.top()].fi == a[j].fi && a[st.top()].se >= a[j].se) st.pop();
+			L[j] = (sz(st) ? st.top() : -1);
+			st.push(j);
 		}
-		R0F(j, c){
-			while(sz(s2)&&maxC[i][s2.top()]>=maxC[i][j]&&grid[i][s2.top()]==grid[i][j]){
-				s2.pop();
-			}
-			R[j] = (sz(s2)? s2.top():c);
-			s2.push(j);
+		while (sz(st)) st.pop();
+		R0F(j, c) {
+			while (sz(st) && a[st.top()].fi == a[j].fi && a[st.top()].se >= a[j].se) st.pop();
+			R[j] = (sz(st) ? st.top() : c);
+			st.push(j);
 		}
-		dbg(L, R);
-		F0R(j, c){
-			if (dupe[j]==-1){
-				ans += (ll)(R[j]-j)*(ll)(j-L[j])*(maxC[i][j]);
-			}else{
-				ans += (ll)(R[j]-j)*(ll)(j-dupe[j])*(maxC[i][j]);
+		F0R(j, c) {
+			mp[make_pair(L[j] + 1, R[j] - 1)].pb(j);
+		}
+		for (auto &[p, v] : mp) {
+			auto [l, r] = p;
+			auto h = a[v.front()].se;
+			int totW = r - l + 1;
+			ans += calc(totW + 1) * h;
+			F0R(k, sz(v)) {
+				if (k == 0) {
+					int lll = l, rrr = v[k] - 1;
+					if (lll <= rrr) {
+						int w = rrr - lll + 1;
+						ans -= calc(w + 1) * h;
+					}
+				}else{
+					int lll = v[k - 1] + 1, rrr = v[k] - 1;
+					if (lll <= rrr) {
+						int w = rrr - lll + 1;
+						ans -= calc(w + 1) * h;
+					}
+				}
+			}
+			int lll = v[sz(v) - 1] + 1, rrr = r;
+			if (lll <= rrr) {
+				int w = rrr - lll + 1;
+				ans -= calc(w + 1) * h;
 			}
 		}
+		dbg(ans);
 	}
 	cout << ans << "\n";
 }
 
-int main()
+int32_t main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     cin >> testcase;
     while (testcase--)

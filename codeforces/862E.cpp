@@ -1,21 +1,53 @@
+// Problem: E. Mahmoud and Ehab and the function
+// Contest: Codeforces - Codeforces Round #435 (Div. 2)
+// URL: https://codeforces.com/contest/862/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using vvi = vector<vector<int>>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -43,10 +75,10 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -61,65 +93,72 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
 void solve()
 {
 	int n, m, q;
 	cin >> n >> m >> q;
 	vi a(n), b(m);
-	for (int &e:a) cin >> e;
-	for (int &e:b) cin >> e;
-	set<ll> c;
-	ll sum = 0;
-	for (int i=0;i<n;i++) sum += (i&1? -b[i]:b[i]);
-	c.insert(sum);
-	for (int i=n;i<m;i++) sum = -sum + b[i-n] +(n&1? b[i]:-b[i]), c.insert(sum);
-	dbg(c);
-	sum = 0;
-	for (int i=0;i<n;i++) sum += (i&1? -a[i]:a[i]);
-	dbg(sum);
-	auto it = c.lower_bound(sum);
-	ll res = LINF;
-	if (it!=c.end()){
-		res = min(res, llabs(*it-sum));
+	ll val = 0, bSum = 0, sign = ((n&1)? 1:-1);
+	multiset<ll> st = {-LINF, LINF};
+	F0R(i, n){
+		cin >> a[i];
+		val += ((i&1) ? -a[i]:a[i]);
 	}
-	if (it!=c.begin()){
-		it--;
-		res = min(res, llabs(*it-sum));
+	F0R(i, n){
+		cin >> b[i];
+		bSum += ((i&1) ? -b[i]:b[i]);
 	}
-	cout << res << "\n";
-	while(q--){
-		ll l, r, x;
-		cin >> l >> r >> x;
-		if (l%2==r%2){
-			sum += (l&1? x:-x);
+	st.insert(bSum);
+	FOR(i, n, m){
+		cin >> b[i];
+		(bSum -= b[i-n]) *= -1LL;
+		bSum += sign*b[i];
+		st.insert(bSum);
+	}
+	dbg(st, val);
+	auto findMin = [&](ll x)->ll{
+		if (auto it = st.find(x);it!=st.end()){
+			return 0LL;
+		}else{
+			ll L = *--st.lb(x), R = *st.lb(x);
+			dbg(x, L, R);
+			return min(x-L, R-x);
 		}
-		auto it = c.lower_bound(sum);
-	ll res = LINF;
-	if (it!=c.end()){
-		res = min(res, llabs(*it-sum));
-	}
-	if (it!=c.begin()){
-		it--;
-		res = min(res, llabs(*it-sum));
-	}
-	cout << res << "\n";
+	};
+	auto upd = [&](int l, int r, ll x){
+		if ((l&1)!=(r&1));
+		else if (l&1) val -= x;
+		else val += x;
+		return;
+	};
+	cout << findMin(val) << "\n";
+	REP(q){
+		int l, r, x;
+		cin >> l >> r >> x;
+		l--, r--;
+		upd(l, r, x);
+		cout << findMin(val) << "\n";
 	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
-    //cin >> testcase;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

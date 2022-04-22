@@ -1,75 +1,147 @@
-//#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+// Problem: D. Max Median
+// Contest: Codeforces - Codeforces Round #703 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/1486/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
+#pragma GCC optimize("O3")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
-using ll = long long;
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
 const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+struct chash
+{
+    static uint64_t splitmix64(uint64_t x)
+    {
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const
+    {
+        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
+};
+
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
 void solve()
 {
-    int n, k, l, r = 0, ans = -1;
-    cin >> n >> k;
-    vector<int> vec(n), pref(n), mod(n);
-    for (int i = 0; i < n; i++)
-    {
-        cin >> vec[i];
-        r = max(r, vec[i]);
-    }
-    l = 1;
-    while (l <= r)
-    {
-        int m = l + (r - l) / 2;
-        for (int i = 0; i < n; i++)
-        {
-            if (vec[i] >= m)
-            {
-                mod[i] = 1;
-            }
-            else
-            {
-                mod[i] = -1;
-            }
-            if (i == 0)
-                pref[i] = mod[i];
-            else
-                pref[i] = pref[i - 1] + mod[i];
-        }
-        int minimum = 0, mx = pref[k - 1];
-        for (int i = k; i < n; i++)
-        {
-            minimum = min(minimum, pref[i - k]);
-            mx = max(mx, pref[i] - minimum);
-        }
-        if (mx > 0)
-        {
-            ans = m;
-            l = m + 1;
-        }
-        else
-        {
-            r = m - 1;
-        }
-    }
-    cout << ans << "\n";
+	int n,k;
+	cin >> n >> k;
+	vi a(n);
+	for (auto&e:a)cin >> e;
+	int l = 1, r=n, ans = 1;
+	while(l<=r){
+		int mid = (l+r)/2;
+		vi pref(n), minPref(n);
+		bool ok = 0;
+		F0R(i, n){
+			if (i) pref[i] = pref[i-1], minPref[i] = minPref[i-1];
+			pref[i] += (a[i]<mid? -1:1);
+			ckmin(minPref[i], pref[i]);
+		}
+		FOR(i, k-1, n){
+			int val = pref[i];
+			if (i>=k){
+				val -= minPref[i-k];
+			}
+			ok |= (val>=1);
+		}
+		if (ok) ans = mid, l = mid + 1;
+		else r = mid - 1;
+	}
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

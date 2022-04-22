@@ -1,27 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: E - Mex Min
+// Contest: AtCoder - AtCoder Beginner Contest 194
+// URL: https://atcoder.jp/contests/abc194/tasks/abc194_e
+// Memory Limit: 1024 MB
+// Time Limit: 4000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -49,64 +76,72 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
-
-
+set<int> st;
+map<int, int> freq;
+void init(int n) {
+	F0R(i, n + 1) st.insert(i);
+}
+void add(int n) {
+	if (st.count(n)) st.erase(n);
+	freq[n]++;
+}
+void remove(int n) {
+	freq[n]--;
+	if (freq[n] == 0) st.insert(n);
+}
+int mex() {
+	return *st.begin();
+}
 
 void solve()
 {
 	int n, m;
-	scanf("%d %d", &n, &m);
+	cin >> n >> m;
 	vi a(n);
-	for (int &e:a) scanf("%d", &e);
-	map<int,int> freq;
-	vi dummy(m+1);
-	iota(all(dummy), 0);
-	set<int> mex(all(dummy));
-	int res = INF;
-	for (int i=0;i<m;++i){
-		freq[a[i]]++;
-		if (freq[a[i]]==1&&mex.count(a[i])) mex.erase(a[i]);
+	init(n);
+	F0R(i, m) cin >> a[i], add(a[i]);
+	int ans = mex();
+	FOR(i, m, n) {
+		cin >> a[i];
+		add(a[i]);
+		remove(a[i - m]);
+		ckmin(ans, mex());
 	}
-	res = min(res, *mex.begin());
-	for (int i=m;i<n;++i){
-		freq[a[i]]++;
-		if (freq[a[i]]==1&&mex.count(a[i])) mex.erase(a[i]);
-		freq[a[i-m]]--;
-		if (!freq[a[i-m]]) mex.insert(a[i-m]);
-		res = min(res, *mex.begin());
-	}
-	cout << res << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    // ios_base::sync_with_stdio(false);
-    // cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

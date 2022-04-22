@@ -6,28 +6,35 @@
 // 
 // Powered by CP Editor (https://cpeditor.org)
 
+//Copyright © 2022 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
 #define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
 const int INF = 1e9;
 const ll LINF = 1e18;
@@ -69,31 +76,96 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct chash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
+
+template<typename T, typename Merge = plus<T>>
+struct SegTree{
+	int sz;
+	const Merge merge;
+	vector<T> t;
+	SegTree(int n) : merge(Merge()) {
+		sz = 1;
+		while (sz<n) sz*=2;
+		t.resize(sz*2);
+	}
+	void build(vector<T> &vec, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        if (l < (int)vec.size())
+	            t[x] = vec[l];
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    build(vec, 2 * x + 1, l, mid);
+	    build(vec, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void build(vector<T> &vec)
+	{
+	    build(vec, 0, 0, sz);
+	}
+	void upd(int i, const T& v, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        t[x] = v;
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    if (i < mid)
+	        upd(i, v, 2 * x + 1, l, mid);
+	    else
+	        upd(i, v, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void upd(int i, const T& v)
+	{
+	    upd(i, v, 0, 0, sz);
+	}
+	T query(int l, int r, int x, int lx, int rx)
+	{
+	    if (lx >= r || rx <= l)
+	        return T();
+	    if (lx >= l && rx <= r)
+	        return t[x];
+	    int mid = (lx + rx) / 2;
+	    T a = query(l, r, 2 * x + 1, lx, mid);
+	    T b = query(l, r, 2 * x + 2, mid, rx);
+	    return merge(a, b);
+	}
+	T query(int l, int r)
+	{
+	    return query(l, r, 0, 0, sz);
+	}
+};
+
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -112,12 +184,17 @@ template<int MOD, int RT> struct mint {
 	mint() { v = 0; }
 	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
 		if (v < 0) v += MOD; }
-	friend bool operator==(const mint& a, const mint& b) { 
-		return a.v == b.v; }
+	bool operator==(const mint& o) const{
+		return v == o.v; }
 	friend bool operator!=(const mint& a, const mint& b) { 
 		return !(a == b); }
 	friend bool operator<(const mint& a, const mint& b) { 
 		return a.v < b.v; }
+	friend istream& operator>>(istream& is, const mint& o){
+		ll v; is >> v; o = mint(v); return is; }
+	friend ostream& operator<<(ostream& os, const mint& o){
+		os << o.v; return os; }
+	
 	mint& operator+=(const mint& m) { 
 		if ((v += m.v) >= MOD) v -= MOD; 
 		return *this; }
@@ -142,83 +219,18 @@ template<int MOD, int RT> struct mint {
 	friend mint operator*(mint a, const mint& b) { return a *= b; }
 	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
+
 using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
 
-ostream &operator<<(ostream &os, Mint x){
-	os << x.v;
-	return os;
-}
 
-using pmi = pair<Mint,Mint>;
-
-template<typename T>
-struct SegTree{
-
-	int sz;
-	vector<T> t;
-	
-	T single(pmi val){
-		return val;
+struct Node {
+	Mint a, b;
+	Node(Mint x, Mint y) : a(x), b(y) {}
+	Node(int a_ = 1, int b_ = 0) {
+		a = a_, b = b_;
 	}
-	T NEUTRAL = {1,0}; //ALSO HAS TO CHANGE
-	T merge(T a, T b){
-		return {b.fi*a.fi, a.se*b.fi+b.se};
-	}
-	
-	void init(int n){
-		sz = 1;
-		while(sz<n) sz*=2;
-		t.resize(sz*2);
-	}
-	void build(vector<pmi> &vec, int x, int l, int r)
-	{
-	    if (r - l == 1)
-	    {
-	        if (l < (int)vec.size())
-	            t[x] = single(vec[l]);
-	        return;
-	    }
-	    int mid = (l + r) / 2;
-	    build(vec, 2 * x + 1, l, mid);
-	    build(vec, 2 * x + 2, mid, r);
-	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
-	}
-	void build(vector<pmi> &vec)
-	{
-	    build(vec, 0, 0, sz);
-	}
-	void upd(int i, pmi v, int x, int l, int r)
-	{
-	    if (r - l == 1)
-	    {
-	        t[x] =v;
-	        return;
-	    }
-	    int mid = (l + r) / 2;
-	    if (i < mid)
-	        upd(i, v, 2 * x + 1, l, mid);
-	    else
-	        upd(i, v, 2 * x + 2, mid, r);
-	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
-	}
-	void upd(int i, pmi v)
-	{
-	    upd(i, v, 0, 0, sz);
-	}
-	T query(int l, int r, int x, int lx, int rx)
-	{
-	    if (lx >= r || rx <= l)
-	        return NEUTRAL;
-	    if (lx >= l && rx <= r)
-	        return t[x];
-	    int mid = (lx + rx) / 2;
-	    T a = query(l, r, 2 * x + 1, lx, mid);
-	    T b = query(l, r, 2 * x + 2, mid, rx);
-	    return merge(a, b);
-	}
-	T query(int l, int r)
-	{
-	    return query(l, r, 0, 0, sz);
+	friend Node operator+(const Node& lhs, const Node& rhs) {
+		return {lhs.a * rhs.a, lhs.b * rhs.a + rhs.b};
 	}
 };
 
@@ -226,37 +238,35 @@ void solve()
 {
 	int n, q;
 	cin >> n >> q;
-	vector<pmi> a(n);
-	for (int i=0;i<n;++i){
+	vector<Node> a(n);
+	F0R(i, n) {
 		int x, y;
-		cin >>x>>y;
-		a[i] = {x,y};
+		cin >> x >> y;
+		a[i] = Node(x, y);
 	}
-	SegTree<pmi> st;
-	st.init(n), st.build(a);
-	while(q--){
+	SegTree<Node> st(n);
+	st.build(a);
+	REP(q) {
 		int t;
 		cin >> t;
-		pmi res;
-		if (t==0){
+		if (t) {
+			int l, r, x;
+			cin >> l >> r >> x;
+			Node res = st.query(l, r);
+			cout << (Mint)(res.a * x + res.b) << '\n';
+		}else{
 			int p, c, d;
 			cin >> p >> c >> d;
-			res = {c,d};
-			st.upd(p, res);
-		}else{
-			int l, r, x;
-			cin >> l >> r>>x;
-			res = st.query(l, r);
-			cout << res.fi*x+res.se << "\n";
+			Node x = Node(c, d);
+			st.upd(p, x);
 		}
-		
 	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

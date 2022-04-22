@@ -1,17 +1,53 @@
+// Problem: D - Pond
+// Contest: AtCoder - AtCoder Beginner Contest 203（Sponsored by Panasonic）
+// URL: https://atcoder.jp/contests/abc203/tasks/abc203_d?lang=en
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -39,10 +75,10 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -57,72 +93,62 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-int val[801][801], check[801][801], pref[801][801];
-
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
+}
 
 void solve()
 {
 	int n, k;
-	
-	int l = 1e9, r = 0, ans;
-	cin >> n>>k;
-	for (int i=0;i<n;i++)
-		for (int j=0;j<n;j++){
-			cin >> val[i][j];
-			l = min(val[i][j], l);
-			r = max(val[i][j], r);
-		}
-	
-	ans = r;
+	cin >> n >> k;
+	int threshold = ((k&1)?1:0);
+	vector<vi> grid(n, vi(n));
+	for (auto&v:grid)for(auto&e:v)cin>>e;
+	int l=0,r=1e9, ans = 0;
 	while(l<=r){
-		int m = l + (r-l)/2;
-		dbg(l,r,m);
-		bool ok = false;
-		for (int i=0;i<n;i++)
-			for (int j=0;j<n;j++)
-				check[i][j] = (val[i][j]<=m?1:-1);
-		for (int i=0;i<n;i++){
-			for (int j=0;j<n;j++){
-				if (i==0&&j==0) pref[i][j] = check[i][j];
-				else if (i==0) pref[i][j] = pref[i][j-1] + check[i][j];
-				else if (j==0) pref[i][j] = pref[i-1][j] + check[i][j];
-				else pref[i][j] = pref[i][j-1]+ pref[i-1][j] - pref[i-1][j-1] + check[i][j];
+		int mid = (l+r)/2;
+		vector<vi> f = grid;
+		for(auto&v:f)for(auto&e:v){
+			e = (e<=mid? 1: -1);
+		}
+		bool ok = 0;
+		dbg(mid);
+		F0R(i, n)F0R(j, n){
+			if (i) f[i][j] += f[i-1][j];
+			if (j) f[i][j] += f[i][j-1];
+			if (i&&j) f[i][j] -= f[i-1][j-1];
+			if (i>=k-1&&j>=k-1){
+				int sum = f[i][j];
+				int ii = i-k+1, jj = j-k+1;
+				if (ii) sum -= f[ii-1][j];
+				if (jj) sum -= f[i][jj-1];
+				if (ii&&jj) sum += f[ii-1][jj-1];
+				if (sum>=threshold) {ok = 1; goto aaa;}
 			}
 		}
-		
-		for (int i=0;i<n-k+1;i++){
-			for (int j=0;j<n-k+1;j++){
-				if (i==0&&j==0){
-					if (pref[i+k-1][j+k-1]>=0) ok =true;
-				}else if (i==0){
-					if (pref[i+k-1][j+k-1]-pref[i+k-1][j-1]>=0) ok =true;
-				}else if (j==0){
-					if (pref[i+k-1][j+k-1]-pref[i-1][j+k-1]>=0) ok = true;
-				}else{
-					if(pref[i+k-1][j+k-1]-pref[i-1][j+k-1]-pref[i+k-1][j-1]+pref[i-1][j-1]>=0) ok =true;
-				}
-				if (ok) break;
-			}
-			if (ok)break;
-		}
-		if (ok){
-			r =m-1;
-			ans = m;
-		}else l = m+1;
+		aaa:;
+		if (ok) ans = mid, r = mid - 1;
+		else l = mid + 1;
 	}
-	cout << ans << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

@@ -107,47 +107,36 @@ void setIO(string s)
 
 void solve()
 {
-	vi v(3);
-	F0R(i, 3)cin >> v[i];
-	int m;
-	cin >> m;
-	vector<multiset<int>> st(2);
+	int a, b, c, m;
+	cin >> a >> b >> c >> m;
+	vi usb, ps;
 	REP(m){
-		int c;
-		string s;
-		cin>> c>>s;
-		if (s[0]=='U'){
-			st[0].insert(c);
-		}else{
-			st[1].insert(c);
-		}
+		int cost; string s;
+		cin >> cost >> s;
+		if (s.front()=='U') usb.pb(cost);
+		else ps.pb(cost);
 	}
-	ll cost = 0;
-	int ans = min(v[0], sz(st[0]))+min(v[1], sz(st[1]))+min(v[2], max(0, sz(st[0])-v[0])+max(0, sz(st[1])-v[1]));
-	bool ok = 1;
-	dbg(st, v);
-	while(ok){
-		ok = 0;
-		int val = 2*INF;
-		int prod = 0, comp = 0;
-		F0R(i, 2){
-			if (sz(st[i])){
-				if (v[i]){
-					dbg(i);
-					if (ckmin(val, *st[i].begin())) comp = prod = i;
-				}else if (v[2]){
-					if (ckmin(val, *st[i].begin())) comp = 2, prod = i;
-				}
-			}
-		}
-		ok |= (val<2*INF);
-		if (val<2*INF){
-			cost += *st[prod].begin();
-			st[prod].erase(st[prod].begin());
-			v[comp]--;
-		}
+	sort(all(usb)), sort(all(ps));
+	ll tot = 0, sum = 0;
+	int i = 0, j = 0;
+	while(i<min(a, sz(usb))){
+		sum += usb[i++], tot++;
 	}
-	cout << ans << " "<< cost << "\n";
+	while(j<min(b, sz(ps))){
+		sum += ps[j++], tot++;
+	}
+	dbg(sum, tot);
+	while((i<sz(usb)||j<sz(ps))&&c){
+		c--; tot++;
+		dbg(c, i, j);
+		if (i<sz(usb)&&j<sz(ps)){
+			if (usb[i]<ps[j]) sum += usb[i++];
+			else sum += ps[j++];
+		}else if (i<sz(usb)){
+			sum += usb[i++];
+		}else sum += ps[j++];
+	}
+	cout << tot << " " << sum;
 }
 
 int main()

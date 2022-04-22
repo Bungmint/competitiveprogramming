@@ -1,22 +1,53 @@
+// Problem: C. They Are Everywhere
+// Contest: Codeforces - Codeforces Round #364 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/701/C
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
-#define PB push_back
+#define pb push_back
 #define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -44,10 +75,10 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -62,29 +93,33 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-int catched[52];
-bool must[52];
-
-inline void add(char c){
-	if (c>='a') catched[c-'a']++;
-	else catched[c-'A'+26]++;
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
 }
 
-inline void remove(char c){
-	if (c>='a') catched[c-'a']--;
-	else catched[c-'A'+26]--;
+int low[26], up[26], visL[26], visR[26];
+void add(char c){
+	if (c>='a') low[c-'a']++;
+	else up[c-'A']++;
 }
-
+void remove(char c){
+	if (c>='a') low[c-'a']--;
+	else up[c-'A']--;
+}
 bool good(){
-	for (int i=0;i<52;i++) if (must[i]&&!catched[i]) return 0;
-	return 1;
+	F0R(i, 26){
+		if (visL[i]&&!low[i]) return false;
+		if (visR[i]&&!up[i]) return false;
+	}
+	return true;
 }
 
 void solve()
@@ -93,34 +128,28 @@ void solve()
 	cin >> n;
 	string s;
 	cin >> s;
-	for (int i=0;i<n;i++){
-		if (s[i]>='a') must[s[i]-'a']=1;
-		else must[s[i]-'A'+26]=1;
+	for (auto &c:s){
+		if (c>='a') visL[c-'a']=1;
+		else visR[c-'A']=1;
 	}
-	int l = 0, r = 0;
-	int ans = INF;
-	for (;r<n;r++){
+	int l = 0, ans = INF;
+	for (int r=0;r<n;r++){
 		add(s[r]);
-		while(l<n&&good()){
-			remove(s[l]);
-			l++;
-			if (!good()){
-				l--;
-				add(s[l]);
-				break;
-			}
+		while(good()&&l<n){
+			remove(s[l++]);
+			if (!good()) {add(s[--l]);break;}
 		}
-		if (good()) ans = min(ans, r-l+1);
+		if (good())ckmin(ans, r-l+1);
 	}
-	cout << ans << "\n";
+	cout << ans;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
-    //cin >> testcase;
+    // cin >> testcase;
     while (testcase--)
     {
         solve();

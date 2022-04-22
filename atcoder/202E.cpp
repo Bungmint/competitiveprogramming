@@ -1,120 +1,232 @@
+// Problem: E - Count Descendants
+// Contest: AtCoder - AISing Programming Contest 2021（AtCoder Beginner Contest 202）
+// URL: https://atcoder.jp/contests/abc202/tasks/abc202_e
+// Memory Limit: 1024 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
 //#pragma GCC optimize("O3")
-//#pragma GCC target("sse4")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-using namespace __gnu_pbds;
 using namespace std;
-template <typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
-};
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
-#define PB push_back
-using ll = long long;
-const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7; //998244353
-const int N = 2e5 + 1, LOG = 20;
-vector<int> adj[N];
-unordered_map<int, vector<int>, custom_hash> m1;
-int n, dep[N], u, v, d, st[N], en[N], timer = 0;
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
-void dfs(int V, int pV)
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
-    st[V] = timer;
-    m1[dep[V]].PB(st[V]);
-    for (auto &e : adj[V])
-    {
-        if (e == pV)
-            continue;
-        timer++;
-        dep[e] = dep[V] + 1;
-        dfs(e, V);
-    }
-    en[V] = timer;
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
-int search(int U, int D)
-{
-    if (dep[U] > D)
-        return 0LL;
-    if (dep[U] == D)
-        return 1LL;
-    int targ1 = st[U], targ2 = en[U];
-    int l = 0, r = (int)m1[D].size() - 1, lbound = -1, rbound = -1;
-    while (l <= r)
-    {
-        int m = l + (r - l) / 2;
-        if (m1[D][m] >= targ1)
-        {
-            lbound = m;
-            r = m - 1;
-        }
-        else
-            l = m + 1;
-    }
-    if (lbound == -1)
-        return 0LL;
-    l = 0, r = (int)m1[D].size() - 1;
-    while (l <= r)
-    {
-        int m = l + (r - l) / 2;
-        if (m1[D][m] <= targ2)
-        {
-            rbound = m;
-            l = m + 1;
-        }
-        else
-            r = m - 1;
-    }
-    if (rbound == -1)
-        return 0LL;
-    return rbound - lbound + 1;
+template<typename T, typename Merge = plus<T>>
+struct SegTree{
+	int sz;
+	const Merge merge;
+	vector<T> t;
+	SegTree(int n) : merge(Merge()) {
+		sz = 1;
+		while (sz<n) sz*=2;
+		t.resize(sz*2);
+	}
+	void build(vector<T> &vec, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        if (l < (int)vec.size())
+	            t[x] = vec[l];
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    build(vec, 2 * x + 1, l, mid);
+	    build(vec, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void build(vector<T> &vec)
+	{
+	    build(vec, 0, 0, sz);
+	}
+	void upd(int i, const T& v, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        t[x] = v;
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    if (i < mid)
+	        upd(i, v, 2 * x + 1, l, mid);
+	    else
+	        upd(i, v, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void upd(int i, const T& v)
+	{
+	    upd(i, v, 0, 0, sz);
+	}
+	T query(int l, int r, int x, int lx, int rx)
+	{
+	    if (lx >= r || rx <= l)
+	        return T();
+	    if (lx >= l && rx <= r)
+	        return t[x];
+	    int mid = (lx + rx) / 2;
+	    T a = query(l, r, 2 * x + 1, lx, mid);
+	    T b = query(l, r, 2 * x + 2, mid, rx);
+	    return merge(a, b);
+	}
+	T query(int l, int r)
+	{
+	    return query(l, r, 0, 0, sz);
+	}
+};
+
+const int N = 2e5;
+int tin[N], tout[N], timer, depth[N], ans[N];
+vi g[N];
+vi d[N];
+vector<pii> quer[N];
+
+void dfs(int u, int pu) {
+	tin[u] = timer++;
+	d[depth[u]].pb(u);
+	for (auto &v : g[u]) {
+		if (v != pu) {
+			depth[v] = depth[u] + 1;
+			dfs(v, u);
+		}
+	}
+	tout[u] = timer - 1;
 }
 
 void solve()
 {
-    cin >> n;
-    for (int i = 2; i <= n; i++)
-    {
-        cin >> v;
-        adj[v].PB(i);
-        adj[i].PB(v);
-    }
-    dfs(1, 0);
-    int q;
-    cin >> q;
-    while (q--)
-    {
-        cin >> u >> d;
-        cout << search(u, d) << "\n";
-    }
+	int n;
+	cin >> n;
+	FOR(i, 1, n) {
+		int p;
+		cin >> p;
+		p--;
+		g[p].pb(i), g[i].pb(p);
+	}
+	dfs(0, -1);
+	int q;
+	cin >> q;
+	F0R(i, q) {
+		int u, v;
+		cin >> u >> v, u--;
+		quer[v].pb({u, i});
+	}
+	SegTree<int> st(timer);
+	F0R(i, n) {
+		for (auto &e : d[i]) {
+			st.upd(tin[e], 1);
+		}
+		for (auto &[v, id] : quer[i]) {
+			ans[id] = st.query(tin[v], tout[v] + 1);
+		}
+		for (auto &e : d[i]) {
+			st.upd(tin[e], 0);
+		}
+	}
+	F0R(i, q) {
+		cout << ans[i] << "\n";
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
-#ifdef LOCAL
-    cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
-#endif
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

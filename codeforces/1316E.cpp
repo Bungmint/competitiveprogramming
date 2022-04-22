@@ -1,25 +1,54 @@
+// Problem: E. Team Building
+// Contest: Codeforces - CodeCraft-20 (Div. 2)
+// URL: https://codeforces.com/contest/1316/problem/E
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -47,67 +76,74 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-const int MN = 1e5+1;
-ll dp[MN][1<<7];
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
 void solve()
 {
 	int n, p, k;
 	cin >> n >> p >> k;
-	vpi a(n);
+	vi a(n);
 	vector<vi> s(n, vi(p));
-	for (int i=0;i<n;++i) cin >> a[i].fi, a[i].se = i;
-	for (int i=0;i<n;++i) for (int j=0;j<p;++j) cin >> s[i][j];
-	sort(all(a), greater<pi> ());
-	dp[0][0] = 0;
-	for (int i=1;i<=n;++i){
-		int cur = a[i-1].fi, idx = a[i-1].se;
-		for (int mask=0;mask<(1<<p);++mask){
-			int c = i-1-__builtin_popcount(mask);
-			if (c<-1) continue;
-			dbg(dp[i-1][mask], mask);
-			if (c<k&&c>=0) dp[i][mask] = dp[i-1][mask] + cur;
-			else if (c>=k) dp[i][mask] = dp[i-1][mask];
-			
-			for (int j=0;j<p;++j){
-				if (mask&(1<<j)){
-					dbg(dp[i][mask], i, mask, dp[i-1][mask^(1<<j)]);
-					dp[i][mask] = max(dp[i][mask], dp[i-1][mask^(1<<j)] + s[idx][j]);
+	for (auto &e : a) cin >> e;
+	for (auto &v : s) for (auto &e : v) cin >> e;
+	vi ind(n);
+	iota(all(ind), 0), sort(all(ind), [&](int i, int j){
+		return a[i] > a[j];
+	});
+	vector<vl> dp(2, vl(1 << p, -LINF));
+	int previous = 1, current = 0;
+	dp[previous][0] = 0;
+	F0R(i, n) {
+		F0R(mask, 1 << p) dp[current][mask] = dp[previous][mask];
+		F0R(mask, 1 << p) {
+			int cnt = __builtin_popcount(mask);
+			if (cnt > i + 1) continue;
+			if (cnt + k >= i + 1) ckmax(dp[current][mask], dp[previous][mask] + a[ind[i]]);
+			F0R(j, p) {
+				if (mask & (1 << j)) {
+					ckmax(dp[current][mask], dp[previous][mask - (1 << j)] + s[ind[i]][j]);
 				}
 			}
 		}
+		swap(previous, current);
 	}
-	cout << dp[n][(1<<p)-1]<<"\n";
+	cout << *max_element(all(dp[previous])) << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    solve();
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

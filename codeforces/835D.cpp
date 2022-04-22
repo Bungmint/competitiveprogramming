@@ -1,27 +1,54 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+// Problem: D. Palindromic characteristics
+// Contest: Codeforces - Codeforces Round #427 (Div. 2)
+// URL: https://codeforces.com/contest/835/problem/D
+// Memory Limit: 256 MB
+// Time Limit: 3000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -49,31 +76,34 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
 /**
  * Description: modular arithmetic operations 
  * Source: 
@@ -92,12 +122,17 @@ template<int MOD, int RT> struct mint {
 	mint() { v = 0; }
 	mint(ll _v) { v = int((-MOD < _v && _v < MOD) ? _v : _v % MOD);
 		if (v < 0) v += MOD; }
-	friend bool operator==(const mint& a, const mint& b) { 
-		return a.v == b.v; }
+	bool operator==(const mint& o) const{
+		return v == o.v; }
 	friend bool operator!=(const mint& a, const mint& b) { 
 		return !(a == b); }
 	friend bool operator<(const mint& a, const mint& b) { 
 		return a.v < b.v; }
+	friend istream& operator>>(istream& is, const mint& o){
+		ll v; is >> v; o = mint(v); return is; }
+	friend ostream& operator<<(ostream& os, const mint& o){
+		os << o.v; return os; }
+	
 	mint& operator+=(const mint& m) { 
 		if ((v += m.v) >= MOD) v -= MOD; 
 		return *this; }
@@ -122,88 +157,69 @@ template<int MOD, int RT> struct mint {
 	friend mint operator*(mint a, const mint& b) { return a *= b; }
 	friend mint operator/(mint a, const mint& b) { return a /= b; }
 };
+
 using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
 
-ostream &operator<<(ostream &os, Mint x){
-	os << x.v;
-	return os;
-}
-
-const int N = 5011, B = 37;
-Mint p[N], inverse[N],hsh[N], rev_hsh[N];
-Mint hshed[N][N];
-int n;
-int k_pal[N][N];
-int cnt[30];
-
-void precalc()
-{
-	p[0] = 1;
-    for (int i=1;i<N;++i){
-    	p[i]=p[i-1]*B;
-    }
-    inverse[0] = 1;
-    inverse[1] = inv((Mint)B);
-    for (int i=2;i<N;++i){
-    	inverse[i] = inverse[i-1]*inverse[1];
-    }
-}
-
-void go(int k){
-	if (k==1){
-		for (int i=1;i<=n;++i){
-			for (int j=i;j<=n;++j){
-				hshed[i][j] = (hsh[j]-hsh[i-1])*inverse[i-1];
-				if (hshed[i][j]==(rev_hsh[i]-rev_hsh[j+1])*inverse[n-j]){
-					k_pal[i][j] = k;
-					cnt[k]++;
-				}
-			}
-		}
-	}else{
-		for (int i=1;i<=n;++i){
-			for (int j=i+1;j<=n;++j){
-				int t = (j-i+1)/2;
-				
-				if (hshed[i][i+t-1]!= hshed[j-t+1][j]) continue;
-				dbg();
-				if (k_pal[i][i+t-1]>=k-1&&k_pal[j-t+1][j]>=k-1){
-					k_pal[i][j] = k;
-					cnt[k]++;
-				}
-			}
-		}
+inline namespace Hash{
+	const int N = 5e3;
+	const Mint B = 9973;
+	Mint hsh[N + 2], hshs[N + 2];
+	Mint pow[N + 1];
+	void precalc() {
+		pow[0] = 1;
+		FOR(i, 1, N + 1) pow[i] = pow[i - 1] * B;
+	}
+	void hashString(string &s) {
+		int n = sz(s);
+		precalc();
+		F0R(i, n) hsh[i + 1] = hsh[i] * B + s[i];
+		R0F(i, n) hshs[i + 1] = hshs[i + 2] * B + s[i];
+	}
+	Mint rangeHash(int i, int j) {
+		dbg(i, j, hsh[j + 1] - hsh[i] * pow[j - i + 1]);	
+		return hsh[j + 1] - hsh[i] * pow[j - i + 1];
+	}
+	bool isPal(int i, int j) {
+		return rangeHash(i, j) == (hshs[i + 1] - hshs[j + 2] * pow[j - i + 1]);
 	}
 }
+
 
 void solve()
 {
 	string s;
 	cin >> s;
-	n = sz(s);
-	dbg(n);
-	for (int i=1;i<=n;++i){
-		hsh[i] = hsh[i-1] + p[i-1]*(s[i-1]-'a'+1);
+	int n = sz(s);
+	hashString(s);
+	vi ans(n + 2);
+	ans[0] = n;
+	ans[2] = -n;
+	vector<vi> dp(n, vi(n, 1));
+	FOR(len, 2, 1 + n) {
+		F0R(l, n - len + 1) {
+			int r = l + len - 1;
+			int half = len / 2;
+			if (!isPal(l, r)) {
+				dp[l][r] = 0;
+			}else if (rangeHash(l, l + half - 1) == rangeHash(r - half + 1, r)) {
+				dp[l][r] = 1 + dp[l][l + half - 1];
+			}
+			ans[dp[l][r] + 1]--;
+			ans[0]++;
+		}
 	}
-	for (int i=n;i>=1;i--){
-		rev_hsh[i] = rev_hsh[i+1] + p[n-i]*(s[i-1]-'a'+1);
-	}
-	for (int k=1;k<30;++k){
-		go(k);
-		
-		if (!cnt[k]) break;
-	}
-	for (int i=1;i<=n;++i){
-		if (i<30){
-			cout << cnt[i]<<" ";
-		}else cout << 0 << " ";
-	}
+	FOR(i, 1, n + 2) ans[i] += ans[i - 1];
+	FOR(i, 1, n + 1) cout << ans[i] << " ";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    precalc();
-    solve();
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    // cin >> testcase;
+    while (testcase--)
+    {
+        solve();
+    }
 }

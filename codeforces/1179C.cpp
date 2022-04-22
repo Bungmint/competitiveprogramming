@@ -6,28 +6,35 @@
 // 
 // Powered by CP Editor (https://cpeditor.org)
 
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
 #define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
 const int INF = 1e9;
 const ll LINF = 1e18;
@@ -69,155 +76,173 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct chash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
 
-const int MX = 1<<20;
 
-struct LazySegTree{
-	const ll seg_initial = 0;
-	const ll seg_lazy_sentinel = 0;
-	const ll NEUTRAL = 0;
-	ll sz;
-	vl t,lazy;
-	
-	
-	// Change the inline function accordingly to the q
-	inline ll merge(ll a, ll b){
-		return max(a,b);
-	}
-	inline ll lazy_apply(ll lazy_val, ll new_val){
-		return lazy_val+new_val;
-	}
-	inline ll lazy_func(ll cur_val, ll lazy_val, ll l, ll r){
-		return cur_val + lazy_val;
-	}
-	
-	
-	void init(int n){
+
+template<typename T, typename Merge = plus<T>>
+struct SegTree{
+	int sz;
+	const Merge merge;
+	vector<T> t;
+	SegTree(int n) : merge(Merge()) {
 		sz = 1;
-		while(sz<n) sz*=2;
-		t.assign(2*sz, seg_initial);
-		lazy.assign(2*sz, seg_lazy_sentinel);
+		while (sz<n) sz*=2;
+		t.resize(sz*2);
 	}
-	void seg_eval_lazy(int i, ll l, ll r)
+	void build(int vec[], int n, int x, int l, int r)
 	{
-	    if (lazy[i] == seg_lazy_sentinel)
-	        return;
-	
-	    t[i] = lazy_func(t[i], lazy[i], l, r);
-	
-	    if (r-l>1)
+	    if (r - l == 1)
 	    {
-	        lazy[i * 2 + 1] = lazy_apply(lazy[i * 2 + 1], lazy[i]);
-	       	lazy[i * 2 + 2] = lazy_apply(lazy[i * 2 + 2], lazy[i]);
+	        if (l < n)
+	            t[x] = T(vec[l]);
+	        return;
 	    }
-	
-	    lazy[i] = seg_lazy_sentinel;
+	    int mid = (l + r) / 2;
+	    build(vec, n, 2 * x + 1, l, mid);
+	    build(vec, n, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
 	}
-	ll upd(int x, int l, int r, int lx, int rx, int v)
+	void build(int vec[], int n)
 	{
-		seg_eval_lazy(x, lx, rx);
-		if (lx>=r||rx<=l) return t[x];
-		if (lx>=l&&rx<=r){
-			lazy[x] = lazy_apply(lazy[x],v);
-			seg_eval_lazy(x, lx ,rx);
-			dbg(t[x], x, lx, rx);
-			if (rx-lx>1)dbg(t[2*x+2], lazy[2*x+2]);
-			return t[x];
-		}
-		if (rx-lx==1) return t[x];
-	    
+	    build(vec, n, 0, 0, sz);
+	}
+	void upd(int i, const T& v, int x, int l, int r)
+	{
+	    if (r - l == 1)
+	    {
+	        t[x] = v;
+	        return;
+	    }
+	    int mid = (l + r) / 2;
+	    if (i < mid)
+	        upd(i, v, 2 * x + 1, l, mid);
+	    else
+	        upd(i, v, 2 * x + 2, mid, r);
+	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
+	}
+	void upd(int i, const T& v)
+	{
+	    upd(i, v, 0, 0, sz);
+	}
+	int query(int x, int lx, int rx, int cumneg)
+	{
+	    if (t[x].pos <= cumneg) return -1;
+	    if (rx - lx == 1) return lx;
 	    int mid = (lx + rx) / 2;
-	    ll a = upd(2*x+1, l, r, lx, mid, v);
-	    ll b = upd(2*x+2, l, r, mid, rx, v);
-	   	return t[x] = merge(a, b);
+	   	if (t[2 * x + 2].pos > cumneg) return query(2 * x + 2, mid, rx, cumneg);
+	   	else return query(2 * x + 1, lx, mid, cumneg - t[2 * x + 2].pos + t[2 * x + 2].neg);
 	}
-	void upd(int l, int r, int v)
+	int query()
 	{
-	    upd(0, l, r, 0, sz, v);
-	}
-	ll query(int x, int lx, int rx)
-	{
-	   	if (rx-lx==1) return lx;
-	    int mid = (lx + rx) >>1;
-	    seg_eval_lazy(x, lx, rx);
-		seg_eval_lazy(2*x+1, lx, mid);
-		seg_eval_lazy(2*x+2, mid, rx);
-	    if (t[2*x+2]>0) return query(2*x+2, mid, rx);
-	    return query(2*x+1, lx, mid);
-	}
-	ll query()
-	{
-		if (t[0]<=0) return -1;
-	    return query(0, 0, sz);
+	    return query(0, 0, sz, 0);
 	}
 };
+
+const int N = 3e5 + 100;
+vi tmp;
+int c[3 * N];
+int getComp(int x) {
+	return lb(all(tmp), x) - begin(tmp);
+}
+
+struct Node {
+	int pos, neg;
+	Node(int x = 0) {
+		pos = neg = 0;
+		if (x > 0) pos = x;
+		else neg = -x;
+	}
+	Node operator+ (const Node& other) const {
+		Node res{};
+		res.pos = other.pos;
+		res.neg = neg;
+		if (pos > other.neg) res.pos += pos - other.neg;
+		else res.neg += other.neg - pos;
+		return res;
+	}
+};
+
 
 void solve()
 {
-	int n, m;
-	scanf("%d%d",&n, &m);
+	int n, m, q;
+	cin >> n >> m;
 	vi a(n), b(m);
-	LazySegTree st;
-	st.init(MX);
-	vi order;
-	for (int i=0;i<n;++i) scanf("%d", &a[i]),order.pb(a[i]);
-	for (int i=0;i<m;++i) scanf("%d", &b[i]), order.pb(b[i]);
-	
-	
-	int q;
-	scanf("%d", &q);
-	vector<ar<int,3>> Q(q);
-	for(int i=0;i<q;++i){
-		int t, id, x;
-		scanf("%d%d%d", &t, &id, &x);
-		id--;
-		Q[i] = {t, id, x};
-		order.pb(x);
+	for (auto &e : a) cin >> e, tmp.pb(e);
+	for (auto &e : b) cin >> e, tmp.pb(e);
+	cin >> q;
+	vector<ar<int, 3>> query(q);
+	for (auto &[t, i, x] : query) cin >> t >> i >> x, i--, tmp.pb(x);
+	sort(all(tmp)), tmp.resize(unique(all(tmp)) - tmp.begin());
+	dbg(tmp);
+	SegTree<Node> st(sz(tmp));
+	for (auto &e : a) {
+		e = getComp(e);
+		c[e]++;
+		dbg(e, c[e]);
 	}
-	sort(all(order)), order.resize(unique(all(order))-order.begin());
-	dbg(order);
-	for (int i=0;i<n;++i) a[i] = lb(all(order), a[i])-order.begin(), st.upd(0, a[i]+1, 1);
-	for (int i=0;i<m;++i) b[i] = lb(all(order), b[i])-order.begin(), st.upd(0, b[i]+1, -1);
-	dbg(st.query());
-	for (int i=0;i<q;++i) Q[i][2] = lb(all(order), Q[i][2])-order.begin();
-	for (int i=0;i<q;++i){
-		auto [t, id, x] = Q[i];
-		if (t==1) st.upd(0, a[id]+1, -1), st.upd(0, x+1, 1), a[id] = x;
-		else st.upd(0, b[id]+1, 1), st.upd(0, x+1, -1), b[id] = x;
-		int k = st.query();
-		cout << (k==-1? k:order[k])<<"\n";
+	for (auto &e : b) {
+		e = getComp(e);
+		c[e]--;
+	}
+	st.build(c, sz(tmp));
+	for (auto &[t, i, x] : query) {
+		x = getComp(x);
+		if (t == 1) {
+			dbg(a[i], x, c[a[i]]);
+			c[a[i]]--;
+			Node r = Node(c[a[i]]);
+			dbg(r.pos, r.neg);
+			st.upd(a[i], r);
+			a[i] = x;
+			c[a[i]]++;
+			r = Node(c[a[i]]);
+			st.upd(a[i], r);
+		}else{
+			c[b[i]]++;
+			Node r = Node(c[b[i]]);
+			st.upd(b[i], r);
+			b[i] = x;
+			c[b[i]]--;
+			r = Node(c[b[i]]);
+			st.upd(b[i], r);
+		}
+		int z = st.query();
+		cout << (z == -1 ? z : tmp[z]) << '\n';
 	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)

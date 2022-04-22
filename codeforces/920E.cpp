@@ -110,37 +110,43 @@ void solve()
 	int n, m;
 	cin >> n >> m;
 	vector<vi> g(n);
-	for (int i=0;i<m;++i){
+	vi remaining(n);
+	vector<bool> vis(n), impossible(n);
+	iota(all(remaining), 0);
+	REP(m){
 		int u, v;
-		cin >> u >> v; u--, v--;
+		cin >> u >> v;
+		u--, v--;
 		g[u].pb(v), g[v].pb(u);
 	}
-	vi vis(n), unvisited(n), impossible(n), ans;
-	iota(all(unvisited), 0);
-	for (int i=0;i<n;++i){
-		if (vis[i]) continue;
-		vis[i] = 1;
-		int SZ = 1;
-		queue<int> q; q.push(i);
-		while(sz(q)){
-			int u = q.front(); q.pop();
-			vi remain;
-			for (auto &e: g[u]) if (!vis[e]) remain.pb(e), impossible[e] = 1;
-			for (auto &e: unvisited){
-				if (e==u) continue;
-				if (impossible[e]) continue;
-				vis[e] = 1;
-				SZ++;
-				q.push(e);
+	int cc = 0;
+	vi ans;
+	F0R(i, n){
+		if (!vis[i]){
+			cc++;
+			int cnt = 1;
+			queue<int> q;
+			q.push(i);
+			vis[i] = 1;
+			while(sz(q)){
+				int v=q.front(); q.pop();
+				vi todo;
+				dbg(i, v);
+				for(auto&e:g[v]) if (!vis[e]) impossible[e] = 1, todo.pb(e);
+				for (auto&e:remaining) if (!impossible[e]&&e!=v){
+					vis[e] = 1;
+					q.push(e);
+					cnt ++ ;
+				}
+				for (auto&e:todo) impossible[e] = 0;
+				remaining = move(todo);
 			}
-			for (auto &v : remain) impossible[v] = 0;
-			unvisited = move(remain);
+			ans.pb(cnt);
 		}
-		ans.pb(SZ);
 	}
+	cout << cc<<endl;
 	sort(all(ans));
-	cout << sz(ans)<<"\n";
-	for (auto x:ans)cout << x << " ";
+	for (auto&e:ans)cout << e << " ";
 }
 
 int main()

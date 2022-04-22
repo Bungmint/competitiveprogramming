@@ -1,14 +1,25 @@
+// Problem: E. Cover it!
+// Contest: Codeforces - Codeforces Round #565 (Div. 3)
+// URL: https://codeforces.com/problemset/problem/1176/E
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
+
+//Copyright © 2021 Youngmin Park. All rights reserved.
 #pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
 
 #define all(v) (v).begin(), (v).end()
 #define ar array
@@ -17,9 +28,26 @@ using vl = vector<ll>;
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -47,10 +75,10 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
+struct chash
 {
     static uint64_t splitmix64(uint64_t x)
     {
@@ -65,63 +93,52 @@ struct custom_hash
         static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
         return splitmix64(x + FIXED_RANDOM);
     }
+    size_t operator()(pair<uint64_t,uint64_t> x) const {
+		static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+		return splitmix64(x.first + FIXED_RANDOM)^(splitmix64(x.second + FIXED_RANDOM) >> 1);
+	}
 };
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353
-const int N = 2e5+1;
-int c[N];
-vi G[N];
-
-void dfs(int V){
-	for (int e:G[V]){
-		if (c[e]!=-1) continue;
-		c[e] = c[V]^1;
-		dfs(e);
-	}
+void setIO(string s)
+{
+    freopen((s + ".in").c_str(), "r", stdin);
+    freopen((s + ".out").c_str(), "w", stdout);
 }
 
-
+void dfs(int u, vector<vi>&g, vector<bool>&vis, vector<bool>&col){
+	vis[u] = 1;
+	for (auto&v:g[u]){
+		if (!vis[v]){
+			col[v] = (col[u]^1);
+			dfs(v,g,vis,col);
+		}
+	}
+}
 
 void solve()
 {
 	int n, m;
 	cin >> n >> m;
-	for (int i=0;i<=n;++i){
-		G[i].clear();
-		c[i] = -1;
-	}
-	for (int i=0;i<m;++i){
-		int u, v;
+	vector<vi> g(n);
+	vector<bool> vis(n), col(n);
+	REP(m){
+		int u,v;
 		cin >> u >> v;
-		G[u].pb(v);
-		G[v].pb(u);
+		u--, v--;
+		g[u].pb(v), g[v].pb(u);
 	}
-	c[1] = 0;
-	dfs(1);
-	vi zr, one, ans;
-	for (int i=1;i<=n;++i){
-		if (c[i]) one.pb(i);
-		else zr.pb(i);
-	}
-	if (sz(zr)>sz(one)){
-		ans = one;
-	}else{
-		ans = zr;
-	}
-	cout << sz(ans) << "\n";
-	for (int x: ans ) cout << x <<" ";
+	dfs(0, g, vis, col);
+	int mi = (count(all(col), 0)*2<=n? 0:1);
+	cout << count(all(col), mi) << "\n";
+	F0R(i, n) if (col[i]==mi) cout << i+1 << " ";
 	cout << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    int testcase;
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
     cin >> testcase;
     while (testcase--)
     {

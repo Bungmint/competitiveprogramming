@@ -1,88 +1,147 @@
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
-#include <bits/stdc++.h>
+// Problem: D. GCD and MST
+// Contest: Codeforces - Divide by Zero 2021 and Codeforces Round #714 (Div. 2)
+// URL: https://codeforces.com/problemset/problem/1513/D
+// Memory Limit: 256 MB
+// Time Limit: 2000 ms
+// 
+// Powered by CP Editor (https://cpeditor.org)
 
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
+#include <bits/stdc++.h>
 using namespace std;
 
-#define all(v) (v).begin(), (v).end()
-#define ar array
 using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
+
+#define all(v) (v).begin(), (v).end()
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
+
 const int INF = 1e9;
-const ll LINF = 1e15;
-const int MOD = 1e9 + 7;
-const int MAX = 2e5 + 10;
-vector<int> adj[MAX];
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+    return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+    os << '{';
+    string sep;
+    for (const T &x : v)
+        os << sep << x, sep = ", ";
+    return os << '}';
+}
+void dbg_out()
+{
+    cerr << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+    cerr << ' ' << H;
+    dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+void setIO(string s) // USACO
+{
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
+}
 
 void solve()
 {
-    int n, p;
-    cin >> n >> p;
-    vector<pair<int, int>> arr(n);
-    vector<int> a(n);
-    vector<bool> is_connected(n);
-    for (int i = 0; i < n; i++)
-    {
-        cin >> arr[i].first;
-        a[i] = arr[i].first;
-        arr[i].second = i;
-    }
-    sort(all(arr));
-    int i = 0;
-    ll ans = 0;
-    while (i < n)
-    {
-        int cur_val = arr[i].first;
-        int cur_idx = arr[i].second;
-        if (cur_val >= p)
-            break;
-        while (cur_idx > 0)
-        {
-            if (is_connected[cur_idx - 1])
-                break;
-            if (a[cur_idx - 1] % cur_val == 0)
-            {
-                is_connected[cur_idx - 1] = true;
-                ans += cur_val;
-                cur_idx--;
-            }
-            else
-            {
-                break;
-            }
-        }
-        cur_idx = arr[i].second;
-        while (cur_idx < n - 1)
-        {
-            if (is_connected[cur_idx])
-                break;
-            if (a[cur_idx + 1] % cur_val == 0)
-            {
-                is_connected[cur_idx] = true;
-                ans += cur_val;
-                cur_idx++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        i++;
-    }
-    for (int i = 0; i < n - 1; i++)
-    {
-        if (!is_connected[i])
-            ans += p;
-    }
-    cout << ans << "\n";
+	int n, p;
+	cin >> n >> p;
+	vi a(n);
+	vi ind(n);
+	vector<bool> connected(n - 1);
+	for (auto &e : a) cin >> e;
+	iota(all(ind), 0);
+	sort(all(ind), [&](int i, int j) {
+		return a[i] < a[j];
+	});
+	ll ans = 0;
+	for (auto &id : ind) {
+		if (a[id] >= p) break;
+		int r = id, l = id;
+		while (r + 1 < n && !connected[r] && a[r + 1] % a[id] == 0) {
+			connected[r] = 1;
+			ans += a[id];
+			r++;
+		}
+		while (l && !connected[l - 1] && a[l - 1] % a[id] == 0) {
+			connected[l - 1] = 1;
+			ans += a[id];
+			l--;
+		}
+	}
+	ans += 1LL * count(all(connected), 0) * p;
+	cout << ans << "\n";
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
-    int t;
-    cin >> t;
-    while (t--)
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
+    int testcase=1;
+    cin >> testcase;
+    while (testcase--)
     {
         solve();
     }

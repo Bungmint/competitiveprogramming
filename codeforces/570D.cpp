@@ -6,30 +6,49 @@
 // 
 // Powered by CP Editor (https://cpeditor.org)
 
-#pragma GCC optimize("O3")
-#pragma GCC target("sse4")
+//Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using pi = pair<int, int>;
-using vpi = vector<pair<int, int>>;
-using pl = pair<ll, ll>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
 using vl = vector<ll>;
-using vpl = vector<pl>;
+using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
 
 #define all(v) (v).begin(), (v).end()
-#define ar array
 #define pb push_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
 #define lb lower_bound
+#define ub upper_bound
+#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
+#define F0R(i, a) FOR(i, 0, a)
+#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
+#define R0F(i, a) ROF(i, 0, a)
+#define REP(a) F0R(_, a)
 
+const int INF = 1e9;
+const ll LINF = 1e18;
+const int MOD = 1e9 + 7; //998244353;
+const ld PI = acos((ld)-1.0);
+const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
 using pqg = priority_queue<T, vector<T>, greater<T>>;
+template <typename T>
+bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
@@ -57,83 +76,81 @@ void dbg_out(Head H, Tail... T)
 #ifdef LOCAL
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
-#define dbg(...)
+#define dbg(...) 42
 #endif
 
-struct custom_hash
-{
-    static uint64_t splitmix64(uint64_t x)
-    {
-        x += 0x9e3779b97f4a7c15;
-        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-        return x ^ (x >> 31);
-    }
-
-    size_t operator()(uint64_t x) const
-    {
-        static const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-        return splitmix64(x + FIXED_RANDOM);
-    }
+inline namespace RecursiveLambda{
+	template <typename Fun>
+	struct y_combinator_result{
+		Fun fun_;
+		template <typename T> 
+		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
+		template <typename...Args>
+		decltype(auto) operator()(Args &&...args){
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun){
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
 };
 
-void setIO(string s)
+void setIO(string s) // USACO
 {
-    freopen((s + ".in").c_str(), "r", stdin);
-    freopen((s + ".out").c_str(), "w", stdout);
+	#ifndef LOCAL
+	    freopen((s + ".in").c_str(), "r", stdin);
+	    freopen((s + ".out").c_str(), "w", stdout);
+	#endif
 }
-
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
-const int N = 5e5+1;
-vi g[N];
-char c[N];
-vpi queries[N];
-int depth[N], st[N], ft[N], ver[N], subtree[N], timer = 0, h[N][26];
-bool ans[N];
-
-void dfsSubtree(int v, int pv){
-	st[v] = timer++;
-	ver[st[v]] = v;
-	subtree[v] = 1;
-	for (int e:g[v]){
-		if (e!=pv){depth[e]=depth[v]+1;dfsSubtree(e,v);subtree[v]+=subtree[e];}
-	}
-	ft[v] = timer;
-}
-
-void dfs(int v, int pv, bool keep){
-	int bigChild = -1, mx = 0;
-	for (int e:g[v]){
-		if (e!=pv&&mx<subtree[e]) mx = subtree[e], bigChild = e;
-	}
-	for (int e:g[v]){
-		if (e!=pv&&e!=bigChild) dfs(e,v, 0);
-	}
-	if (bigChild!=-1) dfs(bigChild, v, 1);
-	for (int e:g[v]){
-		if (e!=pv&&e!=bigChild){
-			for (int j=st[e];j<ft[e];++j){
-				h[depth[ver[j]]][c[ver[j]]-'a']++;
-			}
+const int N = 5e5;
+int cnt[N][26], sub[N], depth[N];
+bitset<N> ans{};
+vi adj[N];
+vpi query[N];
+vi v[N];
+string s;
+void init(int u, int pu) {
+	sub[u] = 1;
+	for (auto &e : adj[u]) {
+		if (e != pu) {
+			depth[e] = depth[u] + 1;
+			init(e, u);
+			sub[u] += sub[e];
 		}
 	}
-	h[depth[v]][c[v]-'a']++;
-	for (auto [height, id]:queries[v]){
-		int odd = 0;
-		for (int x=0;x<26;++x){
-			if (h[height][x]&1){
-				odd++; 
-			}
-		}
-		ans[id] = (odd<=1);
+}
+void dfs(int u, int pu, bool keep) {
+	int mx = 0, big = -1;
+	for (auto &e : adj[u]) {
+		if (e == pu) continue;
+		if (ckmax(mx, sub[e])) big = e;
 	}
-	if (!keep){
-		for (int j=st[v];j<ft[v];++j){
-			h[depth[ver[j]]][c[ver[j]]-'a']--;
+	for (auto &e : adj[u]) {
+		if (e != pu && e != big) dfs(e, u, 0);
+	}
+	if (big != -1) {
+		dfs(big, u, 1);
+		v[u].swap(v[big]);
+	}
+	v[u].pb(u);
+	cnt[depth[u]][s[u] - 'a']++;
+	for (auto &e : adj[u]) {
+		if (e == pu || e == big) continue;
+		for (auto &vv : v[e]) {
+			v[u].pb(vv);
+			cnt[depth[vv]][s[vv] - 'a']++;
+		}
+		v[e].clear();
+	}
+	for (auto &[h, id] : query[u]) {
+		ans[id] = (count_if(cnt[h], cnt[h] + 26, [&](int x) {
+			return (x & 1);
+		}) <= 1);
+	}
+	if (!keep) {
+		for (auto &e : v[u]) {
+			cnt[depth[e]][s[e] - 'a']--;
 		}
 	}
 }
@@ -142,23 +159,26 @@ void solve()
 {
 	int n, m;
 	cin >> n >> m;
-	depth[1] = 1;
-	for (int i=2;i<=n;++i){int t;cin >> t;g[t].pb(i), g[i].pb(t);}
-	for (int i=1;i<=n;++i)cin>>c[i];
-	for (int i=0;i<m;++i){
-		int v, h;
-		cin >> v >> h;
-		queries[v].pb({h,i});
+	FOR(i, 1, n) {
+		int p; cin >> p, --p;
+		adj[i].pb(p), adj[p].pb(i);
 	}
-	dfsSubtree(1,0);
-	dfs(1,0,0);
-	for (int i=0;i<m;++i) cout << (ans[i]? "Yes":"No")<< "\n";
+	cin >> s;
+	F0R(i, m) {
+		int vv, h;
+		cin >> vv >> h;
+		vv--, h--;
+		query[vv].pb({h, i});
+	}
+	init(0, -1);
+	dfs(0, -1, 0);
+	F0R(i, m) cout << (ans[i] ? "Yes" : "No") << '\n';
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    cin.tie(0)->sync_with_stdio(0);
+    cin.exceptions(cin.failbit);
     int testcase=1;
     // cin >> testcase;
     while (testcase--)
