@@ -1,166 +1,213 @@
+// Copyright © 2022 Youngmin Park. All rights reserved.
+//#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
 
 using ll = long long;
 using vi = vector<int>;
-using vl = vector<ll>;
 using pii = pair<int, int>;
-using pll = pair<ll, ll>;
 using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
 using vpl = vector<pll>;
 using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
 
+#define all(v) (v).begin(), (v).end()
+#define pb push_back
 #define sz(x) (int)(x).size()
-#define all(x) (x).begin(), (x).end()
 #define fi first
 #define se second
-#define pb push_back
 #define lb lower_bound
 #define ub upper_bound
-#define FOR(i, a, b) for (int i = (a); i < (b); i++)
-#define F0R(i, b) FOR(i, 0, b)
-#define REP(a) F0R(_, a)
-#define ROF(i, a, b) for (int i = (b) - 1; i >= (a); i--)
-#define R0F(i, b) ROF(i, 0, b)
 
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7;
-template <typename T> 
-bool ckmax(T& a, const T& b) {return b > a ? a = b, 1 : 0;}
+constexpr int INF = 1e9;
+constexpr ll LINF = 1e18;
+const ld PI = acos((ld)-1.0);
+constexpr int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
-bool ckmin(T& a, const T& b) {return b < a ? a = b, 1 : 0;}
-
+constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
 
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
-    return os << '(' << p.first << ", " << p.second << ')';
+	return os << '(' << p.first << ", " << p.second << ')';
 }
 template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v)
 {
-    os << '{';
-    string sep;
-    for (const T &x : v)
-        os << sep << x, sep = ", ";
-    return os << '}';
+	os << '{';
+	string sep;
+	for (const T &x : v)
+		os << sep << x, sep = ", ";
+	return os << '}';
 }
-void dbg_out() {
-	cerr << endl;
+template <typename T>
+ostream &operator<<(ostream &os, const deque<T> &v) {
+	os << vector<T>(all(v));
+	return os;
+}
+template <typename T, typename S, typename C>
+ostream &operator<<(ostream &os, priority_queue<T, S, C> pq) {
+	vector<T> v;
+	while (sz(pq)) {
+		v.pb(pq.top());
+		pq.pop();
+	}
+	os << v;
+	return os;
+}
+void dbg_out()
+{
+	cerr << "\033[0m" << endl;
 }
 template <typename Head, typename... Tail>
-void dbg_out(Head H, Tail... T) {
+void dbg_out(Head H, Tail... T)
+{
 	cerr << ' ' << H;
 	dbg_out(T...);
 }
 #ifdef LOCAL
-#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__);
+#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...) 42
 #endif
 
-inline namespace RecursiveLambda{
+inline namespace RecursiveLambda
+{
 	template <typename Fun>
-	struct y_combinator_result{
+	struct y_combinator_result
+	{
 		Fun fun_;
-		template <typename T> 
-		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
-		template <typename...Args>
-		decltype(auto) operator()(Args &&...args){
+		template <typename T>
+		explicit y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
+		template <typename... Args>
+		decltype(auto) operator()(Args &&...args)
+		{
 			return fun_(ref(*this), forward<Args>(args)...);
 		}
 	};
 	template <typename Fun>
-	decltype(auto) y_combinator(Fun &&fun){
+	decltype(auto) y_combinator(Fun &&fun)
+	{
 		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-void setIO() {
-	cin.tie(0) -> sync_with_stdio(0);
-	cin.exceptions(cin.failbit);
-}
+class Range {
+	struct Iter
+	{
+		int iter;
+		constexpr Iter(int it) noexcept : iter(it) {}
+		constexpr void operator++() noexcept { iter++; }
+		constexpr bool operator!=(const Iter &other) const noexcept { return iter != other.iter; }
+		constexpr int operator*() const noexcept { return iter; }
+	};
+	const Iter first, last;
 
-int add(int a, int b) {
+public:
+	explicit constexpr Range(const int f, const int l) noexcept : first(f), last(max(f, l)) {}
+	constexpr Iter begin() const noexcept { return first; }
+	constexpr Iter end() const noexcept { return last; }
+};
+
+constexpr Range rep(const int l, const int r) noexcept { return Range(l, r); }
+constexpr Range rep(const int n) noexcept { return Range(0, n); }
+
+class ReversedRange {
+    struct Iter {
+        int itr;
+        constexpr Iter(const int pos) noexcept : itr(pos) {}
+        constexpr void operator++() noexcept { --itr; }
+        constexpr bool operator!=(const Iter& other) const noexcept { return itr != other.itr; }
+        constexpr int operator*() const noexcept { return itr; }
+    };
+    const Iter first, last;
+ 
+  public:
+    explicit constexpr ReversedRange(const int f, const int l) noexcept
+        : first(l - 1), last(min(f, l) - 1) {}
+    constexpr Iter begin() const noexcept { return first; }
+    constexpr Iter end() const noexcept { return last; }
+};
+ 
+constexpr ReversedRange per(const int l, const int r) noexcept { return ReversedRange(l, r); }
+constexpr ReversedRange per(const int n) noexcept { return ReversedRange(0, n); }
+ 
+constexpr int MOD = 1e9 + 7;
+constexpr int MX = 2001;
+int dp[MX][MX][2];
+
+void add(int& a, const int &b) {
 	a += b;
 	if (a >= MOD) a -= MOD;
-	return a;
 }
-int sub(int a, int b) {
-	a -= b;
-	if (a < 0) a += MOD;
-	return a;
-}
-int mul(int a, int b) {
-	return 1LL * a * b % MOD;
-}
-int binPow(int a, int b) {
-	int res = 1;
-	while (b) {
-		if (b & 1) res = 1LL * res * a % MOD;
-		a = 1LL * a * a % MOD;
-		b >>= 1;
+
+void read(string& a) {
+	string _s;
+	cin >> _s;
+	for (auto &ch : _s) {
+		if (ch == '1') continue;
+		if (ch == '0') a.clear();
+		if (ch != '+') ch = '2';
+		a += ch;
 	}
-	return res;
 }
 
-const int MN = 2000;
-int c[MN + 1][MN + 1];
-
-void precalc() {
-	F0R(i, MN + 1) {
-		c[i][i] = c[i][0] = 1;
-		FOR(j, 1, i) {
-			c[i][j] = add(c[i - 1][j - 1], c[i - 1][j]);
+void solve()
+{
+	int n;
+	cin >> n;
+	string s, t;
+	read(s), read(t);
+	for (int i : rep(sz(s) + 1)) {
+		for (int j : rep(sz(t) + 1)) {
+			dp[i][j][0] = dp[i][j][1] = 0;
 		}
 	}
+	dp[0][0][0] = 1;
+	int ans = 0;
+	for (int i : rep(sz(s) + 1)) {
+		for (int j : rep(sz(t) + 1)) {
+			for (int k : {0, 1}) {
+				int v = dp[i][j][k];
+				if (v == 0) continue;
+				if (i == sz(s) && j == sz(t)) {
+					add(ans, v);
+				}else{
+					if (j + 1 <= sz(t)) add(dp[i][j + 1][1], v);
+					if (k == 0) add(dp[i + 1][j][0], v);
+					else{
+						assert(j > 0);
+						if (i < sz(s) && s[i] != t[j - 1]) {
+							add(dp[i + 1][j][0], v);
+						}
+					}
+				}
+			}
+		}
+	}
+	cout << ans << '\n';
 }
 
-int process(string &s) {
-	vi cnt(10);
-	int var{};
-	int n = sz(s);
-	int dp[n + 1][2]{};
-	for (auto &e : s) {
-		if (e == '+') var++;
-		else cnt[e - '0']++;
-	}
-	int current = 1, previous = 0;
-	F0R(i, cnt[5] + 1) F0R(j, cnt[7] + 1) {
-		dp[i + j + 1] = 
-	}
-	
-	
-	
-	
-	bool isZero = !!cnt[0];
-	if (isZero) {
-		
-	}else{
-
-	}
-}
-
-
-
-void solve() {
-	int N;
-	cin >> N;
-	string bes, els;
-	cin >> bes >> els;
-	// Elsie 
-	int x = process(els);
-	int y = process(bes);
-	for (auto &e : els) if (e == '0') y = 1;
-	cout << mul(x, y) << "\n";
-}
-int main() {
-	setIO();
-	int tc;
-	cin >> tc;
-	precalc();
-	while (tc--) {
+int main()
+{
+	cin.tie(0)->sync_with_stdio(0);
+	cin.exceptions(cin.failbit);
+	int testcase = 1;
+	cin >> testcase;
+	while (testcase--)
+	{
 		solve();
 	}
+#ifdef LOCAL
+	cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
+#endif
 }

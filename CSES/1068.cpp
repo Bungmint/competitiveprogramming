@@ -60,6 +60,7 @@ void solve(){
 		else n/=2;
 	}
 	for (auto&e:a) cout << e << " ";
+	cout << '\n';
 }
 
 int main(){

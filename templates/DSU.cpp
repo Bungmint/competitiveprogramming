@@ -2,7 +2,7 @@
 struct DSU {
 	vector<int> e;
 	vector<int> mem;
-	vector<pair<pii,pii>> ev;
+	vector<pair<pii, pii>> ev;
 	DSU(int N) { e = vector<int>(N, -1); }
 
 	// get representive component (uses path compression)

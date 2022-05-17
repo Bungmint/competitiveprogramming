@@ -1,12 +1,4 @@
-// Problem: Problem 1. Balanced Photo
-// Contest: USACO - USACO 2017 January Contest, Gold
-// URL: http://www.usaco.org/index.php?page=viewproblem2&cpid=693
-// Memory Limit: 256 MB
-// Time Limit: 4000 ms
-// 
-// Powered by CP Editor (https://cpeditor.org)
-
-//Copyright © 2022 Youngmin Park. All rights reserved.
+// Copyright © 2022 Youngmin Park. All rights reserved.
 //#pragma GCC optimize("O3")
 //#pragma GCC target("avx2")
 #include <bits/stdc++.h>
@@ -22,6 +14,8 @@ using vpl = vector<pll>;
 using ld = long double;
 template <typename T, size_t SZ>
 using ar = array<T, SZ>;
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
 
 #define all(v) (v).begin(), (v).end()
 #define pb push_back
@@ -30,152 +24,202 @@ using ar = array<T, SZ>;
 #define se second
 #define lb lower_bound
 #define ub upper_bound
-#define FOR(i, a, b) for (int i = (a); i < (b); ++i)
-#define F0R(i, a) FOR(i, 0, a)
-#define ROF(i, a, b) for (int i = (b)-1; i >= (a); --i)
-#define R0F(i, a) ROF(i, 0, a)
-#define REP(a) F0R(_, a)
 
-const int INF = 1e9;
-const ll LINF = 1e18;
-const int MOD = 1e9 + 7; //998244353;
+constexpr int INF = 1e9;
+constexpr ll LINF = 1e18;
 const ld PI = acos((ld)-1.0);
-const int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+constexpr int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 template <typename T>
-using pqg = priority_queue<T, vector<T>, greater<T>>;
+constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
 template <typename T>
-bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
-template <typename T>
-bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
 
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p)
 {
-    return os << '(' << p.first << ", " << p.second << ')';
+	return os << '(' << p.first << ", " << p.second << ')';
 }
 template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v)
 {
-    os << '{';
-    string sep;
-    for (const T &x : v)
-        os << sep << x, sep = ", ";
-    return os << '}';
+	os << '{';
+	string sep;
+	for (const T &x : v)
+		os << sep << x, sep = ", ";
+	return os << '}';
 }
 void dbg_out()
 {
-    cerr << endl;
+	cerr << "\033[0m" << endl;
 }
 template <typename Head, typename... Tail>
 void dbg_out(Head H, Tail... T)
 {
-    cerr << ' ' << H;
-    dbg_out(T...);
+	cerr << ' ' << H;
+	dbg_out(T...);
 }
 #ifdef LOCAL
-#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...) 42
 #endif
 
-inline namespace RecursiveLambda{
+inline namespace RecursiveLambda
+{
 	template <typename Fun>
-	struct y_combinator_result{
+	struct y_combinator_result
+	{
 		Fun fun_;
-		template <typename T> 
-		explicit y_combinator_result(T &&fun): fun_(forward<T>(fun)){}
-		template <typename...Args>
-		decltype(auto) operator()(Args &&...args){
+		template <typename T>
+		explicit y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
+		template <typename... Args>
+		decltype(auto) operator()(Args &&...args)
+		{
 			return fun_(ref(*this), forward<Args>(args)...);
 		}
 	};
 	template <typename Fun>
-	decltype(auto) y_combinator(Fun &&fun){
+	decltype(auto) y_combinator(Fun &&fun)
+	{
 		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-void setIO(string s) // USACO
-{
-	#ifndef LOCAL
-	    freopen((s + ".in").c_str(), "r", stdin);
-	    freopen((s + ".out").c_str(), "w", stdout);
-	#endif
-}
+class Range {
+	struct Iter
+	{
+		int iter;
+		constexpr Iter(int it) noexcept : iter(it) {}
+		constexpr void operator++() noexcept { iter++; }
+		constexpr bool operator!=(const Iter &other) const noexcept { return iter != other.iter; }
+		constexpr int operator*() const noexcept { return iter; }
+	};
+	const Iter first, last;
 
-// Uses zero index for the input
-template<typename T>
-struct BIT{
-	int N, lg;
+public:
+	explicit constexpr Range(const int f, const int l) noexcept : first(f), last(max(f, l)) {}
+	constexpr Iter begin() const noexcept { return first; }
+	constexpr Iter end() const noexcept { return last; }
+};
+
+constexpr Range rep(const int l, const int r) noexcept { return Range(l, r); }
+constexpr Range rep(const int n) noexcept { return Range(0, n); }
+
+class ReversedRange {
+    struct Iter {
+        int itr;
+        constexpr Iter(const int pos) noexcept : itr(pos) {}
+        constexpr void operator++() noexcept { --itr; }
+        constexpr bool operator!=(const Iter& other) const noexcept { return itr != other.itr; }
+        constexpr int operator*() const noexcept { return itr; }
+    };
+    const Iter first, last;
+ 
+  public:
+    explicit constexpr ReversedRange(const int f, const int l) noexcept
+        : first(l - 1), last(min(f, l) - 1) {}
+    constexpr Iter begin() const noexcept { return first; }
+    constexpr Iter end() const noexcept { return last; }
+};
+ 
+constexpr ReversedRange per(const int l, const int r) noexcept { return ReversedRange(l, r); }
+constexpr ReversedRange per(const int n) noexcept { return ReversedRange(0, n); }
+ 
+/**
+ * Description: Performs range prefix sum queries and point updates. lower_bound returns the first prefix sum >= v
+ * Source: Own
+ * Verification: http://www.usaco.org/index.php?page=viewproblem2&cpid=693
+ * Time Complexity: O(log n) for query and update
+ * 1-indexing
+ */
+template <typename T>
+struct BIT
+{
+	int N;
 	vector<T> bit;
-	BIT(int n) { bit.resize(n+1); N = n; lg=log2(N);}
-	void upd(int i, T v){ 
-		for (++i; i <= N; i += i & -i) bit[i] += v;	
+	BIT(int n)
+	{
+		bit.resize(n + 1);
+		N = n;
 	}
-	T query(int i){
+	void upd(int id, T v)
+	{
+		for (; id <= N; id += id & -id)
+			bit[id] += v;
+	}
+	T query(int id)
+	{
 		T res = 0;
-		for (++i; i > 0; i -= i & -i) res += bit[i];
+		for (; id > 0; id -= id & -id)
+			res += bit[id];
 		return res;
 	}
-	T range_query(int l, int r) {
+	T rangeQuery(int l, int r)
+	{
 		return query(r) - query(l - 1);
 	}
-	int lower_bound(T v){
-		T sum = 0, id = 0;
-		R0F(i, lg + 1){
-			if (id + (1 << i) <= N && sum + bit[id + (1 << i)] < v){
-				sum += bit[id + (1 << i)];
-				id += (1 << i);
+	T lower_bound(T v)
+	{
+		int id = 0;
+		T sum = 0;
+		int lg = 31 - __builtin_clz(N);
+		for (int j = lg; ~j; j--)
+		{
+			if (id + (1 << j) <= N && sum + bit[id + (1 << j)] < v)
+			{
+				id += (1 << j);
+				sum += bit[id];
 			}
 		}
-		return id; // Zero index
-		// return id+1; // One index
-	}
-	void clear() {
-		fill(all(bit), T(0));
+		return id + 1;
 	}
 };
+
+
 
 void solve()
 {
 	int n;
 	cin >> n;
-	vi a(n), l(n), r(n), ind;
-	for (auto &e : a) cin >> e;
-	ind = a, sort(all(ind)), ind.resize(unique(all(ind)) - begin(ind));
-	auto get = [&](int u) {
-		return lb(all(ind), u) - ind.begin();
-	};
-	for (auto &e : a) e = get(e);
-	BIT<int> bit(sz(ind));
-	F0R(i, n) {
-		l[i] = bit.range_query(a[i] + 1, sz(ind) - 1);
-		bit.upd(a[i], 1);
+	vi a(n), l(n), r(n), tmp;
+	for (auto &e : a) cin >> e, tmp.pb(e);
+	sort(all(tmp)), tmp.resize(unique(all(tmp)) - tmp.begin());
+	BIT<int> bit(sz(tmp)), tib(sz(tmp));
+	int co{};
+	for (auto &e : a) {
+		e = lb(all(tmp), e) - tmp.begin();
+		l[co++] = bit.rangeQuery(e + 2, sz(tmp));
+		bit.upd(e + 1, 1);
 	}
-	bit.clear();
-	R0F(i, n) {
-		r[i] = bit.range_query(a[i] + 1, sz(ind) - 1);
-		bit.upd(a[i], 1);
+	reverse(all(a));
+	for (auto &e : a) {
+		r[--co] = tib.rangeQuery(e + 2, sz(tmp));
+		tib.upd(e + 1, 1);
 	}
+	dbg(l, r);
 	int ans{};
-	F0R(i, n) {
-		if (l[i] > 2 * r[i] || l[i] * 2 < r[i]) {
+	for (auto i : rep(n)) {
+		if (l[i] > 2 * r[i] || 2 * l[i] < r[i]) {
 			ans++;
 		}
 	}
-	cout << ans;
+	cout << ans << '\n';
 }
 
 int main()
 {
-    cin.tie(0)->sync_with_stdio(0);
-    cin.exceptions(cin.failbit);
-    int testcase=1;
-    // cin >> testcase;
-    setIO("bphoto");
-    while (testcase--)
-    {
-        solve();
-    }
+	cin.tie(0)->sync_with_stdio(0);
+	cin.exceptions(cin.failbit);
+	freopen("bphoto.in", "r", stdin);
+	freopen("bphoto.out", "w", stdout);
+	int testcase = 1;
+	// cin >> testcase;
+	while (testcase--)
+	{
+		solve();
+	}
+#ifdef LOCAL
+	cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
+#endif
 }
