@@ -34,10 +34,10 @@ template<int MOD, int RT> struct mint {
 	constexpr mint& operator/=(const mint& m) noexcept { return (*this) *= inv(m); }
 	constexpr friend mint pow(mint a, ll p) noexcept {
 		mint ans = 1; assert(p >= 0);
-		for (; p; p /= 2, a *= a) if (p&1) ans *= a;
+		for (; p; p /= 2, a *= a) if (p & 1) ans *= a;
 		return ans; }
 	constexpr friend mint inv(const mint& a) noexcept { assert(a.v != 0); 
-		return pow(a,MOD-2); }
+		return pow(a, MOD - 2); }
 		
 	constexpr mint operator-() const noexcept { return mint(-v); }
 	constexpr mint& operator++() noexcept { return *this += 1; }
@@ -82,3 +82,4 @@ struct Combination {
 
 using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
 using Combo = Combination<Mint>;
+using vmi = vector<Mint>;

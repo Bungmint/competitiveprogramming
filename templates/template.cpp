@@ -75,7 +75,7 @@ void dbg_out(Head H, Tail... T)
 	dbg_out(T...);
 }
 #ifdef LOCAL
-#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
+#define dbg(...) cerr << "\033[1;35m" << __func__ << ':' << __LINE__ << " (" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...) 42
 #endif
@@ -133,6 +133,7 @@ inline namespace Range {
 
 void solve()
 {
+	
 }
 
 int main()

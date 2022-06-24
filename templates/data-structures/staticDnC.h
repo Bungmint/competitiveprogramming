@@ -4,7 +4,6 @@
  * Source: BenQ
  * Verification: https://www.codechef.com/problems/SEGPROD
  */ 
- 
 template<class T, int SZ> struct RangeQuery {
 	int n;
 	T stor[SZ][32 - __builtin_clz(SZ)], id = 1;

@@ -1,0 +1,264 @@
+// Copyright © 2022 Youngmin Park. All rights reserved.
+#pragma GCC optimize("O3")
+//#pragma GCC target("avx2")
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+using vi = vector<int>;
+using pii = pair<int, int>;
+using vpi = vector<pii>;
+using pll = pair<ll, ll>;
+using vl = vector<ll>;
+using vpl = vector<pll>;
+using ld = long double;
+template <typename T, size_t SZ>
+using ar = array<T, SZ>;
+template <typename T>
+using pqg = priority_queue<T, vector<T>, greater<T>>;
+
+#define all(v) (v).begin(), (v).end()
+#define pb push_back
+#define sz(x) (int)(x).size()
+#define fi first
+#define se second
+#define lb lower_bound
+#define ub upper_bound
+
+constexpr int INF = 1e9;
+constexpr ll LINF = 1e18;
+const ld PI = acos((ld)-1.0);
+constexpr int dx[4] = {1, 0, -1, 0}, dy[4] = {0, 1, 0, -1};
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+template <typename T>
+constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
+template <typename T>
+constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p)
+{
+	return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v)
+{
+	os << '{';
+	string sep;
+	for (const T &x : v)
+		os << sep << x, sep = ", ";
+	return os << '}';
+}
+template <typename T>
+ostream &operator<<(ostream &os, const deque<T> &v) {
+	os << vector<T>(all(v));
+	return os;
+}
+template <typename T, typename S, typename C>
+ostream &operator<<(ostream &os, priority_queue<T, S, C> pq) {
+	vector<T> v;
+	while (sz(pq)) {
+		v.pb(pq.top());
+		pq.pop();
+	}
+	os << v;
+	return os;
+}
+void dbg_out()
+{
+	cerr << "\033[0m" << endl;
+}
+template <typename Head, typename... Tail>
+void dbg_out(Head H, Tail... T)
+{
+	cerr << ' ' << H;
+	dbg_out(T...);
+}
+#ifdef LOCAL
+#define dbg(...) cerr << "\033[1;35m" << __func__ << ':' << __LINE__ << " (" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...) 42
+#endif
+
+inline namespace RecursiveLambda
+{
+	template <typename Fun>
+	struct y_combinator_result
+	{
+		Fun fun_;
+		template <typename T>
+		explicit y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
+		template <typename... Args>
+		decltype(auto) operator()(Args &&...args)
+		{
+			return fun_(ref(*this), forward<Args>(args)...);
+		}
+	};
+	template <typename Fun>
+	decltype(auto) y_combinator(Fun &&fun)
+	{
+		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
+	}
+};
+
+inline namespace Range {
+	class ForwardRange {
+		int src, dst;
+
+	  public:
+	  	explicit constexpr ForwardRange(const int l, const int r) : src(l), dst(r) {}
+		explicit constexpr ForwardRange(const int n) : src(0), dst(n) {}
+		constexpr ForwardRange begin() const { return *this; }
+		constexpr monostate end() const { return {}; }
+		constexpr bool operator!=(monostate) const { return src < dst; }
+		constexpr void operator++() const {}
+		constexpr int operator*() { return src++; }
+	};
+	class BackwardRange {
+		int src, dst;
+
+	  public:
+	  	explicit constexpr BackwardRange(const int l, const int r) : src(r), dst(l) {}
+		explicit constexpr BackwardRange(const int n) : src(n), dst(0) {}
+		constexpr BackwardRange begin() const { return *this; }
+		constexpr monostate end() const { return {}; }
+		constexpr bool operator!=(monostate) const { return src > dst; }
+		constexpr void operator++() const {}
+		constexpr int operator*() { return --src; }
+	};
+	using rep = ForwardRange;
+	using per = BackwardRange;
+};
+void dfs(vector<vector<bool>>& g, vector<bool>& vis, int u);
+bool isGood(vi& a) {
+	vector<vector<bool>> g(30, vector<bool>(30));
+	vector<bool> vis(30), on(30);
+	for (int e : a) {
+		for (int j : rep(30)) {
+			for (int k : rep(30)) {
+				if (((e >> j) & 1) && ((e >> k) & 1)) {
+					g[j][k] = g[k][j] = 1;
+				}
+			}
+			if (e >> j & 1) on[j] = 1;
+		}
+	}
+	// dbg(vis, on);
+	// dbg(g);
+	int cnt = 0;
+	for (int i : rep(30)) {
+		if (!vis[i] && on[i]) dfs(g, vis, i), cnt++;
+	}
+	dbg(cnt);
+	return cnt == 1;
+}
+void dfs(vector<vector<bool>>& g, vector<bool>& vis, int u) {
+	vis[u] = 1;
+	for (int i : rep(30)) {
+		if (!vis[i] && g[u][i]) dfs(g, vis, i);
+	}
+}
+
+// From the USACO tutorial lol
+struct DSU {
+	vector<int> e;
+	DSU(int N) { e = vector<int>(N, -1); }
+
+	// get representive component (uses path compression)
+	// To use rollback, disable path compression
+	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	
+	bool same_set(int a, int b) { return get(a) == get(b); }
+	
+	int size(int x) { return -e[get(x)]; }
+	
+	bool unite(int x, int y) {  // union by size
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
+};
+
+void solve()
+{
+	int n;
+	cin >> n;
+	vi a(n);
+	int must = 0;
+	for (int i : rep(n)) {
+		cin >> a[i];
+		if (a[i] == 0) {
+			a[i]++, must++;
+		}
+	}
+	int ans{};
+	if (isGood(a)) {
+		ans = 0;
+		cout << ans + must << '\n';
+		for (int i : rep(n)) cout << a[i] << " \n"[i == n - 1];
+		return;
+	}
+	{
+		for (int i : rep(n)) {
+			if (a[i] > 1) {
+				a[i]--;
+				if (isGood(a)) {
+					ans = 1;
+					cout << ans + must << '\n';
+					for (int j : rep(n)) cout << a[j] << " \n"[j == n - 1];
+					return;
+				}
+				a[i]++;
+			}
+			a[i]++;
+			if (isGood(a)) {
+				ans = 1;
+				cout << ans + must << '\n';
+				for (int j : rep(n)) cout << a[j] << " \n"[j == n - 1];
+				return;
+			}
+			a[i]--;
+		}
+	}
+
+	ans = 2;
+	int mxT = 0;
+	for (int i : rep(n)) {
+		ckmax(mxT, __builtin_ctz(a[i]));
+	}
+	int cnt = 0;
+	for (int i : rep(n)) {
+		if (cnt == 2) break;
+		if (__builtin_ctz(a[i]) == mxT) {
+			if (cnt == 1) a[i]++;
+			else a[i]--;
+			cnt++;
+		}
+	}
+	
+
+
+
+
+
+	cout << ans + must << '\n';
+	for (int i : rep(n)) cout << a[i] << " \n"[i == n - 1];
+
+}
+
+int main()
+{
+	cin.tie(0)->sync_with_stdio(0);
+	cin.exceptions(cin.failbit);
+	int testcase = 1;
+	cin >> testcase;
+	while (testcase--)
+	{
+		solve();
+	}
+#ifdef LOCAL
+	cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
+#endif
+}

@@ -1,5 +1,5 @@
 /**
- * Description: Tests primality up to SZ
+ * Description: Tests primality up to SZ [1, SZ)
  * Source: Benq
  * Time complexity: O(SZ log log SZ) or O(SZ)
  */

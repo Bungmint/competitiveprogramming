@@ -1,5 +1,5 @@
 /**
- * Description: Basic functions for the builtin 128bit integer
+ * Description: Basic I/O for the builtin 128bit integer
  * Source: https://codeforces.com/blog/entry/75044
  * Verification: https://atcoder.jp/contests/abc129/tasks/abc129_f
  */

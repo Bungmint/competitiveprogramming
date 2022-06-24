@@ -16,7 +16,7 @@ struct DSU {
 	bool unite(int x, int y) {  // union by size
 		x = get(x), y = get(y);
 		if (x == y) return false;
-		ev.pb({{x, e[x]}, {y,e[y]}});
+		ev.pb({{x, e[x]}, {y, e[y]}});
 		if (e[x] > e[y]) swap(x, y);
 		e[x] += e[y]; e[y] = x;
 		return true;
@@ -27,11 +27,11 @@ struct DSU {
 	}
 	
 	void rollback(){
-		if (mem.empty())return;
+		if (mem.empty()) return;
 		int SZ = mem.back();
 		mem.pop_back();
-		while(sz(ev)!=SZ){
-			pair<pii,pii> p = ev.back();
+		while(sz(ev) != SZ){
+			pair<pii, pii> p = ev.back();
 			e[p.fi.fi] = p.fi.se;
 			e[p.se.fi] = p.se.se;
 			ev.pop_back();

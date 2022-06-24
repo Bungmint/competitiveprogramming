@@ -46,7 +46,7 @@ struct SparseSeg {
                 c[0]->parallelUpd(ind, c0 ? c0->c[0] : nullptr, c1 ? c1->c[0] : nullptr, L, M);
             }else{
                 if (!c[1]) c[1] = new SparseSeg();
-                c[1]->parallelUpd(ind, c0 ? c0->c[1] : nullptr, c1 ? c1->c[1] : nullptr, L, M);
+                c[1]->parallelUpd(ind, c0 ? c0->c[1] : nullptr, c1 ? c1->c[1] : nullptr, M, R);
             }
         }
         val = (c0 ? c0->val : T()) + (c1 ? c1->val : T());

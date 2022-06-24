@@ -1,5 +1,5 @@
 set -e
-cd debug
+cd scripts
 g++-11 code.cpp -o code
 g++-11 gen.cpp -o gen
 g++-11 brute.cpp -o brute
