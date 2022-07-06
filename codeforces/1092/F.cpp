@@ -75,7 +75,7 @@ void dbg_out(Head H, Tail... T)
 	dbg_out(T...);
 }
 #ifdef LOCAL
-#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
+#define dbg(...) cerr << "\033[1;35m" << __func__ << ':' << __LINE__ << " (" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...) 42
 #endif
@@ -130,74 +130,41 @@ inline namespace Range {
 	using per = BackwardRange;
 };
 
-int n, s, q, e;
-constexpr int M = 1e5 + 1, K = 17;
-constexpr ar<ll, 2> ID = {LINF, LINF};
-string ESC = "escaped", IMP = "oo";
-vpi adj[M];
-pii edges[M];
-ar<ll, 2> bes[M];
-pair<int, ll> up[K][M];
-int tin[M], tout[M], timer{};
-int depth[M];
-bitset<M> shop{};
-
-
-void ins(ar<ll, 2>& A, ll x) {
-	for (int i : rep(2)) {
-		if (A[i] > x) swap(A[i], x);
-	}
-}
-void dfs(int u, int pu) {
-	tin[u] = timer++;
-	if (shop[u]) ins(bes[u], 0);
-	for (auto &[v, w] : adj[u]) {
-		if (v == pu) continue;
-		depth[v] = depth[u] + 1;
-		up[0][v] = {u, w};
-		for (int i : rep(1, K)) {
-			auto& [U, W] = up[i - 1][v];
-			if (U == 0) up[i][v] = {0, 0};
-			else{
-				up[i][v].fi = up[i - 1][U].fi;
-				up[i][v].se = up[i - 1][U].se + W;
-			}
-		}
-		dfs(v, u);
-		for (auto &x : bes[v]) {
-			ins(bes[u], x + w);
-		}
-	}
-	tout[u] = timer - 1;
-}
-void recalc(int u, int pu) {
-	
-}
-bool isAnc(int u, int v) {
-	return tin[u] <= tin[v] && tout[v] <= tout[u];
-}
 
 void solve()
 {
-	cin >> n >> s >> q >> e;
-	fill(bes + 1, bes + n + 1, ID);
+	int n;
+	cin >> n;
+	vi a(n);
+	for (auto &e : a) cin >> e;
+	vector<vi> g(n);
+	vl subsum(n);
+	ll cursum{}, ans{};
 	for (int i : rep(n - 1)) {
-		int u, v, w;
-		cin >> u >> v >> w; 
-		adj[u].pb({v, w}), adj[v].pb({u, w});
-		edges[i + 1] = {u, v};
+		int u, v;
+		cin >> u >> v, u--, v--; g[u].pb(v), g[v].pb(u);
 	}
-	for (int i : rep(s)) {
-		int x;
-		cin >> x;
-		shop[x] = 1;
-	}
-	dfs(1, 0);
-	for (int i : rep(q)) {
-		int id, r;
-		cin >> id >> r;
-
-	}
+	auto init = y_combinator([&](auto self, int u, int pu, int d) -> void {
+		subsum[u] = a[u];
+		cursum += 1LL * d * a[u];
+		for (auto &v : g[u]) {
+			if (v == pu) continue;
+			self(v, u, d + 1);
+			subsum[u] += subsum[v];
+		}
+	});
+	auto dfs = y_combinator([&](auto self, int u, int pu) -> void {
+		ckmax(ans, cursum);
+		for (auto &v : g[u]) {
+			if (v == pu) continue;
+			cursum += (subsum[0] - 2 * subsum[v]);
+			self(v, u);
+			cursum -= (subsum[0] - 2 * subsum[v]);
+		}
+	});
+	init(0, -1, 0);
+	dfs(0, -1);
+	cout << ans << "\n";
 }
 
 int main()

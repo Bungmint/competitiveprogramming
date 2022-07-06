@@ -18,11 +18,11 @@ struct Sieve {
                 }
             }
         }
-        for (int i : rep(SZ)) if (is_prime[i]) primes.pb(i);
+        for (int i = 0; i < SZ; i++) if (is_prime[i]) primes.pb(i);
     }
     // int lp[SZ];
     // Sieve() {
-    //     for (int i : rep(2, SZ)) {
+    //     for (int i = 2; i < SZ; i++) {
     //         if (lp[i] == 0) lp[i] = i, primes.pb(i);
     //         for (int p : primes) {
     //             if (p > lp[i] || i * p >= SZ) break;

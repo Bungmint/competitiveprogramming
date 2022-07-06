@@ -53,8 +53,6 @@ template<int MOD, int RT> struct mint {
 		os << o.v; return os; }
 };
 
-constexpr int MOD = 1e9 + 7; // 998244353;
-
 template <typename M>
 struct Combination {
 	static const int mod = M::mod;
@@ -80,6 +78,7 @@ struct Combination {
 	}
 };
 
-using Mint = mint<MOD,5>; // 5 is primitive root for both common mods
+constexpr int MOD = 1e9 + 7; // 998244353;
+using Mint = mint<MOD, 5>; // 5 is primitive root for both common mods
 using Combo = Combination<Mint>;
 using vmi = vector<Mint>;

@@ -8,10 +8,8 @@ ll hilbertorder(int x, int y)
 	{
 		bool rx = x & s, ry = y & s;
 		d = d << 2 | rx * 3 ^ static_cast<int>(ry);
-		if (!ry)
-		{
-			if (rx)
-			{
+		if (!ry) {
+			if (rx) {
 				x = MAXN - x;
 				y = MAXN - y;
 			}
@@ -34,13 +32,13 @@ inline bool operator<(const Query &a, const Query &b) {
 
 using vq = vector<Query>;
 
-void remove(int idx){
+void remove(int idx) {
 	
 }
-void add(int idx){
+void add(int idx) {
 	
 }     
-ll get_answer(){
+ll get_answer() {
 	
 }
 

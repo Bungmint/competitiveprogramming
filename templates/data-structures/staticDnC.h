@@ -6,16 +6,17 @@
  */ 
 template<class T, int SZ> struct RangeQuery {
 	int n;
-	T stor[SZ][32 - __builtin_clz(SZ)], id = 1;
+	T stor[SZ][32 - __builtin_clz(SZ)];
+	const T ID = 1;
 	vector<T> a;
 	T comb (T a, T b) { return mul(a, b); } // associative operation
 	void fill(int l, int r, int ind) {
 		if (ind < 0) return;
 		int m = (l + r) / 2;
-		T prod = id; 
-        for (int i : per(l, m)) stor[i][ind] = prod = comb(a[i], prod);
-		prod = id; 
-        for (int i : rep(m, r)) stor[i][ind] = prod = comb(prod, a[i]);
+		T prod = ID; 
+        for (int i = m - 1; i >= l; i--) stor[i][ind] = prod = comb(a[i], prod);
+		prod = ID; 
+        for (int i = m; i < r; i++) stor[i][ind] = prod = comb(prod, a[i]);
 		fill(l, m, ind - 1); fill(m, r, ind - 1);
 	}
 	void init() {

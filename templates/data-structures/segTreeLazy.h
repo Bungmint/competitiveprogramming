@@ -16,7 +16,7 @@ struct LazySegTree{
 		t.resize(sz * 2);
 		lazy.resize(sz * 2);
 	}
-	void build(vector<T> &vec, int x, int l, int r)
+	void build(const vector<T> &vec, int x, int l, int r)
 	{
 	    if (r - l == 1)
 	    {
@@ -29,12 +29,13 @@ struct LazySegTree{
 	    build(vec, 2 * x + 2, mid, r);
 	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
 	}
-	void build(vector<T> &vec)
+	void build(const vector<T> &vec)
 	{
 	    build(vec, 0, 0, sz);
 	}
 	void upd(int i, const T& v, int x, int l, int r)
 	{
+		push(x, l, r);
 	    if (r - l == 1)
 	    {
 	        t[x] = v;

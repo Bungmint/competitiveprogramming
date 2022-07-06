@@ -10,10 +10,11 @@ COPY_TO="currentTask"
 ### MAIN ###
 
 if [ -z $NAME ]; then
+    NAME=A
     cp $COPY_FROM "$COPY_TO/A.cpp"
     code "$COPY_TO/A.cpp"
-else
-    cp $COPY_FROM "$COPY_TO/$NAME.cpp"
-    code "$COPY_TO/$NAME.cpp"
 fi
+cp $COPY_FROM "$COPY_TO/$NAME.cpp"
+code --goto "$COPY_TO/$NAME.cpp":62:4
+
 echo "Your file has been successfully generated!"
