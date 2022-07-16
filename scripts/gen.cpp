@@ -2,7 +2,7 @@
 using namespace std;
 
 using vi = vector<int>;
-using pi = pair<int, int>;
+using pii = pair<int, int>;
 using ll = long long;
 #define ar array
 #define pb push_back

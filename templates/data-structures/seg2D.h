@@ -30,7 +30,7 @@ struct SegSeg {
             c[1]->upd(x, y, v, M, R);
         }
         seg.upd(y, v); // only for addition
-        // seg.parallelUpd(y, c[0] ? &c[0]->seg : nullptr, c[1] ? &c[1]->seg : nullptr); 
+        // seg.parallel_upd(y, c[0] ? &c[0]->seg : nullptr, c[1] ? &c[1]->seg : nullptr); 
     }
     void query(int x1, int x2, int y1, int y2, int L = 0, int R = SZ) {
         if (x1 >= R || x2 <= L) return T();

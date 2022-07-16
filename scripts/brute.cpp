@@ -35,114 +35,39 @@ constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
 template <typename T>
 constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
 
-template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p)
-{
-	return os << '(' << p.first << ", " << p.second << ')';
-}
-template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
-ostream &operator<<(ostream &os, const T_container &v)
-{
-	os << '{';
-	string sep;
-	for (const T &x : v)
-		os << sep << x, sep = ", ";
-	return os << '}';
-}
-template <typename T>
-ostream &operator<<(ostream &os, const deque<T> &v) {
-	os << vector<T>(all(v));
-	return os;
-}
-template <typename T, typename S, typename C>
-ostream &operator<<(ostream &os, priority_queue<T, S, C> pq) {
-	vector<T> v;
-	while (sz(pq)) {
-		v.pb(pq.top());
-		pq.pop();
-	}
-	os << v;
-	return os;
-}
-void dbg_out()
-{
-	cerr << "\033[0m" << endl;
-}
-template <typename Head, typename... Tail>
-void dbg_out(Head H, Tail... T)
-{
-	cerr << ' ' << H;
-	dbg_out(T...);
-}
 #ifdef LOCAL
-#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
+#include "miscellaneous/debug.h"
 #else
 #define dbg(...) 42
 #endif
 
-inline namespace RecursiveLambda
-{
+inline namespace RecursiveLambda {
 	template <typename Fun>
-	struct y_combinator_result
-	{
+	struct y_combinator_result {
 		Fun fun_;
 		template <typename T>
-		explicit y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
+		explicit constexpr y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
 		template <typename... Args>
-		decltype(auto) operator()(Args &&...args)
-		{
+		constexpr decltype(auto) operator()(Args &&...args) const {
 			return fun_(ref(*this), forward<Args>(args)...);
 		}
 	};
 	template <typename Fun>
-	decltype(auto) y_combinator(Fun &&fun)
-	{
+	decltype(auto) y_combinator(Fun &&fun) {
 		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-inline namespace Range {
-	class ForwardRange {
-		int src, dst;
-
-	  public:
-	  	explicit constexpr ForwardRange(const int l, const int r) : src(l), dst(r) {}
-		explicit constexpr ForwardRange(const int n) : src(0), dst(n) {}
-		constexpr ForwardRange begin() const { return *this; }
-		constexpr monostate end() const { return {}; }
-		constexpr bool operator!=(monostate) const { return src < dst; }
-		constexpr void operator++() const {}
-		constexpr int operator*() { return src++; }
-	};
-	class BackwardRange {
-		int src, dst;
-
-	  public:
-	  	explicit constexpr BackwardRange(const int l, const int r) : src(r), dst(l) {}
-		explicit constexpr BackwardRange(const int n) : src(n), dst(0) {}
-		constexpr BackwardRange begin() const { return *this; }
-		constexpr monostate end() const { return {}; }
-		constexpr bool operator!=(monostate) const { return src > dst; }
-		constexpr void operator++() const {}
-		constexpr int operator*() { return --src; }
-	};
-	using rep = ForwardRange;
-	using per = BackwardRange;
-};
-
-
-void solve()
-{
+void solve() {
+	
 }
 
-int main()
-{
+int main() {
 	cin.tie(0)->sync_with_stdio(0);
 	cin.exceptions(cin.failbit);
 	int testcase = 1;
 	cin >> testcase;
-	while (testcase--)
-	{
+	while (testcase--) {
 		solve();
 	}
 #ifdef LOCAL

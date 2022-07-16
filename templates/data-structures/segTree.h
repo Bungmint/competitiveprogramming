@@ -4,7 +4,8 @@
  * Verification:
  * Time Complexity: O(n) build, O(log n) per update/query
  */
-template<typename T, typename Merge = plus<T>>
+
+template <typename T, typename Merge = plus<T>>
 struct SegTree{
 	int sz;
 	const Merge merge;
@@ -14,10 +15,8 @@ struct SegTree{
 		while (sz < n) sz *= 2;
 		t.resize(sz * 2);
 	}
-	void build(const vector<T> &vec, int x, int l, int r)
-	{
-	    if (r - l == 1)
-	    {
+	void build(const vector<T> &vec, int x, int l, int r) {
+	    if (r - l == 1) {
 	        if (l < (int)vec.size())
 	            t[x] = vec[l];
 	        return;
@@ -27,14 +26,11 @@ struct SegTree{
 	    build(vec, 2 * x + 2, mid, r);
 	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
 	}
-	void build(const vector<T> &vec)
-	{
+	void build(const vector<T> &vec) {
 	    build(vec, 0, 0, sz);
 	}
-	void upd(int i, const T& v, int x, int l, int r)
-	{
-	    if (r - l == 1)
-	    {
+	void upd(int i, const T& v, int x, int l, int r) {
+	    if (r - l == 1) {
 	        t[x] = v;
 	        return;
 	    }
@@ -45,12 +41,10 @@ struct SegTree{
 	        upd(i, v, 2 * x + 2, mid, r);
 	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
 	}
-	void upd(int i, const T& v)
-	{
+	void upd(int i, const T& v) {
 	    upd(i, v, 0, 0, sz);
 	}
-	T query(int l, int r, int x, int lx, int rx)
-	{
+	T query(int l, int r, int x, int lx, int rx) {
 	    if (lx >= r || rx <= l)
 	        return T();
 	    if (lx >= l && rx <= r)
@@ -60,8 +54,7 @@ struct SegTree{
 	    T b = query(l, r, 2 * x + 2, mid, rx);
 	    return merge(a, b);
 	}
-	T query(int l, int r)
-	{
+	T query(int l, int r) {
 	    return query(l, r, 0, 0, sz);
 	}
 };

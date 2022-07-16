@@ -3,6 +3,7 @@
  * Source: https://codeforces.com/blog/entry/75044
  * Verification: https://atcoder.jp/contests/abc129/tasks/abc129_f
  */
+
 using i128 = __int128_t;
 istream& operator>>(istream& in, i128& num) { 
     i128 x = 0, f = 1;

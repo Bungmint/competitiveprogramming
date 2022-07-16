@@ -5,7 +5,8 @@
         * Benq
  * Verification:
  * Time Complexity: O(n) build, O(log n) updates/queries
-**/
+ */
+
 template <typename T>
 struct SegTree{
     const T ID = {}; 
@@ -24,6 +25,7 @@ struct SegTree{
         seg[p += n] = val;
         for (p /= 2; p; p /= 2) pull(p);
     }
+    void build() { for (int i = n - 1; i; i--) pull(i); }
     T query(int l, int r) { // query interval: [l, r), must be associative
         T ra = ID, rb = ID;
         for (l += n, r += n; l < r; l /= 2, r /= 2) {

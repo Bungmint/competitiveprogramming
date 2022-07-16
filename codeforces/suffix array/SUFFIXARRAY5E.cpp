@@ -194,7 +194,6 @@ void solve()
 	SparseTable<int, 20> spar(sa.lcp);
 	vl l(n),r(n);
 	stack<int> st;
-	//TODO: Fix this
 	for (ll i=0;i<n;++i){
 		while(sz(st)&&sa.lcp[st.top()]>=sa.lcp[i]){
 			st.pop();

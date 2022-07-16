@@ -3,6 +3,7 @@
  * Source: USACO Guide
  * Time complexity: O(log^d n)
  */
+
 template <class T, int ...Ns> struct BIT {
 	T val = 0;
 	void upd(T v) { val += v; }
@@ -10,7 +11,7 @@ template <class T, int ...Ns> struct BIT {
 };
 
 template <class T, int N, int... Ns> struct BIT<T, N, Ns...> {
-	BIT<T,Ns...> bit[N + 1];
+	BIT<T, Ns...> bit[N + 1];
 	template<typename... Args> void upd(int pos, Args... args) {
 		for (; pos <= N; pos += (pos & -pos)) bit[pos].upd(args...);
 	}
@@ -19,6 +20,6 @@ template <class T, int N, int... Ns> struct BIT<T, N, Ns...> {
 		return res;
 	}
 	template<typename... Args> T query(int l, int r, Args... args) {
-		return sum(r,args...) - sum(l - 1,args...);
+		return sum(r, args...) - sum(l - 1, args...);
 	}
 };

@@ -3,7 +3,9 @@
  * Source: https://codeforces.com/blog/entry/11080
  * Verification: https://www.spoj.com/problems/ORDERSET/
  * Time: O(log n) for both queries, but has a big constant
+ * BUT, don't be afraid to use it if the only alternative is Dynamic Segment Tree
  */
+
 #include <ext/pb_ds/assoc_container.hpp>
 using namespace __gnu_pbds;
 template<class T>

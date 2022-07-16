@@ -6,6 +6,7 @@
  * Memory complexity: O(n^2)
  * O-indexing
  */
+
 template <typename T>
 struct BIT2D {
     vector<vector<T>> bit;

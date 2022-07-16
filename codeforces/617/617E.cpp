@@ -108,7 +108,6 @@ vl mo(vector<Query> queries) {
    	vl answers(queries.size());
     sort(queries.begin(), queries.end());
 
-    // TODO: initialize data structure
 
     int cur_l = 0;
     int cur_r = -1;

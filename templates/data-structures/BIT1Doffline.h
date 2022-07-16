@@ -1,3 +1,4 @@
+// TODO: Test imp
 /**
  * Description: Offline BIT with coordinate compression
  * Source: USACO Guide
@@ -5,12 +6,12 @@
  * Time complexity: O(log n) per query
  * Memory complexity: O(n)
  */
+
 template <typename T>
 struct BIToff {
-    bool mode = 0;
-    vector<int> ind;
+    bool mode = 0; vi ind;
     vector<T> bit;
-    int atMost(V x) {
+    int at_most(int x) {
         return ub(all(ind), x) - ind.begin();
     }
     void upd(int x, T v) {
@@ -18,7 +19,7 @@ struct BIToff {
             ind.pb(x);
             return;
         }
-        int p = atMost(x);
+        int p = at_most(x);
         assert(p && ind[p - 1] == x);
         for (; p <= sz(ind); p += p & -p) bit[p] = bit[p] + v;
     }
@@ -30,7 +31,7 @@ struct BIToff {
     T sum(int x) {
         assert(mode);
         T res = T();
-        int p = atMost(x);
+        int p = at_most(x);
         for (; p; p -= p & -p) res = res + bit[p];
         return res;
     }

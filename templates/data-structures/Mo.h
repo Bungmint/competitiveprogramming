@@ -4,8 +4,7 @@ constexpr int MAXN = 1 << LOGN;
 ll hilbertorder(int x, int y)
 {
 	ll d = 0;
-	for (int s = 1 << (LOGN - 1); s; s >>= 1)
-	{
+	for (int s = 1 << (LOGN - 1); s; s >>= 1) {
 		bool rx = x & s, ry = y & s;
 		d = d << 2 | rx * 3 ^ static_cast<int>(ry);
 		if (!ry) {
@@ -44,30 +43,16 @@ ll get_answer() {
 
 vl mo(vq queries) {
    	vl answers(queries.size());
-    for (auto &e : queries) {
-        e.calcOrder();
-    }
+    for (auto &e : queries) e.calcOrder();
     sort(queries.begin(), queries.end());
 
     int cur_l = 0;
     int cur_r = -1;
     for (Query q : queries) {
-        while (cur_l > q.l) {
-            cur_l--;
-            add(cur_l);
-        }
-        while (cur_r < q.r) {
-            cur_r++;
-            add(cur_r);
-        }
-        while (cur_l < q.l) {
-            remove(cur_l);
-            cur_l++;
-        }
-        while (cur_r > q.r) {
-            remove(cur_r);
-            cur_r--;
-        }
+        while (cur_l > q.l) { cur_l--; add(cur_l); }
+        while (cur_r < q.r) { cur_r++; add(cur_r); }
+        while (cur_l < q.l) { remove(cur_l); cur_l++; }
+        while (cur_r > q.r) { remove(cur_r); cur_r--; }
         answers[q.idx] = get_answer();
     }
     return answers;

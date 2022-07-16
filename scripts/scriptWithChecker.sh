@@ -4,7 +4,7 @@ g++-11 code.cpp -o code
 g++-11 gen.cpp -o gen
 g++-11 brute.cpp -o brute
 g++-11 checker.cpp -o checker
-for((i = 1; i <= 10000; ++i)); do
+for((i = 1; i <= 1; ++i)); do
     ./gen $i > input_file
     ./code < input_file > myAnswer
     ./brute < input_file > correctAnswer

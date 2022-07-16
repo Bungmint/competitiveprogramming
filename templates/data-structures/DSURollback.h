@@ -1,19 +1,20 @@
-// From the USACO tutorial lol
+// TODO: test imp
+/**
+ * Disjoint Set Union with rollback
+ * Source: USACO Guide/Benq
+ * Verification:
+ * Time complexity: amortized O(logn) updates/queries
+ */
+
 struct DSU {
 	vector<int> e;
 	vector<int> mem;
 	vector<pair<pii, pii>> ev;
 	DSU(int N) { e = vector<int>(N, -1); }
-
-	// get representive component (uses path compression)
-	// To use rollback, disable path compression
-	int get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	
+	int get(int x) { return e[x] < 0 ? x : get(e[x]); }
 	bool same_set(int a, int b) { return get(a) == get(b); }
-	
 	int size(int x) { return -e[get(x)]; }
-	
-	bool unite(int x, int y) {  // union by size
+	bool unite(int x, int y) {
 		x = get(x), y = get(y);
 		if (x == y) return false;
 		ev.pb({{x, e[x]}, {y, e[y]}});
@@ -21,11 +22,7 @@ struct DSU {
 		e[x] += e[y]; e[y] = x;
 		return true;
 	}
-	
-	void snapshot(){
-		mem.pb(sz(ev));
-	}
-	
+	void snapshot(){ mem.pb(sz(ev)); }
 	void rollback(){
 		if (mem.empty()) return;
 		int SZ = mem.back();

@@ -34,6 +34,8 @@ template <typename T>
 constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
 template <typename T>
 constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+ll cdiv(ll a, ll b) { return a / b + ((a ^ b) > 0 && a % b); } // divide a by b rounded up
+ll fdiv(ll a, ll b) { return a / b - ((a ^ b) < 0 && a % b); } // divide a by b rounded down
 
 #ifdef LOCAL
 #include "miscellaneous/debug.h"

@@ -9,6 +9,7 @@
  * Verification: 
 	* https://open.kattis.com/problems/modulararithmetic
  */
+
 template<int MOD, int RT> struct mint {
 	static const int mod = MOD;
 	static constexpr mint rt() { return RT; } // primitive root for FFT

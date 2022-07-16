@@ -58,9 +58,32 @@ inline namespace RecursiveLambda {
 	}
 };
 
-void solve()
-{
-	
+void solve(int tc) {
+	ll a, b, n;
+	cin >> a >> b >> n;
+	vl pr;
+	for (int i = 2; i * i <= n; i++) {
+		if (n % i == 0) {
+			pr.pb(i);
+			while (n % i == 0) {
+				n /= i;
+			}
+		}
+	}
+	if (n > 1) pr.pb(n);
+	int k = sz(pr);
+	ll ans{};
+	for (int mask = 0; mask < (1 << k); mask++) {
+		int fl = (__builtin_popcount(mask) & 1) ? -1 : 1;
+		ll z{1};
+		for (int i = 0; i < k; i++) {
+			if (mask >> i & 1) z *= pr[i];
+		}
+		ll lo = (a + z - 1) / z, hi = b / z;
+		ans += (hi - lo + 1) * fl;
+	}
+
+	cout << "Case #" << tc << ": " << ans << '\n';
 }
 
 int main()
@@ -69,9 +92,8 @@ int main()
 	cin.exceptions(cin.failbit);
 	int testcase = 1;
 	cin >> testcase;
-	while (testcase--)
-	{
-		solve();
+	for (int i = 1; i <= testcase; i++) {
+		solve(i);
 	}
 #ifdef LOCAL
 	cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";

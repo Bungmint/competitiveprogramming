@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 using vi = vector<int>;
-using pi = pair<int, int>;
+using pii = pair<int, int>;
 using ll = long long;
 #define pb push_back
 #define fi first

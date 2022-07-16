@@ -5,10 +5,11 @@
  * Time Complexity: O(log n) for query and update
  * 0-indexing
  */
+
 template <typename T>
 struct BIT {
 	int N; vector<T> bit;
-	BIT(int n) : bit(n + 1), N(n) {}
+	BIT(int n) : N(n), bit(n + 1) {}
 	void upd(int id, T v) {
 		for (id++; id <= N; id += id & -id)
 			bit[id] += v;

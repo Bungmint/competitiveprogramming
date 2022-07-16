@@ -3,6 +3,7 @@
  * Source: Benq
  * Time complexity: O(SZ log log SZ) or O(SZ)
  */
+
 template <int SZ>
 struct Sieve {
     bitset<SZ> is_prime;

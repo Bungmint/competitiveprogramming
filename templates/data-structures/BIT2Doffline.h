@@ -8,7 +8,8 @@
  	* https://dmoj.ca/problem/occ19g4
  	* http://www.usaco.org/index.php?page=viewproblem2&cpid=722 (753 ms)
  	* http://www.usaco.org/index.php?page=viewproblem2&cpid=601 (679 ms)
-**/
+ */
+
 template<class T, int SZ> struct BITOff2D { 
 	bool mode = 0; // mode = 1 -> initialized
 	vpi todo; // locations of updates to process

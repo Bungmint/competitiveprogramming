@@ -4,7 +4,8 @@
  * Verification:
  * Time Complexity: O(nlogn) build, O(1) query
  */
-template<typename T>
+
+template <typename T>
 struct SparseTable{
 	vector<vector<T>> spar;
 	inline T merge(const T& a, const T& b) { // change this
