@@ -6,12 +6,12 @@
  */
 
 template<typename T, typename U, typename Merge = plus<T>>
-struct LazySegTree{
+struct SegTreeLazy{
 	int sz;
 	const Merge merge;
 	vector<T> t;
 	vector<U> lazy;
-	LazySegTree(int n) : merge(Merge()) {
+	SegTreeLazy(int n) : merge(Merge()) {
 		sz = 1;
 		while (sz < n) sz *= 2;
 		t.resize(sz * 2);

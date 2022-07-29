@@ -27,10 +27,8 @@ struct BIT {
 		int id = 0;
 		T sum = 0;
 		int lg = 31 - __builtin_clz(N);
-		for (int j = lg; ~j; j--)
-		{
-			if (id + (1 << j) <= N && sum + bit[id + (1 << j)] < v)
-			{
+		for (int j = lg; ~j; j--) {
+			if (id + (1 << j) <= N && sum + bit[id + (1 << j)] < v) {
 				id += (1 << j);
 				sum += bit[id];
 			}

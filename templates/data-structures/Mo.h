@@ -1,17 +1,21 @@
-constexpr int LOGN = 20;
-constexpr int MAXN = 1 << LOGN;
+// TODO: TEST impl
+/**
+ * Description: Mo's Trick using the Hilbert curve
+ * Source: 
+ 	* https://cp-algorithms.com/data_structures/sqrt_decomposition.html#mos-algorithm
+	* https://en.wikipedia.org/wiki/Hilbert_curve#Applications_and_mapping_algorithms
+ * Verification: Various
+ * Time complexity: O(q\sqrt{n})
+ */
 
-ll hilbertorder(int x, int y)
-{
+ll hilbertorder(int x, int y) {
+	constexpr int LOGN = 20, MAXN = 1 << LOGN;
 	ll d = 0;
 	for (int s = 1 << (LOGN - 1); s; s >>= 1) {
 		bool rx = x & s, ry = y & s;
-		d = d << 2 | rx * 3 ^ static_cast<int>(ry);
+		d = d << 2 | (rx * 3 ^ static_cast<int>(ry));
 		if (!ry) {
-			if (rx) {
-				x = MAXN - x;
-				y = MAXN - y;
-			}
+			if (rx) x = MAXN - x, y = MAXN - y;
 			swap(x, y);
 		}
 	}
@@ -29,19 +33,11 @@ inline bool operator<(const Query &a, const Query &b) {
 	return a.ord < b.ord;
 }
 
-using vq = vector<Query>;
+void remove(int idx){}
+void add(int idx){}
+ll get_answer(){}
 
-void remove(int idx) {
-	
-}
-void add(int idx) {
-	
-}     
-ll get_answer() {
-	
-}
-
-vl mo(vq queries) {
+vl mo(vector<Query> queries) {
    	vl answers(queries.size());
     for (auto &e : queries) e.calcOrder();
     sort(queries.begin(), queries.end());

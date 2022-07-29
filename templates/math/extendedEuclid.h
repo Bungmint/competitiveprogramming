@@ -11,7 +11,7 @@ template <typename T>
 pair<T, T> extended_gcd(T a, T b) {
     if (b == 0) return {1, 0};
     auto [x, y] = extended_gcd(b, a % b);
-    T z = x % b;
+    T z = y % b;
     if (z < 0) z += b;
     return {z, (1LL - z * a) / b};
 }

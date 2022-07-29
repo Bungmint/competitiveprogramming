@@ -8,7 +8,7 @@
 CONTEST=$1
 NUM=$2
 cnt=0
-COPY_FROM="../templates/template.cpp"
+COPY_FROM="../templates/miscellaneous/template.cpp"
 
 ### MAIN ###
 
@@ -20,6 +20,7 @@ for i in {A..Z}; do
     fi
     true $((cnt++))
     cp $COPY_FROM "$i.cpp"
-    code --goto "$i.cpp":64:4
+    code --goto "$i.cpp":68:4
+    sleep .01
 done
 echo "$CONTEST folder is ready to go!"

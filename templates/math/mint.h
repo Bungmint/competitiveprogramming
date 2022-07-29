@@ -11,7 +11,7 @@
  */
 
 template<int MOD, int RT> struct mint {
-	static const int mod = MOD;
+	static constexpr int mod = MOD;
 	static constexpr mint rt() { return RT; } // primitive root for FFT
 	int v; explicit operator int() const { return v; } // explicit -> don't silently convert to int
 	constexpr mint() { v = 0; }
@@ -48,18 +48,18 @@ template<int MOD, int RT> struct mint {
 	constexpr friend mint operator*(mint a, const mint& b) noexcept { return a *= b; }
 	constexpr friend mint operator/(mint a, const mint& b) noexcept { return a /= b; }
 
-	friend istream& operator>>(istream& is, mint& o){
+	friend istream& operator>>(istream& is, mint& o) {
 		ll v; is >> v; o = mint(v); return is; }
-	friend ostream& operator<<(ostream& os, const mint& o){
+	friend ostream& operator<<(ostream& os, const mint& o) {
 		os << o.v; return os; }
 };
 
 template <typename M>
 struct Combination {
 	static const int mod = M::mod;
-	vector<M> fact, invFact, inv;
+	vector<M> fact, inv_fact, inv;
 	Combination(int N) noexcept {
-		fact.resize(N + 1), invFact.resize(N + 1), inv.resize(N + 1);
+		fact.resize(N + 1), inv_fact.resize(N + 1), inv.resize(N + 1);
 		fact[0] = 1;
 		for (int i = 1; i <= N; i++) {
 				fact[i] =  fact[i - 1] * i;
@@ -68,14 +68,14 @@ struct Combination {
 		for (int i = 2; i <= N; ++i) {
 			inv[i] = mod - (mod / i) * inv[mod % i];
 		}
-		invFact[0] = invFact[1] = 1;
+		inv_fact[0] = inv_fact[1] = 1;
 		for (int i = 2; i <= N; ++i){
-			invFact[i] = invFact[i - 1] * inv[i];
+			inv_fact[i] = inv_fact[i - 1] * inv[i];
 		}
 	}
 	constexpr M binom(int n, int k) const noexcept {
 		if (n < k || n < 0) return 0;
-		return fact[n] * invFact[k] * invFact[n - k];
+		return fact[n] * inv_fact[k] * inv_fact[n - k];
 	}
 };
 

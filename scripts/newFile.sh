@@ -4,7 +4,7 @@
 ### VARIABLES ###
 
 NAME=$1
-COPY_FROM="templates/template.cpp"
+COPY_FROM="templates/miscellaneous/template.cpp"
 COPY_TO="currentTask"
 
 ### MAIN ###
@@ -15,6 +15,6 @@ if [ -z $NAME ]; then
     code "$COPY_TO/A.cpp"
 fi
 cp $COPY_FROM "$COPY_TO/$NAME.cpp"
-code --goto "$COPY_TO/$NAME.cpp":64:4
+code --goto "$COPY_TO/$NAME.cpp":68:4
 
 echo "Your file has been successfully generated!"
