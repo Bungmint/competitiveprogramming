@@ -64,7 +64,7 @@ inline namespace RecursiveLambda {
 
 #pragma endregion TEMPLATE
 
-// TODO: Test imp
+
 /**
  * Description: Trie-like structure storing distinct palindromes. Also called eertree
     * Edge from u to v with character c: S_v = "c" + S_u + "c"

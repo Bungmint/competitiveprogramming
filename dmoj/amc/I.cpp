@@ -170,7 +170,7 @@ ll get_generator(ll p, ll e)
 	}
 }
 
-// TODO: Test imp
+
 /**
  * Extended Euclidean Algorithm 
  * Returns {x, y}, such that ax + by = g 

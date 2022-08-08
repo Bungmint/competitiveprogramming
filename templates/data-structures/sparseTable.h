@@ -11,6 +11,7 @@ struct SparseTable{
 	inline T merge(const T& a, const T& b) { // change this
 		return min(a, b);
 	} 
+	SparseTable() {}
 	SparseTable(const vector<T>& a) {
 		int lg = 32 - __builtin_clz(sz(a));
 		spar.assign(lg, vi(sz(a), 0));

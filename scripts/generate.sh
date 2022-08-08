@@ -21,6 +21,6 @@ for i in {A..Z}; do
     true $((cnt++))
     cp $COPY_FROM "$i.cpp"
     code --goto "$i.cpp":68:4
-    sleep .01
+    sleep .1
 done
 echo "$CONTEST folder is ready to go!"

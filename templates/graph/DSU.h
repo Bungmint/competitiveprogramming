@@ -1,9 +1,8 @@
-// TODO: Test imp
 /*
  * Description: Disjoint Set Union with both path compression and size heuristic
  * Source: USACO Guide/Benq
  * Verification:
- * Time complexity: amortized O(logn) updates/queries
+ * Time complexity: amortized O(\alpha(n)) updates/queries
  */
 
 struct DSU {

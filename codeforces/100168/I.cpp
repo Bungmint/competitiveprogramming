@@ -60,7 +60,7 @@ inline namespace RecursiveLambda {
 	}
 };
 
-// TODO: Test implementation
+
 /**
  * Implementation of 2D points using std::pair
  * Source: Benq
@@ -140,7 +140,7 @@ istream& operator>>(istream& is, Point& a) {
     return is;
 }
 
-// TODO: Test imp
+
 /**
  * Calculates distance between:
  * A point and a line
