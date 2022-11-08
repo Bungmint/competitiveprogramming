@@ -1,4 +1,3 @@
-// TODO: TEST impl
 /**
  * Description: Mo's Trick using the Hilbert curve
  * Source: 

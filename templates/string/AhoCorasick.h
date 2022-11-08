@@ -1,4 +1,3 @@
-// TODO: Test imp
 /**
  * Description: Deterministic Finite Automaton of a dictionary of strings
  * Source: https://github.com/bqi343/USACO/blob/master/Implementations/content/strings%20(14)/Light/ACfixed.h

@@ -1,0 +1,14 @@
+TODO:
+<!-- 1. Create a new dynamic segment tree & 2D segment tree implementation  -->
+<!-- 2. Test them via solving some problems -->
+<!-- 3. Learn the O(n) memory approach for a dynamic segment tree and other similar things -->
+<!-- 4. Learn treaps -->
+<!-- 5. Create a treap implementation -->
+<!-- 6. Solve problems with treaps -->
+<!-- 7. Learn persistent segment trees -->
+<!-- 8. Create a persistent segment tree implementation -->
+9. Solve problems about PSTs
+10. Go back to solve hard segment tree problems
+11. 2D segment tree with treaps + persistent treap
+
+When solving problems, solve at least three of that type

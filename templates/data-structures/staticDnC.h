@@ -5,12 +5,13 @@
  * Verification: https://www.codechef.com/problems/SEGPROD
  */ 
 
-template <class T, int SZ> struct RangeQuery {
+template <class T, int SZ> 
+struct RangeQuery {
 	int n;
 	T stor[SZ][32 - __builtin_clz(SZ)];
 	const T ID = 1;
 	vector<T> a;
-	T comb (T a, T b) { return a * b; } // associative operation
+	T comb(T a, T b) { return a * b; } // associative operation
 	void fill(int l, int r, int ind) {
 		if (ind < 0) return;
 		int m = (l + r) / 2;

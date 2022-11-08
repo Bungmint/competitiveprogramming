@@ -20,7 +20,7 @@ for i in {A..Z}; do
     fi
     true $((cnt++))
     cp $COPY_FROM "$i.cpp"
-    code --goto "$i.cpp":68:4
-    sleep .1
+    code --goto "$i.cpp":69:4
+    sleep .01
 done
 echo "$CONTEST folder is ready to go!"

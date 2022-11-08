@@ -1,55 +1,53 @@
-// TODO: Change the implementation?
 /**
  * Description: Dynamic Segment Tree with no lazy propagation
+    * Half-open intervals are used for ranges 
  * Source: USACO Guide
  * Verification: https://oj.uz/problem/view/IZhO12_apple
  * Time Complexity: O(log SZ)
  * Memory Complexity: O(QlogSZ)
  */
 
-template <typename T> 
-struct SparseSeg {
-    T val = T();
-    SparseSeg<T>* c[2];
-    SparseSeg() { c[0] = c[1] = nullptr; }
-    static constexpr int SZ = 1 << 17; // change SZ accordingly
-    
-    void upd(int ind, T v, int L = 0, int R = SZ) {
-        if (R - L == 1) {
-            val = val + v;
+template <typename T, int SZ = 1 << 20>
+struct Node {
+    T ans;
+    Node *l, *r;  
+    Node() : ans(T()), l(nullptr), r(nullptr) {}
+
+    void upd(int ind, T val, int lx = 0, int rx = SZ) {
+        if (rx - lx == 1) {
+            ans = val;
             return;
         }
-        int M = (L + R) / 2;
-        if (ind < M) {
-            if (!c[0]) c[0] = new SparseSeg();
-            c[0]->upd(ind, v, L, M);
-        }else{
-            if (!c[1]) c[1] = new SparseSeg();
-            c[1]->upd(ind, v, M, R);
+        int mx = (lx + rx) / 2;
+        if (ind < mx) {
+            if (!l) l = new Node();
+            l->upd(ind, val, lx, mx);
+        }else {
+            if (!r) r = new Node();
+            r->upd(ind, val, mx, rx);
         }
-        val = T();
-        for (int i : rep(2)) if (c[i]) val = val + c[i]->val;
+        ans = l->ans + r->ans;
     }
-    T query(int lo, int hi, int L = 0, int R = SZ) {
-        if (hi <= L || lo >= R) return T();
-        if (lo <= L && R <= hi) return val;
-        int M = (L + R) / 2;
-        T res = T();
-        if (c[0]) res = res + c[0]->query(lo, hi, L, M);
-        if (c[1]) res = res + c[1]->query(lo, hi, M, R);
-        return res;
+    T query(int lo, int hi, int lx = 0, int rx = SZ) {
+        if (lo >= rx || hi <= lx) return T();
+        if (lo <= lx && rx <= hi) return ans;
+        int mx = (lx + rx) / 2;
+        T lef = (l ? l->query(lo, hi, lx, mx) : T());
+		T rig = (r ? r->query(lo, hi, mx, rx) : T());
+        return lef + rig;
     }
-    void parallel_upd(int ind, SparseSeg* c0, SparseSeg* c1, int L = 0, int R = SZ) {
-        if (R - L > 1) {
-            int M = (L + R) / 2;
-            if (ind < M) {
-                if (!c[0]) c[0] = new SparseSeg();
-                c[0]->parallel_upd(ind, c0 ? c0->c[0] : nullptr, c1 ? c1->c[0] : nullptr, L, M);
+    // For 2D updates
+    void parallel_upd(int ind, Node* lef, Node* rig, int lx = 0, int rx = SZ) {
+        if (rx - lx > 1) {
+            int mx = (lx + rx) / 2;
+            if (ind < mx) {
+                if (!l) l = new Node();
+                l->parllel_upd(ind, (lef ? lef->l : nullptr), (rig ? rig->l : nullptr), lx, mx);
             }else{
-                if (!c[1]) c[1] = new SparseSeg();
-                c[1]->parallel_upd(ind, c0 ? c0->c[1] : nullptr, c1 ? c1->c[1] : nullptr, M, R);
+                if (!r) r = new Node();
+                r->parllel_upd(ind, (lef ? lef->r : nullptr), (rig ? rig->r : nullptr), mx, rx);
             }
         }
-        val = (c0 ? c0->val : T()) + (c1 ? c1->val : T());
+        ans = (lef ? lef->ans : T()) + (rig ? rig->ans : T());
     }
 };
