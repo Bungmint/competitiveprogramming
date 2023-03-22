@@ -1,4 +1,6 @@
 TODO:
+
+For advanced segtrees
 <!-- 1. Create a new dynamic segment tree & 2D segment tree implementation  -->
 <!-- 2. Test them via solving some problems -->
 <!-- 3. Learn the O(n) memory approach for a dynamic segment tree and other similar things -->
@@ -10,5 +12,8 @@ TODO:
 9. Solve problems about PSTs
 10. Go back to solve hard segment tree problems
 11. 2D segment tree with treaps + persistent treap
+
+Library related
+1. Fix Sparsetable implementation (Currently, it uses vector<int> instead of vector<T>)
 
 When solving problems, solve at least three of that type

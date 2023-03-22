@@ -8,7 +8,7 @@
 struct AhoCorasick {
     static const int ALPHA = 26;
     struct Node {
-        ar<int, 26> to;
+        ar<int, ALPHA> to;
         int link;
     };
     vector<Node> d{{}};

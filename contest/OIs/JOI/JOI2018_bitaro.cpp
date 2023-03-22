@@ -1,8 +1,10 @@
 // Copyright © 2022 Youngmin Park. All rights reserved.
-#pragma GCC optimize("O3")
+//#pragma GCC optimize("O3")
 //#pragma GCC target("avx2")
 #include <bits/stdc++.h>
 using namespace std;
+
+#pragma region TEMPLATE
 
 using ll = long long;
 using vi = vector<int>;
@@ -19,6 +21,7 @@ using pqg = priority_queue<T, vector<T>, greater<T>>;
 
 #define all(v) (v).begin(), (v).end()
 #define pb push_back
+#define eb emplace_back
 #define sz(x) (int)(x).size()
 #define fi first
 #define se second
@@ -34,187 +37,122 @@ template <typename T>
 constexpr bool ckmin(T &a, const T &b) { return b < a ? a = b, 1 : 0; }
 template <typename T>
 constexpr bool ckmax(T &a, const T &b) { return b > a ? a = b, 1 : 0; }
+ll cdiv(ll a, ll b) { return a / b + ((a ^ b) > 0 && a % b); } // divide a by b rounded up
+ll fdiv(ll a, ll b) { return a / b - ((a ^ b) < 0 && a % b); } // divide a by b rounded down
 
-template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p)
-{
-	return os << '(' << p.first << ", " << p.second << ')';
-}
-template <typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
-ostream &operator<<(ostream &os, const T_container &v)
-{
-	os << '{';
-	string sep;
-	for (const T &x : v)
-		os << sep << x, sep = ", ";
-	return os << '}';
-}
-template <typename T>
-ostream &operator<<(ostream &os, const deque<T> &v) {
-	os << vector<T>(all(v));
-	return os;
-}
-template <typename T, typename S, typename C>
-ostream &operator<<(ostream &os, priority_queue<T, S, C> pq) {
-	vector<T> v;
-	while (sz(pq)) {
-		v.pb(pq.top());
-		pq.pop();
-	}
-	os << v;
-	return os;
-}
-void dbg_out()
-{
-	cerr << "\033[0m" << endl;
-}
-template <typename Head, typename... Tail>
-void dbg_out(Head H, Tail... T)
-{
-	cerr << ' ' << H;
-	dbg_out(T...);
-}
 #ifdef LOCAL
-#define dbg(...) cerr << "\033[1;35m(" << #__VA_ARGS__ << "):\033[33m", dbg_out(__VA_ARGS__)
+#include "miscellaneous/debug.h"
 #else
 #define dbg(...) 42
 #endif
 
-inline namespace RecursiveLambda
-{
+inline namespace RecursiveLambda {
 	template <typename Fun>
-	struct y_combinator_result
-	{
+	struct y_combinator_result {
 		Fun fun_;
 		template <typename T>
-		explicit y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
+		explicit constexpr y_combinator_result(T &&fun) : fun_(forward<T>(fun)) {}
 		template <typename... Args>
-		decltype(auto) operator()(Args &&...args)
-		{
+		constexpr decltype(auto) operator()(Args &&...args) const {
 			return fun_(ref(*this), forward<Args>(args)...);
 		}
 	};
 	template <typename Fun>
-	decltype(auto) y_combinator(Fun &&fun)
-	{
+	decltype(auto) y_combinator(Fun &&fun) {
 		return y_combinator_result<decay_t<Fun>>(forward<Fun>(fun));
 	}
 };
 
-inline namespace Range {
-	class ForwardRange {
-		int src, dst;
+#pragma endregion TEMPLATE
 
-	  public:
-	  	explicit constexpr ForwardRange(const int l, const int r) : src(l), dst(r) {}
-		explicit constexpr ForwardRange(const int n) : src(0), dst(n) {}
-		constexpr ForwardRange begin() const { return *this; }
-		constexpr monostate end() const { return {}; }
-		constexpr bool operator!=(monostate) const { return src < dst; }
-		constexpr void operator++() const {}
-		constexpr int operator*() { return src++; }
-	};
-	class BackwardRange {
-		int src, dst;
+constexpr int SQRT = 350, MAXN = 100'111;
+vi g[MAXN], revg[MAXN];
+vpi top[MAXN];
+bool vis[MAXN];
+int dp[MAXN];
+int N, M, Q;
 
-	  public:
-	  	explicit constexpr BackwardRange(const int l, const int r) : src(r), dst(l) {}
-		explicit constexpr BackwardRange(const int n) : src(n), dst(0) {}
-		constexpr BackwardRange begin() const { return *this; }
-		constexpr monostate end() const { return {}; }
-		constexpr bool operator!=(monostate) const { return src > dst; }
-		constexpr void operator++() const {}
-		constexpr int operator*() { return --src; }
-	};
-	using rep = ForwardRange;
-	using per = BackwardRange;
-};
-
-constexpr int N = 1e5 + 10;
-constexpr int SQ = 320;
-int n, m, q;
-vi adj[N], radj[N], queries[N];
-bitset<N> busy, used;
-int t[N], DP[N];
-vpi dp[N];
-
-void solve()
-{
-	cin >> n >> m >> q;
-	for (int i : rep(m)) {
-		int u, v;
-		cin >> u >> v, u--, v--;
-		adj[u].pb(v), radj[v].pb(u);
-	}
-	for (int i : rep(n)) {
-		dp[i] = {{0, i}};
-		for (int j : radj[i]) {
-			vpi res;
-			int sa = sz(dp[i]), sb = sz(dp[j]);
-			int a = 0, b = 0;
-			while (sz(res) < SQ && (a < sa || b < sb)) {
-				if (b == sb || (a != sa && dp[i][a].fi >= dp[j][b].fi + 1)) {
-					if (used[dp[i][a].se]) a++;
-					else{
-						res.pb(dp[i][a]);
-						used[dp[i][a].se] = 1;
-						a++;
-					}
-				}else{
-					if (used[dp[j][b].se]) b++;
-					else{
-						res.pb({dp[j][b].fi + 1, dp[j][b].se});
-						used[dp[j][b].se] = 1;
-						b++;
-					}
-				}
-			}
-			for (auto [d, v] : res) used[v] = 0;
-			swap(res, dp[i]);
-		}
-		dbg(dp[i]);
-	}
-	auto naiveDP = [&](int t, vi& C) -> int {
-		for (int i : rep(n)) DP[i] = 0;
-		for (int i : C) DP[i] = -1;
-		for (int i : rep(t + 1)) {
-			for (int j : radj[i]) {
-				if (DP[j] >= 0) ckmax(DP[i], DP[j] + 1);
-			}
-		}
-		return DP[t];
-	};
-	for (int i : rep(q)) {
-		cin >> t[i];
-		t[i]--;
-		int x;
-		cin >> x;
-		queries[i].resize(x);
-		for (auto &e : queries[i]) cin >> e, e--, busy[e] = 1;
-		if (x >= SQ) {
-			cout << naiveDP(t[i], queries[i]) << '\n';
-		}else{
-			int ans = -1;
-			for (auto &[d, v] : dp[t[i]]) {
-				if (!busy[v]) ckmax(ans, d);
-			}
-			cout << ans << '\n';
-		}
-		for (auto &e : queries[i]) busy[e] = 0;
-	}
+void calc_top() {
+    for (int u = 0; u < N; u++) {
+        top[u] = {{u, 0}};   
+        for (auto &v : revg[u]) {
+            {
+                vpi fin;
+                int su = sz(top[u]), sv = sz(top[v]); 
+                for (int i = 0, j = 0; sz(fin) < SQRT && (i < su || j < sv); ) {
+                    if (j == sv || (i != su && top[u][i].se > 1 + top[v][j].se)) {
+                        fin.pb(top[u][i]);
+                        vis[top[u][i].fi] = 1;
+                        i++;
+                    } else {
+                        fin.eb(top[v][j].fi, top[v][j].se + 1);
+                        vis[top[v][j].fi] = 1;
+                        j++;
+                    }
+                    while (i < su && vis[top[u][i].fi]) i++;
+                    while (j < sv && vis[top[v][j].fi]) j++;
+                }
+                for (auto &[w, _] : fin) vis[w] = 0;
+                swap(top[u], fin);
+            }
+        }
+    }
 }
 
-int main()
-{
+void solve() {
+    cin >> N >> M >> Q;
+    vi is_forb(N);
+    for (int i = 0; i < M; i++) {
+        int u, v;
+        cin >> u >> v, u--, v--;
+        g[u].pb(v);
+        revg[v].pb(u);
+    }
+    calc_top(); 
+    for (int i = 0; i < Q; i++) {
+        int T, Y;
+        cin >> T >> Y;
+        T--;
+        vi forb(Y);
+        for (auto &e : forb) {
+            cin >> e;
+            e--;
+            is_forb[e] = 1;
+        }
+        if (Y < SQRT) {
+            // dbg(forb, top[T]);
+            int ans = -1;
+            for (auto &[u, d] : top[T]) {
+                if (!is_forb[u]) ckmax(ans, d); 
+            } 
+            cout << ans << '\n'; 
+        } else {
+            memset(dp, -1, sizeof(dp));
+            for (int u = 0; u < N; u++) {
+                if (!is_forb[u]) ckmax(dp[u], 0);
+                if (dp[u] < 0) continue;
+                for (auto &v : g[u]) {
+                    ckmax(dp[v], dp[u] + 1); 
+                }
+            }
+            cout << dp[T] << '\n'; 
+        }
+        for (auto &e : forb) {
+            is_forb[e] = 0;
+        }
+    }
+}
+
+int main() {
 	cin.tie(0)->sync_with_stdio(0);
 	cin.exceptions(cin.failbit);
 	int testcase = 1;
 	// cin >> testcase;
-	while (testcase--)
-	{
+	while (testcase--) {
 		solve();
 	}
 #ifdef LOCAL
 	cerr << "Time elapsed: " << 1.0 * (double)clock() / CLOCKS_PER_SEC << " s.\n";
 #endif
 }
+

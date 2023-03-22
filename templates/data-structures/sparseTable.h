@@ -8,13 +8,14 @@
 template <typename T>
 struct SparseTable{
 	vector<vector<T>> spar;
+	const T ID = {}; // change this
 	inline T merge(const T& a, const T& b) { // change this
 		return min(a, b);
 	} 
 	SparseTable() {}
 	SparseTable(const vector<T>& a) {
 		int lg = 32 - __builtin_clz(sz(a));
-		spar.assign(lg, vi(sz(a), 0));
+		spar.assign(lg, vector<T>(sz(a), ID));
 		for (int i = 0; i < sz(a); ++i) spar[0][i] = a[i];
 		for (int j = 1; j < lg; ++j) 
 			for (int i = 0; i + (1 << j) <= sz(a); ++i)
@@ -22,7 +23,7 @@ struct SparseTable{
 	}
 	SparseTable(T a[], int n) {
 		int lg = 32 - __builtin_clz(n);
-		spar.assign(lg, vi(n, 0));
+		spar.assign(lg, vector<T>(n, ID));
 		for (int i = 0; i < n; ++i) spar[0][i] = a[i];
 		for (int j = 1; j < lg; ++j) 
 			for (int i = 0; i + (1 << j) <= n; ++i)

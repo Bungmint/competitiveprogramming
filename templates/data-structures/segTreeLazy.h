@@ -42,6 +42,8 @@ struct SegTreeLazy{
 	        upd(i, v, 2 * x + 1, l, mid);
 	    else
 	        upd(i, v, 2 * x + 2, mid, r);
+        push(2 * x + 1, l, mid);
+        push(2 * x + 2, mid, r);
 	    t[x] = merge(t[2 * x + 1], t[2 * x + 2]);
 	}
 	void upd(int i, const T& v) {

@@ -1,0 +1,5 @@
+-std=c++17
+-I
+/opt/homebrew/Cellar/gcc/12.2.0/include/c++/12/aarch64-apple-darwin21
+-I
+~/Documents/Programming/competitiveprogramming/templates
